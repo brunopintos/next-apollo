@@ -1,21 +1,15 @@
 import React, { useState } from "react";
-import TextField from "@material-ui/core/TextField";
-import MainHeader from "../components/MainHeader";
 import styled from "styled-components";
-import { Typography, Container, Button } from "@material-ui/core";
+import Link from "next/link";
+
+import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
+import Container from "@material-ui/core/Container";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
-const CenteredContainer = styled(Container)``;
-
-const Title = styled(Typography)`
-  && {
-    margin: 0;
-    width: 100%;
-    padding-top: 100px;
-    text-align: center;
-    font-weight: bold;
-  }
-`;
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
 
 const StyledTextField = styled(TextField)``;
 
@@ -36,7 +30,7 @@ const Login = () => {
   const password = useFormInput("");
 
   return (
-    <CenteredContainer>
+    <Container>
       <MainHeader />
       <Title variant="h3">Log In</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
@@ -70,7 +64,7 @@ const Login = () => {
           </StyledButton>
         </Grid>
       </StyledGrid>
-    </CenteredContainer>
+    </Container>
   );
 };
 

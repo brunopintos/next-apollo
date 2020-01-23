@@ -1,19 +1,13 @@
 import React, { useState } from "react";
-import MainHeader from "../components/MainHeader";
 import styled from "styled-components";
-import { Typography, Container, Button } from "@material-ui/core";
+
+import { Typography, Container } from "@material-ui/core";
+
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
 
 const CenteredContainer = styled(Container)``;
 
-const Title = styled(Typography)`
-  && {
-    margin: 0;
-    width: 100%;
-    padding-top: 100px;
-    text-align: center;
-    font-weight: bold;
-  }
-`;
 const Subtitle = styled(Typography)`
   && {
     margin: 0;
