@@ -63,6 +63,14 @@ const Login = () => {
             Continue
           </StyledButton>
         </Grid>
+        <Grid item>
+          <Typography variant="h6">Don't have an account? </Typography>
+          <Typography variant="h6">
+            <Link href="/signup">
+              <a>Sign Up</a>
+            </Link>
+          </Typography>
+        </Grid>
       </StyledGrid>
     </Container>
   );
