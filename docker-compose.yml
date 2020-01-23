@@ -1,9 +1,10 @@
-version: '3'
+version: "3"
 services:
   postgres:
     image: postgres:10.3
     restart: always
     environment:
+      POSTGRES_DB: kbdb
       POSTGRES_USER: pg_user
       POSTGRES_PASSWORD: pg_password
     volumes:
