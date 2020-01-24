@@ -25,6 +25,12 @@ const StyledButton = styled(Button)`
   }
 `;
 
+const LittleText = styled(Typography)`
+  && {
+    font-size: 14px;
+  }
+`;
+
 const Login = () => {
   const email = useFormInput("");
   const password = useFormInput("");
@@ -59,12 +65,12 @@ const Login = () => {
           </StyledButton>
         </Grid>
         <Grid item>
-          <Typography variant="h6">Don't have an account? </Typography>
-          <Typography variant="h6">
+          <LittleText variant="h6">Don't have an account? </LittleText>
+          <LittleText variant="h6">
             <Link href="/signup">
               <a>Sign Up</a>
             </Link>
-          </Typography>
+          </LittleText>
         </Grid>
       </StyledGrid>
     </Container>
