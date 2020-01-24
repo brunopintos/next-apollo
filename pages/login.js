@@ -35,18 +35,13 @@ const Login = () => {
       <Title variant="h3">Log In</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
         <Grid item>
-          <StyledTextField
-            {...email}
-            id="outlined-basic"
-            label="Email"
-            variant="outlined"
-          />
+          <StyledTextField {...email} label="Email" variant="outlined" />
         </Grid>
         <Grid item>
           <StyledTextField
             {...password}
-            id="outlined-basic"
             label="Password"
+            type="password"
             variant="outlined"
           />
         </Grid>
