@@ -29,7 +29,7 @@ const Signup = () => {
 
   return (
     <Container>
-      <MainHeader />
+      <MainHeader title="KB - Knowledge Base" />
       <Title variant="h3">Sign Up</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
         <Grid item>

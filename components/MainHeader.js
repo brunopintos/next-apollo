@@ -8,6 +8,7 @@ import Link from "next/link";
 import Container from "@material-ui/core/Container";
 import styled from "styled-components";
 import HomeIcon from "@material-ui/icons/Home";
+import Head from "next/head";
 
 const ImageButton = styled(IconButton)`
   width: 5%;
@@ -33,8 +34,12 @@ const Title = styled(Typography)`
   }
 `;
 
-const MainHeader = () => (
+const MainHeader = props => (
   <StyledDiv>
+    <Head>
+      <title>{props.title}</title>
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
     <StyledAppBar position="static">
       <Toolbar>
         <Link href="/">

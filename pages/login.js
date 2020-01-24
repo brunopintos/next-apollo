@@ -31,7 +31,7 @@ const Login = () => {
 
   return (
     <Container>
-      <MainHeader />
+      <MainHeader title="KB - Knowledge Base" />
       <Title variant="h3">Log In</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
         <Grid item>

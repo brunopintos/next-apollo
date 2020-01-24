@@ -6,8 +6,6 @@ import { Typography, Container } from "@material-ui/core";
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 
-const CenteredContainer = styled(Container)``;
-
 const Subtitle = styled(Typography)`
   && {
     margin: 0;
@@ -22,11 +20,11 @@ const Signup = () => {
   const password = useFormInput("");
 
   return (
-    <CenteredContainer>
-      <MainHeader />
+    <Container>
+      <MainHeader title="KB - Knowledge Base" />
       <Title variant="h3">Wellcome to KB!</Title>
       <Subtitle variant="h6">Knowledge Base App</Subtitle>
-    </CenteredContainer>
+    </Container>
   );
 };
 
