@@ -65,8 +65,8 @@ const Login = () => {
           </StyledButton>
         </Grid>
         <Grid item>
-          <LittleText variant="h6">Don't have an account? </LittleText>
           <LittleText variant="h6">
+            Don't have an account?{" "}
             <Link href="/signup">
               <a>Sign Up</a>
             </Link>
