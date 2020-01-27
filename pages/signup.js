@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { withApollo } from "../apollo";
+import gql from "graphql-tag";
 import styled from "styled-components";
+import { useMutation } from "@apollo/react-hooks";
 
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -9,6 +11,16 @@ import Button from "@material-ui/core/Button";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+
+const CREATE_USER = gql`
+  mutation CreateUsers($email: String!, $password: String!) {
+    createUser(email: $email, password: $password) {
+      id
+      email
+      password
+    }
+  }
+`;
 
 const StyledTextField = styled(TextField)``;
 
@@ -27,6 +39,8 @@ const StyledButton = styled(Button)`
 const Signup = () => {
   const email = useFormInput("");
   const password = useFormInput("");
+  const passwordConfirmation = useFormInput("");
+  const [createUser, { data }] = useMutation(CREATE_USER);
 
   return (
     <Container>
@@ -34,18 +48,20 @@ const Signup = () => {
       <Title variant="h3">Sign Up</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
         <Grid item>
+          <StyledTextField {...email} label="Email" variant="outlined" />
+        </Grid>
+        <Grid item>
           <StyledTextField
-            {...email}
-            id="outlined-basic"
-            label="Email"
+            {...password}
+            label="Password"
+            type="password"
             variant="outlined"
           />
         </Grid>
         <Grid item>
           <StyledTextField
-            {...password}
-            id="outlined-password-input"
-            label="Password"
+            {...passwordConfirmation}
+            label="Confirm Password"
             type="password"
             variant="outlined"
           />
@@ -54,10 +70,17 @@ const Signup = () => {
           <StyledButton
             aria-label="Continue"
             onClick={() => {
-              //validar que no exista y registrarme
-              //
-              //
-              //ir a la welcome page
+              if (password.value === passwordConfirmation.value) {
+                createUser({
+                  variables: { email: email.value, password: password.value }
+                });
+                console.log(`User ${email.value} created successfully!!`);
+                email.value = "";
+                password.value = "";
+                passwordConfirmation.value = "";
+              } else {
+                console.log("Passwords dont match");
+              }
             }}
           >
             Continue

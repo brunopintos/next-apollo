@@ -5,11 +5,13 @@ const User = dataBase.sequelize.define(
   {
     email: {
       type: dataBase.Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     password: {
       type: dataBase.Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     }
   },
   {}

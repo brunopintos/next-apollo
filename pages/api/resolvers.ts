@@ -14,9 +14,12 @@ const resolvers = {
   },
   Mutation: {
     createUser: (_, { email, password }, context) => {
-      return User.create({
-        email: email,
-        password: password
+      User.max("id").then(max => {
+        return User.create({
+          id: max + 1,
+          email: email,
+          password: password
+        });
       });
     }
   }
