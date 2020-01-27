@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { withApollo } from "../apollo";
 import styled from "styled-components";
 
 import { Typography, Container } from "@material-ui/core";
@@ -15,7 +16,7 @@ const Subtitle = styled(Typography)`
   }
 `;
 
-const Signup = () => {
+const Welcome = () => {
   const email = useFormInput("");
   const password = useFormInput("");
 
@@ -41,4 +42,4 @@ function useFormInput(initialValue) {
   };
 }
 
-export default Signup;
+export default withApollo(Welcome);

@@ -1,13 +1,15 @@
 import React from "react";
+
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
-import Link from "next/link";
 import Container from "@material-ui/core/Container";
-import styled from "styled-components";
 import HomeIcon from "@material-ui/icons/Home";
+
+import Link from "next/link";
+import styled from "styled-components";
 import Head from "next/head";
 
 const ImageButton = styled(IconButton)`

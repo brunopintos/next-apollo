@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { withApollo } from "../apollo";
 import styled from "styled-components";
 import Link from "next/link";
 
@@ -90,4 +91,4 @@ function useFormInput(initialValue) {
   };
 }
 
-export default Login;
+export default withApollo(Login);

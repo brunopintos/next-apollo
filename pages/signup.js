@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { withApollo } from "../apollo";
 import styled from "styled-components";
 
 import TextField from "@material-ui/core/TextField";
@@ -33,11 +34,17 @@ const Signup = () => {
       <Title variant="h3">Sign Up</Title>
       <StyledGrid container direction="column" spacing={3} alignItems="center">
         <Grid item>
-          <StyledTextField {...email} label="Email" variant="outlined" />
+          <StyledTextField
+            {...email}
+            id="outlined-basic"
+            label="Email"
+            variant="outlined"
+          />
         </Grid>
         <Grid item>
           <StyledTextField
             {...password}
+            id="outlined-password-input"
             label="Password"
             type="password"
             variant="outlined"
@@ -74,4 +81,4 @@ function useFormInput(initialValue) {
   };
 }
 
-export default Signup;
+export default withApollo(Signup);

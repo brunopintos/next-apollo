@@ -5,17 +5,16 @@ const resolvers = {
     getUsers: (_, __, context) => {
       return User.findAll();
     },
-    getUser: (_, { id }, context) => {
-      return User.findByPk(id);
+    getUser: (_, { email }, context) => {
+      return User.findOne({ where: { email: email } });
     },
     login: (_, { email, password }, context) => {
       return User.findOne({ where: { email: email, password: password } });
     }
   },
   Mutation: {
-    createUser: (_, { id, email, password }, context) => {
+    createUser: (_, { email, password }, context) => {
       return User.create({
-        id: id,
         email: email,
         password: password
       });
