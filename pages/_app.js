@@ -1,4 +1,4 @@
-import { withApollo } from "../apollo";
+import { withApollo } from "../lib/apollo";
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { withApollo } from "../apollo";
+import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
 import { Typography, Container } from "@material-ui/core";
