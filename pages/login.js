@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { withApollo } from "../apollo";
 import styled from "styled-components";
 import Link from "next/link";
+import { useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -11,6 +13,16 @@ import Typography from "@material-ui/core/Typography";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+
+const LOGIN = gql`
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      id
+      email
+      password
+    }
+  }
+`;
 
 const StyledTextField = styled(TextField)``;
 
@@ -35,6 +47,7 @@ const LittleText = styled(Typography)`
 const Login = () => {
   const email = useFormInput("");
   const password = useFormInput("");
+  const [login, { data }] = useMutation(LOGIN);
 
   return (
     <Container>
@@ -56,10 +69,12 @@ const Login = () => {
           <StyledButton
             aria-label="Continue"
             onClick={() => {
-              //validar que exista y logearme
-              //
-              //
-              //ir a la welcome page
+              login({
+                variables: { email: email.value, password: password.value }
+              });
+              console.log(`User ${email.value} logged in successfully!!`);
+              email.value = "";
+              password.value = "";
             }}
           >
             Continue

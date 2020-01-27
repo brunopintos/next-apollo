@@ -7,12 +7,12 @@ const resolvers = {
     },
     getUser: (_, { email }, context) => {
       return User.findOne({ where: { email: email } });
-    },
-    login: (_, { email, password }, context) => {
-      return User.findOne({ where: { email: email, password: password } });
     }
   },
   Mutation: {
+    login: (_, { email, password }, context) => {
+      return User.findOne({ where: { email: email, password: password } });
+    },
     createUser: (_, { email, password }, context) => {
       User.max("id").then(max => {
         return User.create({
