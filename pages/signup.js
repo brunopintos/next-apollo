@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { withApollo } from "../lib/apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
@@ -81,17 +81,14 @@ const Signup = () => {
                   variables: { email: email.value, password: password.value }
                 }).then(data => {
                   console.log(data);
-                  if (data.signupUser) {
+                  if (data) {
                     enqueueSnackbar(
                       `User ${email.value} created successfully!!`,
                       {
                         variant: "success"
                       }
                     );
-                    email.value = "";
-                    password.value = "";
-                    passwordConfirmation.value = "";
-                    router.push("/");
+                    router.push("/onboarding");
                   } else {
                     enqueueSnackbar("Oops! Something went wrong.", {
                       variant: "error"
