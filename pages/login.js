@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { withApollo } from "../lib/apollo";
-import styled from "styled-components";
-import Link from "next/link";
-import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
+import styled from "styled-components";
+import { useMutation } from "@apollo/react-hooks";
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
+import Link from "next/link";
 
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -48,6 +50,8 @@ const Login = () => {
   const email = useFormInput("");
   const password = useFormInput("");
   const [login, { data }] = useMutation(LOGIN);
+  const router = useRouter();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <Container>
@@ -68,13 +72,23 @@ const Login = () => {
         <Grid item>
           <StyledButton
             aria-label="Continue"
-            onClick={() => {
+            onClick={e => {
+              e.preventDefault();
               login({
                 variables: { email: email.value, password: password.value }
+              }).then(data => {
+                console.log(data);
+                if (data) {
+                  enqueueSnackbar(`User ${email.value} logged in!!`, {
+                    variant: "success"
+                  });
+                  router.push("/onboarding");
+                } else {
+                  enqueueSnackbar("Wrong email or password.", {
+                    variant: "error"
+                  });
+                }
               });
-              console.log(`User ${email.value} logged in successfully!!`);
-              email.value = "";
-              password.value = "";
             }}
           >
             Continue

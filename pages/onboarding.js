@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 

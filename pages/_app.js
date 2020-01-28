@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }) {
     <SnackbarProvider
       maxSnack={3}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      autoHideDuration={2000}
+      autoHideDuration={3500}
     >
       <Component {...pageProps} />
     </SnackbarProvider>
