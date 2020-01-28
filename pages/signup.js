@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withApollo } from "../lib/apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -12,9 +14,9 @@ import Button from "@material-ui/core/Button";
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 
-const CREATE_USER = gql`
+const SIGNUP_USER = gql`
   mutation CreateUsers($email: String!, $password: String!) {
-    createUser(email: $email, password: $password) {
+    signupUser(email: $email, password: $password) {
       id
       email
       password
@@ -40,7 +42,9 @@ const Signup = () => {
   const email = useFormInput("");
   const password = useFormInput("");
   const passwordConfirmation = useFormInput("");
-  const [createUser, { data }] = useMutation(CREATE_USER);
+  const [signupUser, { data }] = useMutation(SIGNUP_USER);
+  const router = useRouter();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <Container>
@@ -69,17 +73,35 @@ const Signup = () => {
         <Grid item>
           <StyledButton
             aria-label="Continue"
-            onClick={() => {
+            href={"/"}
+            onClick={e => {
+              e.preventDefault();
               if (password.value === passwordConfirmation.value) {
-                createUser({
+                signupUser({
                   variables: { email: email.value, password: password.value }
+                }).then(data => {
+                  console.log(data);
+                  if (data.signupUser) {
+                    enqueueSnackbar(
+                      `User ${email.value} created successfully!!`,
+                      {
+                        variant: "success"
+                      }
+                    );
+                    email.value = "";
+                    password.value = "";
+                    passwordConfirmation.value = "";
+                    router.push("/");
+                  } else {
+                    enqueueSnackbar("Oops! Something went wrong.", {
+                      variant: "error"
+                    });
+                  }
                 });
-                console.log(`User ${email.value} created successfully!!`);
-                email.value = "";
-                password.value = "";
-                passwordConfirmation.value = "";
               } else {
-                console.log("Passwords dont match");
+                enqueueSnackbar("The passwords don`t match.", {
+                  variant: "error"
+                });
               }
             }}
           >
