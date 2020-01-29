@@ -29,7 +29,13 @@ const resolvers = {
   },
   Mutation: {
     login: (_, { email, password }, context) => {
-      User.findOne({ where: { email: email, password: password } });
+      let user;
+      user = User.findOne({
+        where: { email: email, password: password }
+      }).catch(() => {
+        user = null;
+      });
+      return user;
     },
     signupUser: (_, { email, password }, context) => {
       let user;

@@ -5,9 +5,11 @@ import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 import Link from "next/link";
 
-import TextField from "@material-ui/core/TextField";
+import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
@@ -25,6 +27,18 @@ const LOGIN = gql`
     }
   }
 `;
+
+const validationSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "Your password must be at least 8 characters.")
+    .max(100, "Your password is too long.")
+    .required("Must enter a password."),
+  email: Yup.string()
+    .email("Your email address is invalid.")
+    .min(2, "Your email address is invalid.")
+    .max(320, "Your email address is too long.")
+    .required("Must enter an email.")
+});
 
 const StyledTextField = styled(TextField)``;
 
@@ -47,8 +61,6 @@ const LittleText = styled(Typography)`
 `;
 
 const Login = () => {
-  const email = useFormInput("");
-  const password = useFormInput("");
   const [login, { data }] = useMutation(LOGIN);
   const router = useRouter();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -57,67 +69,98 @@ const Login = () => {
     <Container>
       <MainHeader title="KB - Knowledge Base" />
       <Title variant="h3">Log In</Title>
-      <StyledGrid container direction="column" spacing={3} alignItems="center">
-        <Grid item>
-          <StyledTextField {...email} label="Email" variant="outlined" />
-        </Grid>
-        <Grid item>
-          <StyledTextField
-            {...password}
-            label="Password"
-            type="password"
-            variant="outlined"
-          />
-        </Grid>
-        <Grid item>
-          <StyledButton
-            aria-label="Continue"
-            onClick={e => {
-              e.preventDefault();
-              login({
-                variables: { email: email.value, password: password.value }
-              }).then(data => {
-                console.log(data);
-                if (data) {
-                  enqueueSnackbar(`User ${email.value} logged in!!`, {
-                    variant: "success"
-                  });
-                  router.push("/onboarding");
-                } else {
-                  enqueueSnackbar("Wrong email or password.", {
-                    variant: "error"
-                  });
-                }
+      <Formik
+        initialValues={{
+          email: "",
+          password: ""
+        }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { setSubmitting, resetForm }) => {
+          setSubmitting(true);
+          login({
+            variables: { email: values.email, password: values.password }
+          }).then(data => {
+            if (data.data.login) {
+              enqueueSnackbar(`User ${values.email} logged in!!`, {
+                variant: "success"
               });
-            }}
-          >
-            Continue
-          </StyledButton>
-        </Grid>
-        <Grid item>
-          <LittleText variant="h6">
-            Don't have an account?{" "}
-            <Link href="/signup">
-              <a>Sign Up</a>
-            </Link>
-          </LittleText>
-        </Grid>
-      </StyledGrid>
+              router.push("/onboarding");
+            } else {
+              enqueueSnackbar("Wrong email or password.", {
+                variant: "error"
+              });
+            }
+          });
+          resetForm();
+          setSubmitting(false);
+        }}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting
+        }) => (
+          <Form onSubmit={handleSubmit}>
+            <StyledGrid
+              container
+              direction="column"
+              spacing={3}
+              alignItems="center"
+            >
+              <Grid item>
+                <StyledTextField
+                  name="email"
+                  label="Email"
+                  variant="outlined"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.email && errors.email}
+                  helperText={touched.email && errors.email ? errors.email : ""}
+                />
+              </Grid>
+              <Grid item>
+                <StyledTextField
+                  name="password"
+                  label="Password"
+                  variant="outlined"
+                  value={values.password}
+                  type="password"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.password && errors.password}
+                  helperText={
+                    touched.password && errors.password ? errors.password : ""
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <StyledButton
+                  type="submit"
+                  aria-label="Continue"
+                  disabled={isSubmitting}
+                >
+                  Continue
+                </StyledButton>
+              </Grid>
+              <Grid item>
+                <LittleText variant="h6">
+                  Don't have an account?{" "}
+                  <Link href="/signup">
+                    <a>Sign Up</a>
+                  </Link>
+                </LittleText>
+              </Grid>
+            </StyledGrid>
+          </Form>
+        )}
+      </Formik>
     </Container>
   );
 };
-
-function useFormInput(initialValue) {
-  const [value, setValue] = useState(initialValue);
-
-  function handleChange(e) {
-    setValue(e.target.value);
-  }
-
-  return {
-    value,
-    onChange: handleChange
-  };
-}
 
 export default withApollo(Login);
