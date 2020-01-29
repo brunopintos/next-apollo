@@ -32,10 +32,14 @@ const resolvers = {
       User.findOne({ where: { email: email, password: password } });
     },
     signupUser: (_, { email, password }, context) => {
-      return User.create({
+      let user;
+      user = User.create({
         email: email,
         password: password
+      }).catch(() => {
+        user = null;
       });
+      return user; //useMutation usar error.
     }
   }
 };
