@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
@@ -16,14 +16,14 @@ const Subtitle = styled(Typography)`
   }
 `;
 
-const Welcome = () => {
+const Onboarding = () => {
   return (
     <Container>
       <MainHeader title="KB - Knowledge Base" />
       <Title variant="h3">Welcome to KB!</Title>
-      <Subtitle variant="h6">Knowledge Base App</Subtitle>
+      <Subtitle variant="h6">Let's create an article!</Subtitle>
     </Container>
   );
 };
 
-export default withApollo(Welcome);
+export default withApollo(Onboarding);
