@@ -130,6 +130,7 @@ const Login = () => {
                     helperText={
                       touched.email && errors.email ? errors.email : ""
                     }
+                    required
                   />
                 </Grid>
                 <Grid item>
@@ -145,6 +146,7 @@ const Login = () => {
                     helperText={
                       touched.password && errors.password ? errors.password : ""
                     }
+                    required
                   />
                 </Grid>
                 <Grid item>
