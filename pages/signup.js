@@ -86,19 +86,17 @@ const Signup = () => {
               email: values.email,
               password: values.password
             }
-          }).then(data => {
-            if (data.data.signupUser) {
+          })
+            .then(data => {
               enqueueSnackbar(`User ${values.email} created successfully!!`, {
                 variant: "success"
               });
               router.push("/onboarding");
-            } else {
-              enqueueSnackbar("Oops! Something went wrong.", {
-                variant: "error"
-              });
-            }
-            setSubmitting(false);
-          });
+            })
+            .catch(error => {
+              setErrors({ email: "Email address is already in use." });
+              setSubmitting(false);
+            });
         }}
       >
         {({
