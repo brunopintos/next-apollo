@@ -42,6 +42,12 @@ const validationSchema = Yup.object().shape({
 
 const StyledTextField = styled(TextField)``;
 
+const MaxWidthContainer = styled(Container)`
+  && {
+    max-width: 250px;
+  }
+`;
+
 const StyledGrid = styled(Grid)`
   && {
     padding-top: 20px;
@@ -56,7 +62,7 @@ const StyledButton = styled(Button)`
 
 const LittleText = styled(Typography)`
   && {
-    font-size: 14px;
+    font-size: 12.5px;
   }
 `;
 
@@ -104,59 +110,63 @@ const Login = () => {
           handleSubmit,
           isSubmitting
         }) => (
-          <Form onSubmit={handleSubmit}>
-            <StyledGrid
-              container
-              direction="column"
-              spacing={3}
-              alignItems="center"
-            >
-              <Grid item>
-                <StyledTextField
-                  name="email"
-                  label="Email"
-                  variant="outlined"
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.email && errors.email}
-                  helperText={touched.email && errors.email ? errors.email : ""}
-                />
-              </Grid>
-              <Grid item>
-                <StyledTextField
-                  name="password"
-                  label="Password"
-                  variant="outlined"
-                  value={values.password}
-                  type="password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.password && errors.password}
-                  helperText={
-                    touched.password && errors.password ? errors.password : ""
-                  }
-                />
-              </Grid>
-              <Grid item>
-                <StyledButton
-                  type="submit"
-                  aria-label="Continue"
-                  disabled={isSubmitting}
-                >
-                  Continue
-                </StyledButton>
-              </Grid>
-              <Grid item>
-                <LittleText variant="h6">
-                  Don't have an account?{" "}
-                  <Link href="/signup">
-                    <a>Sign Up</a>
-                  </Link>
-                </LittleText>
-              </Grid>
-            </StyledGrid>
-          </Form>
+          <MaxWidthContainer>
+            <Form onSubmit={handleSubmit}>
+              <StyledGrid
+                container
+                direction="column"
+                spacing={3}
+                alignItems="center"
+              >
+                <Grid item>
+                  <StyledTextField
+                    name="email"
+                    label="Email"
+                    variant="outlined"
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.email && errors.email}
+                    helperText={
+                      touched.email && errors.email ? errors.email : ""
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledTextField
+                    name="password"
+                    label="Password"
+                    variant="outlined"
+                    value={values.password}
+                    type="password"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.password && errors.password}
+                    helperText={
+                      touched.password && errors.password ? errors.password : ""
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledButton
+                    type="submit"
+                    aria-label="Continue"
+                    disabled={isSubmitting}
+                  >
+                    Continue
+                  </StyledButton>
+                </Grid>
+                <Grid item>
+                  <LittleText variant="h6">
+                    Don't have an account?{" "}
+                    <Link href="/signup">
+                      <a>Sign Up</a>
+                    </Link>
+                  </LittleText>
+                </Grid>
+              </StyledGrid>
+            </Form>
+          </MaxWidthContainer>
         )}
       </Formik>
     </Container>

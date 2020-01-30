@@ -46,6 +46,12 @@ const validationSchema = Yup.object().shape({
 
 const StyledTextField = styled(TextField)``;
 
+const MaxWidthContainer = styled(Container)`
+  && {
+    max-width: 250px;
+  }
+`;
+
 const StyledGrid = styled(Grid)`
   && {
     padding-top: 20px;
@@ -74,7 +80,7 @@ const Signup = () => {
           passwordConfirmation: ""
         }}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting, resetForm }) => {
+        onSubmit={(values, { setSubmitting, setErrors }) => {
           signupUser({
             variables: {
               email: values.email,
@@ -104,70 +110,77 @@ const Signup = () => {
           handleSubmit,
           isSubmitting
         }) => (
-          <Form onSubmit={handleSubmit}>
-            <StyledGrid
-              container
-              direction="column"
-              spacing={3}
-              alignItems="center"
-            >
-              <Grid item>
-                <StyledTextField
-                  name="email"
-                  label="Email"
-                  variant="outlined"
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.email && errors.email}
-                  helperText={touched.email && errors.email ? errors.email : ""}
-                />
-              </Grid>
-              <Grid item>
-                <StyledTextField
-                  name="password"
-                  label="Password"
-                  variant="outlined"
-                  value={values.password}
-                  type="password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.password && errors.password}
-                  helperText={
-                    touched.password && errors.password ? errors.password : ""
-                  }
-                />
-              </Grid>
-              <Grid item>
-                <StyledTextField
-                  name="passwordConfirmation"
-                  label="Confirm password"
-                  variant="outlined"
-                  type="password"
-                  value={values.passwordConfirmation}
-                  onChange={handleChange}
-                  onBlur={handleChange}
-                  error={
-                    touched.passwordConfirmation && errors.passwordConfirmation
-                  }
-                  helperText={
-                    touched.passwordConfirmation && errors.passwordConfirmation
-                      ? errors.passwordConfirmation
-                      : ""
-                  }
-                />
-              </Grid>
-              <Grid item>
-                <StyledButton
-                  type="submit"
-                  aria-label="Continue"
-                  disabled={isSubmitting}
-                >
-                  Continue
-                </StyledButton>
-              </Grid>
-            </StyledGrid>
-          </Form>
+          <MaxWidthContainer>
+            <Form onSubmit={handleSubmit}>
+              <StyledGrid
+                container
+                direction="column"
+                spacing={3}
+                alignItems="center"
+              >
+                <Grid item>
+                  <StyledTextField
+                    name="email"
+                    label="Email"
+                    variant="outlined"
+                    value={values.email}
+                    type="email"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.email && errors.email}
+                    helperText={
+                      touched.email && errors.email ? errors.email : ""
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledTextField
+                    name="password"
+                    label="Password"
+                    variant="outlined"
+                    value={values.password}
+                    type="password"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.password && errors.password}
+                    helperText={
+                      touched.password && errors.password ? errors.password : ""
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledTextField
+                    name="passwordConfirmation"
+                    label="Confirm password"
+                    variant="outlined"
+                    type="password"
+                    value={values.passwordConfirmation}
+                    onChange={handleChange}
+                    onBlur={handleChange}
+                    error={
+                      touched.passwordConfirmation &&
+                      errors.passwordConfirmation
+                    }
+                    helperText={
+                      touched.passwordConfirmation &&
+                      errors.passwordConfirmation
+                        ? errors.passwordConfirmation
+                        : ""
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledButton
+                    type="submit"
+                    aria-label="Continue"
+                    disabled={isSubmitting}
+                  >
+                    Continue
+                  </StyledButton>
+                </Grid>
+              </StyledGrid>
+            </Form>
+          </MaxWidthContainer>
         )}
       </Formik>
     </Container>
