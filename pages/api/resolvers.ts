@@ -1,6 +1,7 @@
 import User from "./models/user";
 import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
+import { UserInputError } from "apollo-server-micro";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -29,13 +30,17 @@ const resolvers = {
   },
   Mutation: {
     login: (_, { email, password }, context) => {
-      let user;
-      user = User.findOne({
-        where: { email: email, password: password }
-      }).catch(() => {
-        user = null; //throw new UserInputError()
+      return User.findOne({
+        where: { email: email }
+      }).then(user => {
+        if (user && user.dataValues) {
+          if (user.dataValues.password !== password) {
+            throw new UserInputError("Incorrect password.");
+          }
+        } else {
+          throw new UserInputError("The email address is not registered.");
+        }
       });
-      return user;
     },
     signupUser: (_, { email, password }, context) => {
       return User.create({

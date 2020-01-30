@@ -81,24 +81,31 @@ const Login = () => {
           password: ""
         }}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting, resetForm }) => {
-          setSubmitting(true);
+        onSubmit={(values, { setSubmitting, setErrors }) => {
           login({
-            variables: { email: values.email, password: values.password }
-          }).then(data => {
-            if (data.data.login) {
+            variables: {
+              email: values.email,
+              password: values.password
+            }
+          })
+            .then(() => {
               enqueueSnackbar(`User ${values.email} logged in!!`, {
                 variant: "success"
               });
               router.push("/onboarding");
-            } else {
-              enqueueSnackbar("Wrong email or password.", {
-                variant: "error"
-              });
-            }
-          });
-          resetForm();
-          setSubmitting(false);
+            })
+            .catch(err => {
+              if (err.message.includes("email")) {
+                setErrors({
+                  email: err.message.substring(14, err.message.length)
+                });
+              } else {
+                setErrors({
+                  password: err.message.substring(14, err.message.length)
+                });
+              }
+              setSubmitting(false);
+            });
         }}
       >
         {({

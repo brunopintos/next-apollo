@@ -87,13 +87,13 @@ const Signup = () => {
               password: values.password
             }
           })
-            .then(data => {
+            .then(() => {
               enqueueSnackbar(`User ${values.email} created successfully!!`, {
                 variant: "success"
               });
               router.push("/onboarding");
             })
-            .catch(error => {
+            .catch(err => {
               setErrors({ email: "Email address is already in use." });
               setSubmitting(false);
             });
