@@ -111,7 +111,7 @@ const Signup = () => {
           isSubmitting
         }) => (
           <MaxWidthContainer>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} noValidate>
               <StyledGrid
                 container
                 direction="column"
