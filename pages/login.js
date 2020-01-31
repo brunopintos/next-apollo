@@ -19,11 +19,9 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 
 const LOGIN = gql`
-  mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-      email
-      password
+  mutation login($usernameOrEmail: String!, $password: String!) {
+    login(usernameOrEmail: $usernameOrEmail, password: $password) {
+      username
     }
   }
 `;
@@ -33,14 +31,19 @@ const validationSchema = Yup.object().shape({
     .min(8, "Your password must be at least 8 characters.")
     .max(100, "Your password is too long.")
     .required("Must enter a password."),
-  email: Yup.string()
-    .email("Your email address is invalid.")
-    .min(2, "Your email address is invalid.")
-    .max(320, "Your email address is too long.")
-    .required("Must enter an email.")
+  usernameOrEmail: Yup.string()
+    .min(2, "Your username or email address is invalid.")
+    .max(320, "Your username or email address is too long.")
+    .required("Must enter an username or email address.")
 });
 
 const StyledTextField = styled(TextField)``;
+
+const MaxWidthContainer = styled(Container)`
+  && {
+    max-width: 250px;
+  }
+`;
 
 const StyledGrid = styled(Grid)`
   && {
@@ -56,7 +59,7 @@ const StyledButton = styled(Button)`
 
 const LittleText = styled(Typography)`
   && {
-    font-size: 14px;
+    font-size: 12.5px;
   }
 `;
 
@@ -71,28 +74,35 @@ const Login = () => {
       <Title variant="h3">Log In</Title>
       <Formik
         initialValues={{
-          email: "",
+          usernameOrEmail: "",
           password: ""
         }}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting, resetForm }) => {
-          setSubmitting(true);
+        onSubmit={(values, { setSubmitting, setErrors }) => {
           login({
-            variables: { email: values.email, password: values.password }
-          }).then(data => {
-            if (data.data.login) {
-              enqueueSnackbar(`User ${values.email} logged in!!`, {
+            variables: {
+              usernameOrEmail: values.usernameOrEmail,
+              password: values.password
+            }
+          })
+            .then(data => {
+              enqueueSnackbar(`User ${data.data.login.username} logged in!!`, {
                 variant: "success"
               });
               router.push("/onboarding");
-            } else {
-              enqueueSnackbar("Wrong email or password.", {
-                variant: "error"
-              });
-            }
-          });
-          resetForm();
-          setSubmitting(false);
+            })
+            .catch(err => {
+              if (err.message.includes("username")) {
+                setErrors({
+                  usernameOrEmail: err.graphQLErrors.map(x => x.message)
+                });
+              } else {
+                setErrors({
+                  password: err.graphQLErrors.map(x => x.message)
+                });
+              }
+              setSubmitting(false);
+            });
         }}
       >
         {({
@@ -104,59 +114,68 @@ const Login = () => {
           handleSubmit,
           isSubmitting
         }) => (
-          <Form onSubmit={handleSubmit}>
-            <StyledGrid
-              container
-              direction="column"
-              spacing={3}
-              alignItems="center"
-            >
-              <Grid item>
-                <StyledTextField
-                  name="email"
-                  label="Email"
-                  variant="outlined"
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.email && errors.email}
-                  helperText={touched.email && errors.email ? errors.email : ""}
-                />
-              </Grid>
-              <Grid item>
-                <StyledTextField
-                  name="password"
-                  label="Password"
-                  variant="outlined"
-                  value={values.password}
-                  type="password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.password && errors.password}
-                  helperText={
-                    touched.password && errors.password ? errors.password : ""
-                  }
-                />
-              </Grid>
-              <Grid item>
-                <StyledButton
-                  type="submit"
-                  aria-label="Continue"
-                  disabled={isSubmitting}
-                >
-                  Continue
-                </StyledButton>
-              </Grid>
-              <Grid item>
-                <LittleText variant="h6">
-                  Don't have an account?{" "}
-                  <Link href="/signup">
-                    <a>Sign Up</a>
-                  </Link>
-                </LittleText>
-              </Grid>
-            </StyledGrid>
-          </Form>
+          <MaxWidthContainer>
+            <Form onSubmit={handleSubmit} noValidate>
+              <StyledGrid
+                container
+                direction="column"
+                spacing={3}
+                alignItems="center"
+              >
+                <Grid item>
+                  <StyledTextField
+                    name="usernameOrEmail"
+                    label="Username/Email"
+                    variant="outlined"
+                    value={values.usernameOrEmail}
+                    type="text"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.usernameOrEmail && errors.usernameOrEmail}
+                    helperText={
+                      touched.usernameOrEmail && errors.usernameOrEmail
+                        ? errors.usernameOrEmail
+                        : ""
+                    }
+                    required
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledTextField
+                    name="password"
+                    label="Password"
+                    variant="outlined"
+                    value={values.password}
+                    type="password"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.password && errors.password}
+                    helperText={
+                      touched.password && errors.password ? errors.password : ""
+                    }
+                    required
+                  />
+                </Grid>
+                <Grid item>
+                  <StyledButton
+                    type="submit"
+                    aria-label="Continue"
+                    disabled={isSubmitting}
+                  >
+                    Continue
+                  </StyledButton>
+                </Grid>
+                <Grid item>
+                  <LittleText variant="h6">
+                    Don't have an account?{" "}
+                    <Link href="/signup">
+                      <a>Sign Up</a>
+                    </Link>
+                  </LittleText>
+                </Grid>
+              </StyledGrid>
+            </Form>
+          </MaxWidthContainer>
         )}
       </Formik>
     </Container>

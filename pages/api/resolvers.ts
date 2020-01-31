@@ -1,6 +1,8 @@
 import User from "./models/user";
 import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
+import { UserInputError } from "apollo-server-micro";
+import { Op } from "sequelize";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -28,24 +30,46 @@ const resolvers = {
     }
   },
   Mutation: {
-    login: (_, { email, password }, context) => {
-      let user;
-      user = User.findOne({
-        where: { email: email, password: password }
-      }).catch(() => {
-        user = null;
+    login: (_, { usernameOrEmail, password }, context) => {
+      return User.findOne({
+        where: {
+          [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+        }
+      }).then(user => {
+        if (user && user.dataValues) {
+          if (user.dataValues.password !== password) {
+            throw new UserInputError("Incorrect password.");
+          }
+        } else {
+          throw new UserInputError(
+            "The username or email address is not registered."
+          );
+        }
+        return user;
       });
-      return user;
     },
-    signupUser: (_, { email, password }, context) => {
-      let user;
-      user = User.create({
+    signupUser: (_, { username, email, password }, context) => {
+      return User.create({
+        username: username,
         email: email,
         password: password
-      }).catch(() => {
-        user = null;
+      }).catch(err => {
+        if (err.errors[0].message.includes("username")) {
+          return User.findOne({
+            where: { email: email }
+          }).then(user => {
+            if (user && user.dataValues) {
+              throw new UserInputError(
+                "Both username and email addres are already in use."
+              );
+            } else {
+              throw new UserInputError("Username is already in use.");
+            }
+          });
+        } else {
+          throw new UserInputError("Email address is already in use.");
+        }
       });
-      return user; //useMutation usar error.
     }
   }
 };
