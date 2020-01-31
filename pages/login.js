@@ -19,11 +19,9 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 
 const LOGIN = gql`
-  mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-      email
-      password
+  mutation login($usernameOrEmail: String!, $password: String!) {
+    login(usernameOrEmail: $usernameOrEmail, password: $password) {
+      username
     }
   }
 `;
@@ -33,11 +31,10 @@ const validationSchema = Yup.object().shape({
     .min(8, "Your password must be at least 8 characters.")
     .max(100, "Your password is too long.")
     .required("Must enter a password."),
-  email: Yup.string()
-    .email("Your email address is invalid.")
-    .min(2, "Your email address is invalid.")
-    .max(320, "Your email address is too long.")
-    .required("Must enter an email.")
+  usernameOrEmail: Yup.string()
+    .min(2, "Your username or email address is invalid.")
+    .max(320, "Your username or email address is too long.")
+    .required("Must enter an username or email address.")
 });
 
 const StyledTextField = styled(TextField)``;
@@ -77,31 +74,31 @@ const Login = () => {
       <Title variant="h3">Log In</Title>
       <Formik
         initialValues={{
-          email: "",
+          usernameOrEmail: "",
           password: ""
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           login({
             variables: {
-              email: values.email,
+              usernameOrEmail: values.usernameOrEmail,
               password: values.password
             }
           })
-            .then(() => {
-              enqueueSnackbar(`User ${values.email} logged in!!`, {
+            .then(data => {
+              enqueueSnackbar(`User ${data.data.login.username} logged in!!`, {
                 variant: "success"
               });
               router.push("/onboarding");
             })
             .catch(err => {
-              if (err.message.includes("email")) {
+              if (err.message.includes("username")) {
                 setErrors({
-                  email: err.message.substring(14, err.message.length)
+                  usernameOrEmail: err.graphQLErrors.map(x => x.message)
                 });
               } else {
                 setErrors({
-                  password: err.message.substring(14, err.message.length)
+                  password: err.graphQLErrors.map(x => x.message)
                 });
               }
               setSubmitting(false);
@@ -127,15 +124,18 @@ const Login = () => {
               >
                 <Grid item>
                   <StyledTextField
-                    name="email"
-                    label="Email"
+                    name="usernameOrEmail"
+                    label="Username/Email"
                     variant="outlined"
-                    value={values.email}
+                    value={values.usernameOrEmail}
+                    type="text"
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={touched.email && errors.email}
+                    error={touched.usernameOrEmail && errors.usernameOrEmail}
                     helperText={
-                      touched.email && errors.email ? errors.email : ""
+                      touched.usernameOrEmail && errors.usernameOrEmail
+                        ? errors.usernameOrEmail
+                        : ""
                     }
                     required
                   />

@@ -8,6 +8,14 @@ const User = dataBase.sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
+    username: {
+      type: dataBase.Sequelize.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        len: [8, 100]
+      }
+    },
     email: {
       type: dataBase.Sequelize.STRING,
       allowNull: false,

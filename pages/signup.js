@@ -17,25 +17,27 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 
 const SIGNUP_USER = gql`
-  mutation CreateUsers($email: String!, $password: String!) {
-    signupUser(email: $email, password: $password) {
-      id
-      email
-      password
+  mutation SignupUser($username: String!, $email: String!, $password: String!) {
+    signupUser(username: $username, email: $email, password: $password) {
+      username
     }
   }
 `;
 
 const validationSchema = Yup.object().shape({
-  password: Yup.string()
-    .min(8, "Your password must be at least 8 characters.")
-    .max(100, "Your password is too long.")
-    .required("Must enter a password."),
+  username: Yup.string()
+    .min(8, "Your username must be at least 8 characters.")
+    .max(100, "Your username is too long.")
+    .required("Must enter a username."),
   email: Yup.string()
     .email("Your email address is invalid.")
     .min(2, "Your email address is invalid.")
     .max(320, "Your email address is too long.")
-    .required("Must enter an email."),
+    .required("Must enter an email address."),
+  password: Yup.string()
+    .min(8, "Your password must be at least 8 characters.")
+    .max(100, "Your password is too long.")
+    .required("Must enter a password."),
   passwordConfirmation: Yup.string()
     .oneOf(
       [Yup.ref("password"), null],
@@ -75,6 +77,7 @@ const Signup = () => {
       <Title variant="h3">Sign Up</Title>
       <Formik
         initialValues={{
+          username: "",
           email: "",
           password: "",
           passwordConfirmation: ""
@@ -83,18 +86,37 @@ const Signup = () => {
         onSubmit={(values, { setSubmitting, setErrors }) => {
           signupUser({
             variables: {
+              username: values.username,
               email: values.email,
               password: values.password
             }
           })
             .then(() => {
-              enqueueSnackbar(`User ${values.email} created successfully!!`, {
-                variant: "success"
-              });
+              enqueueSnackbar(
+                `User ${values.username} created successfully!!`,
+                {
+                  variant: "success"
+                }
+              );
               router.push("/onboarding");
             })
             .catch(err => {
-              setErrors({ email: "Email address is already in use." });
+              if (err.message.includes("Both")) {
+                setErrors({
+                  username: "Username is already in use.",
+                  email: "Email address is already in use."
+                });
+              } else {
+                if (err.message.includes("Username")) {
+                  setErrors({
+                    username: err.graphQLErrors.map(x => x.message)
+                  });
+                } else {
+                  setErrors({
+                    email: err.graphQLErrors.map(x => x.message)
+                  });
+                }
+              }
               setSubmitting(false);
             });
         }}
@@ -116,6 +138,22 @@ const Signup = () => {
                 spacing={3}
                 alignItems="center"
               >
+                <Grid item>
+                  <StyledTextField
+                    name="username"
+                    label="Username"
+                    variant="outlined"
+                    value={values.username}
+                    type="text"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.username && errors.username}
+                    helperText={
+                      touched.username && errors.username ? errors.username : ""
+                    }
+                    required
+                  />
+                </Grid>
                 <Grid item>
                   <StyledTextField
                     name="email"
