@@ -16,12 +16,32 @@ const Subtitle = styled(Typography)`
   }
 `;
 
+const StyledImage = styled.img`
+  margin: 0;
+  width: 100%;
+  padding-top: 20px;
+`;
+
+const StyledContainer = styled(Container)`
+  && {
+    width: 80%;
+  }
+`;
+
 const Welcome = () => {
   return (
     <Container>
-      <MainHeader title="KB - Knowledge Base" />
-      <Title variant="h3">Welcome to KB!</Title>
-      <Subtitle variant="h6">Knowledge Base App</Subtitle>
+      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      <StyledContainer>
+        <Title variant="h3">Welcome to Lithium KB!</Title>
+        <Subtitle variant="h5">
+          Turn your tribal knowledge into easy-to-find answers!
+        </Subtitle>
+        <StyledImage
+          src="/lkbScreenRecord.gif"
+          alt="lithium kb screen record"
+        />
+      </StyledContainer>
     </Container>
   );
 };

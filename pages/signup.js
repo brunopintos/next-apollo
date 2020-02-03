@@ -73,7 +73,7 @@ const Signup = () => {
 
   return (
     <Container>
-      <MainHeader title="KB - Knowledge Base" />
+      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
       <Title variant="h3">Sign Up</Title>
       <Formik
         initialValues={{
