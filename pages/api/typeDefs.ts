@@ -21,6 +21,18 @@ const typeDefs = gql`
     createdAt: Date
     updatedAt: Date
   }
+
+  type Article {
+    id: ID!
+    title: String!
+    icon: String!
+    content: Content!
+    tags: [Tag]
+    parent: Article!
+    isFavourite: Boolean!
+    createdAt: Date
+    updatedAt: Date
+  }
 `;
 
 export default typeDefs;
