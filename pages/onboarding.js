@@ -2,27 +2,64 @@ import React from "react";
 import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
-import { Typography, Container } from "@material-ui/core";
+import { Typography, Container, Button } from "@material-ui/core";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+import Layout from "../components/Layout";
+import Link from "next/link";
 
 const Subtitle = styled(Typography)`
   && {
     margin: 0;
     width: 100%;
-    padding-top: 20px;
     text-align: center;
+    color: #fff;
+    position: relative;
+  }
+`;
+
+const StyledImage = styled.img`
+  margin: auto;
+  width: 80%;
+  padding-top: 4%;
+  display: block;
+`;
+
+const StyledContainer = styled(Container)`
+  && {
+    width: 80%;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  && {
+    background-color: Gold;
+    display: block;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;
 
 const Onboarding = () => {
   return (
-    <Container>
-      <MainHeader title="KB - Knowledge Base" />
-      <Title variant="h3">Welcome to KB!</Title>
-      <Subtitle variant="h6">Let's create an article!</Subtitle>
-    </Container>
+    <Layout>
+      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      <Title variant="h3">Welcome to Lithium KB!</Title>
+      <Subtitle variant="h5">
+        Create articles to start sharing knowledge with your partners!
+      </Subtitle>
+      <Link href="/chooseWorkspace">
+        <StyledButton aria-label="Continue">Let's Go!</StyledButton>
+      </Link>
+      <StyledContainer>
+        <StyledImage
+          src="/lkbScreenRecord.gif"
+          alt="lithium kb screen record"
+        />
+      </StyledContainer>
+    </Layout>
   );
 };
 

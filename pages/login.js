@@ -70,7 +70,7 @@ const Login = () => {
 
   return (
     <Container>
-      <MainHeader title="KB - Knowledge Base" />
+      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
       <Title variant="h3">Log In</Title>
       <Formik
         initialValues={{

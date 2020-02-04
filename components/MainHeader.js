@@ -33,6 +33,8 @@ const Title = styled(Typography)`
     flex-grow: 1;
     display: "block";
     color: black;
+    padding-left: 5px;
+    height: 100%;
   }
 `;
 
@@ -42,14 +44,14 @@ const MainHeader = props => (
       <title>{props.title}</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <StyledAppBar position="static">
+    <StyledAppBar position="fixed">
       <Toolbar>
         <Link href="/">
-          <ImageButton aria-label="home page">
+          <IconButton edge="start" aria-label="home page">
             <HomeIcon />
-          </ImageButton>
+          </IconButton>
         </Link>
-        <Title variant="h6">KB - Knowledge Base</Title>
+        <Title variant="h6">Lithium Knowledge Base</Title>
         <Link href="/login">
           <Button>Log in</Button>
         </Link>
