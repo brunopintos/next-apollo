@@ -30,7 +30,22 @@ const typeDefs = gql`
     content: Content!
     tags: [Tag]
     parent: Article!
+    owner: User!
     isFavourite: Boolean!
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  type Content {
+    id: ID!
+    data: [String]!
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  type Tag {
+    id: ID!
+    name: String!
     createdAt: Date
     updatedAt: Date
   }
@@ -39,6 +54,7 @@ const typeDefs = gql`
     title: String!
     icon: String
     parent: Article
+    owner: User!
   }
 `;
 
