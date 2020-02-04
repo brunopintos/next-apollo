@@ -1,4 +1,5 @@
 import User from "./models/user";
+import Article from "./models/user";
 import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
@@ -68,6 +69,23 @@ const resolvers = {
           });
         } else {
           throw new UserInputError("Email address is already in use.");
+        }
+      });
+    },
+    createArticle: (_, { input: { title, icon, parent, owner } }) => {
+      return Article.create({
+        title: title,
+        icon: icon || "-",
+        content: null,
+        tags: [],
+        parent: parent || null,
+        owner: owner,
+        isFavourite: false
+      }).catch(err => {
+        if (err.errors[0].message.includes("title")) {
+          throw new UserInputError("Title is already in use.");
+        } else {
+          throw new UserInputError("Another error.");
         }
       });
     }
