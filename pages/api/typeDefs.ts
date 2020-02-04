@@ -11,6 +11,7 @@ const typeDefs = gql`
   type Mutation {
     signupUser(username: String!, email: String!, password: String!): User!
     login(usernameOrEmail: String!, password: String!): User
+    createArticle(input: InputCreateArticle!): Article!
   }
 
   type User {
@@ -32,6 +33,12 @@ const typeDefs = gql`
     isFavourite: Boolean!
     createdAt: Date
     updatedAt: Date
+  }
+
+  input InputCreateArticle {
+    title: String!
+    icon: String
+    parent: Article
   }
 `;
 
