@@ -2,66 +2,64 @@ import React from "react";
 import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
-import { Typography, Container } from "@material-ui/core";
+import { Typography, Container, Button } from "@material-ui/core";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+import Layout from "../components/Layout";
+import Link from "next/link";
 
 const Subtitle = styled(Typography)`
   && {
     margin: 0;
     width: 100%;
     text-align: center;
-    padding-top: 50px;
-    font-weight: bold;
+    color: #fff;
+    position: relative;
   }
 `;
 
-const WelcomeToLKB = styled(Container)`
-  position: relative;
-  min-height: 700px;
-  &::after {
-    opacity: 0.3;
-    background-image: url("/welcomeToLKB.jpeg");
-    width: 100%;
-    height: 100%;
-    background-size: 100%;
-    display: block;
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+const StyledImage = styled.img`
+  margin: auto;
+  width: 80%;
+  padding-top: 4%;
+  display: block;
 `;
 
-const Description = styled(Typography)`
+const StyledContainer = styled(Container)`
   && {
-    margin: 0;
-    width: 100%;
-    text-align: center;
+    width: 80%;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  && {
+    background-color: Gold;
+    display: block;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
   }
 `;
 
 const Onboarding = () => {
   return (
-    <Container>
+    <Layout>
       <MainHeader title="Lithium KB - Lithium Knowledge Base" />
-      <WelcomeToLKB>
-        <Title variant="h4">Welcome to Lithium KB!</Title>
-        <Description variant="h6">
-          Turn your tribal knowledge into easy-to-find answers.
-        </Description>
-        <Description variant="h6">
-          With Lithium KB, knowledge and collaboration meet to achieve great
-          things.
-        </Description>
-      </WelcomeToLKB>
-      <Subtitle variant="h4">Create a source of truth</Subtitle>
-      <Description>
-        Save time by harnessing your teams' collective knowledge into
-        easy-to-find answers for everyone.
-      </Description>
-    </Container>
+      <Title variant="h3">Welcome to Lithium KB!</Title>
+      <Subtitle variant="h5">
+        Create articles to start sharing knowledge with your partners!
+      </Subtitle>
+      <Link href="/chooseWorkspace">
+        <StyledButton aria-label="Continue">Let's Go!</StyledButton>
+      </Link>
+      <StyledContainer>
+        <StyledImage
+          src="/lkbScreenRecord.gif"
+          alt="lithium kb screen record"
+        />
+      </StyledContainer>
+    </Layout>
   );
 };
 
