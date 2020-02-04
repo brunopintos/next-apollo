@@ -5,10 +5,12 @@ const Title = styled(Typography)`
   && {
     margin: 0;
     width: 100%;
-    padding-top: 140px;
+    padding-top: 150px;
     padding-bottom: 20px;
     text-align: center;
     font-weight: bold;
+    color: #fff;
+    position: relative;
   }
 `;
 
