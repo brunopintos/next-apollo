@@ -27,9 +27,9 @@ const typeDefs = gql`
     id: ID!
     title: String!
     icon: String!
-    content: Content!
-    tags: [Tag]
-    parent: Article!
+    content: Content
+    tags: [String]!
+    parent: Article
     owner: User!
     isFavourite: Boolean!
     createdAt: Date
@@ -38,14 +38,7 @@ const typeDefs = gql`
 
   type Content {
     id: ID!
-    data: [String]!
-    createdAt: Date
-    updatedAt: Date
-  }
-
-  type Tag {
-    id: ID!
-    name: String!
+    data: String!
     createdAt: Date
     updatedAt: Date
   }

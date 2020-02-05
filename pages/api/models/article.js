@@ -1,4 +1,6 @@
 import dataBase from "./index";
+import User from "./user";
+import Content from "./content";
 
 const Article = dataBase.sequelize.define(
   "article",
@@ -23,25 +25,12 @@ const Article = dataBase.sequelize.define(
         len: [1, 20]
       }
     },
-    content: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false //usar objetos
-    },
     tags: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false //usar objetos
-    },
-    parent: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false //usar objetos
-    },
-    owner: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false //usar objetos
+      type: dataBase.Sequelize.ARRAY(dataBase.Sequelize.STRING)
     },
     isFavourite: {
       type: dataBase.Sequelize.BOOLEAN,
-      allowNull: false //usar objetos
+      allowNull: false
     },
     createdAt: {
       type: dataBase.Sequelize.DATE
@@ -52,5 +41,9 @@ const Article = dataBase.sequelize.define(
   },
   {}
 );
+
+Article.belongsTo(Article, { as: "parent" });
+Article.belongsTo(User, { as: "owner" });
+Article.hasOne(Content, { as: "article" });
 
 export default Article;
