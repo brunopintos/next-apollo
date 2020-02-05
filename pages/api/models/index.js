@@ -1,6 +1,6 @@
 import Sequelize from "sequelize";
 
-const sequelize = new Sequelize("kbdb", "admin", "admin", {
+const sequelize = new Sequelize("lkbdb", "admin", "admin", {
   host: "postgres",
   dialect: "postgres"
 });
