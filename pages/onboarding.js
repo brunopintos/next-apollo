@@ -29,6 +29,7 @@ const StyledImage = styled.img`
 const StyledContainer = styled(Container)`
   && {
     width: 80%;
+    padding-bottom: 50px;
   }
 `;
 
@@ -50,7 +51,7 @@ const Onboarding = () => {
       <Subtitle variant="h5">
         Create articles to start sharing knowledge with your partners!
       </Subtitle>
-      <Link href="/chooseWorkspace">
+      <Link href="/articles">
         <StyledButton aria-label="Continue">Let's Go!</StyledButton>
       </Link>
       <StyledContainer>

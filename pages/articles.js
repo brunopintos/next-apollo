@@ -1,3 +1,5 @@
+import React from "react";
+import { withApollo } from "../lib/apollo";
 import ArticlesDrawer from "../components/ArticlesDrawer";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -9,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
 import { Container } from "@material-ui/core";
 
-const drawerWidth = 240;
+const drawerWidth = 170;
 
 const StyledAppBar = styled(Container)`
   && {
@@ -50,7 +52,6 @@ const Articles = () => {
           { id: 3, icon: "#", name: "ARTICLE 3" },
           { id: 4, icon: "$", name: "ARTICLE 4" }
         ]}
-        width={240}
       />
       <main>
         <div />
@@ -60,4 +61,4 @@ const Articles = () => {
   );
 };
 
-export default Articles;
+export default withApollo(Articles);

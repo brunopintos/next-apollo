@@ -6,6 +6,7 @@ const typeDefs = gql`
   type Query {
     getUsers: [User]!
     getUser(email: String!): User
+    getArticles: [Article]!
   }
 
   type Mutation {
@@ -28,12 +29,19 @@ const typeDefs = gql`
     title: String!
     icon: String!
     content: Content
-    tags: [String]!
+    tags: [Tag]!
     parent: Article
     owner: User!
     isFavourite: Boolean!
     createdAt: Date
     updatedAt: Date
+  }
+
+  type Tag {
+    id: ID!
+    name: String!
+    createdAt: Date
+    createdAt: Date
   }
 
   type Content {
@@ -46,8 +54,8 @@ const typeDefs = gql`
   input InputCreateArticle {
     title: String!
     icon: String
-    parent: Article
-    owner: User!
+    parentId: ID
+    ownerId: ID!
   }
 `;
 

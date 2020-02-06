@@ -1,5 +1,5 @@
 import User from "./models/user";
-import Article from "./models/user";
+import Article from "./models/article";
 import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
@@ -28,6 +28,9 @@ const resolvers = {
     },
     getUser: (_, { email }, context) => {
       return User.findOne({ where: { email: email } });
+    },
+    getArticles: (_, __, context) => {
+      return Article.findAll();
     }
   },
   Mutation: {
@@ -72,22 +75,18 @@ const resolvers = {
         }
       });
     },
-    createArticle: (_, { input: { title, icon, parent, owner } }) => {
-      return Article.create({
+    createArticle: async (_, { input: { title, icon, parentId, ownerId } }) => {
+      const owner = await User.findByPk(1);
+      const parent = parentId ? await Article.findByPk(parentId) : null;
+      const article = await Article.create({
         title: title,
         icon: icon || "-",
-        content: null,
         tags: [],
-        parent: parent || null,
-        owner: owner,
+        ownerId: owner.dataValues.id,
         isFavourite: false
-      }).catch(err => {
-        if (err.errors[0].message.includes("title")) {
-          throw new UserInputError("Title is already in use.");
-        } else {
-          throw new UserInputError("Another error.");
-        }
       });
+      console.log(article);
+      return article;
     }
   }
 };
