@@ -68,9 +68,6 @@ module.exports = {
                 len: [1, 20]
               }
             },
-            tags: {
-              type: Sequelize.ARRAY(Sequelize.STRING)
-            },
             isFavourite: {
               type: Sequelize.BOOLEAN,
               allowNull: false
@@ -82,6 +79,31 @@ module.exports = {
                   tableName: "users"
                 },
                 key: "id"
+              }
+            },
+            createdAt: {
+              type: Sequelize.DATE
+            },
+            updatedAt: {
+              type: Sequelize.DATE
+            }
+          },
+          { transaction: t }
+        ),
+        queryInterface.createTable(
+          "tags",
+          {
+            id: {
+              type: Sequelize.INTEGER,
+              primaryKey: true,
+              autoIncrement: true
+            },
+            name: {
+              type: Sequelize.STRING,
+              allowNull: false,
+              unique: true,
+              validate: {
+                len: [1, 30]
               }
             },
             createdAt: {
@@ -122,7 +144,43 @@ module.exports = {
             }
           },
           { transaction: t }
-        )
+        ),
+        queryInterface
+          .createTable(
+            "articleTags",
+            {
+              articleId: {
+                type: Sequelize.INTEGER,
+                references: {
+                  model: {
+                    tableName: "articles"
+                  },
+                  key: "id"
+                }
+              },
+              tagId: {
+                type: Sequelize.INTEGER,
+                references: {
+                  model: {
+                    tableName: "tags"
+                  },
+                  key: "id"
+                }
+              },
+              createdAt: {
+                type: Sequelize.DATE
+              },
+              updatedAt: {
+                type: Sequelize.DATE
+              }
+            },
+            { transaction: t }
+          )
+          .then(() => {
+            queryInterface.sequelize.query(
+              'ALTER TABLE "articleTags" ADD CONSTRAINT "articleTagIds" PRIMARY KEY ("articleId", "tagId")'
+            );
+          })
       ]);
     });
   },
@@ -132,7 +190,8 @@ module.exports = {
       return Promise.all([
         queryInterface.dropTable("users", { transaction: t }),
         queryInterface.dropTable("articles", { transaction: t }),
-        queryInterface.dropTable("contents", { transaction: t })
+        queryInterface.dropTable("contents", { transaction: t }),
+        queryInterface.dropTable("tags", { transaction: t })
       ]);
     });
   }

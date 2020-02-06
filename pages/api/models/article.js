@@ -1,6 +1,7 @@
 import dataBase from "./index";
 import User from "./user";
 import Content from "./content";
+import Tag from "./tag";
 
 const Article = dataBase.sequelize.define(
   "article",
@@ -43,7 +44,9 @@ const Article = dataBase.sequelize.define(
 );
 
 Article.belongsTo(Article, { as: "parent" });
+Article.hasMany(Article);
 Article.belongsTo(User, { as: "owner" });
-Article.hasOne(Content, { as: "article" });
+Article.hasOne(Content);
+Article.belongsToMany(Tag, { through: "articleTags" });
 
 export default Article;

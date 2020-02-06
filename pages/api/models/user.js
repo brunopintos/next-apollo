@@ -1,4 +1,5 @@
 import dataBase from "./index";
+import Article from "./article";
 
 const User = dataBase.sequelize.define(
   "user",
@@ -42,5 +43,7 @@ const User = dataBase.sequelize.define(
   },
   {}
 );
+
+User.hasMany(Article);
 
 export default User;

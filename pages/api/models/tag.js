@@ -1,17 +1,21 @@
 import dataBase from "./index";
 import Article from "./article";
 
-const Content = dataBase.sequelize.define(
-  "content",
+const Tag = dataBase.sequelize.define(
+  "tag",
   {
     id: {
       type: dataBase.Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    data: {
+    name: {
       type: dataBase.Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true,
+      validate: {
+        len: [1, 30]
+      }
     },
     createdAt: {
       type: dataBase.Sequelize.DATE
@@ -23,6 +27,6 @@ const Content = dataBase.sequelize.define(
   {}
 );
 
-Content.belongsTo(Article);
+Tag.belongsToMany(Article, { through: "articleTags" });
 
-export default Content;
+export default Tag;
