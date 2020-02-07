@@ -2,7 +2,7 @@
   "development": {
     "username": "admin",
     "password": "admin",
-    "database": "kbdb",
+    "database": "lkbdb",
     "host": "127.0.0.1",
     "dialect": "postgres",
     "operatorsAliases": false

@@ -47,7 +47,7 @@ const MainHeader = props => (
     <StyledAppBar position="fixed">
       <Toolbar>
         <Link href="/">
-          <IconButton edge="start" aria-label="home page">
+          <IconButton color="inherit" edge="start" aria-label="home page">
             <HomeIcon />
           </IconButton>
         </Link>

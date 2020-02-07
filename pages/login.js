@@ -17,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+import Layout from "../components/Layout";
 
 const LOGIN = gql`
   mutation login($usernameOrEmail: String!, $password: String!) {
@@ -36,6 +37,18 @@ const validationSchema = Yup.object().shape({
     .max(320, "Your username or email address is too long.")
     .required("Must enter an username or email address.")
 });
+
+const StyledTitle = styled(Title)`
+  && {
+    color: black;
+  }
+`;
+
+const StyledLayout = styled(Layout)`
+  && {
+    background-color: #fff;
+  }
+`;
 
 const StyledTextField = styled(TextField)``;
 
@@ -69,9 +82,9 @@ const Login = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
-    <Container>
+    <StyledLayout>
       <MainHeader title="Lithium KB - Lithium Knowledge Base" />
-      <Title variant="h3">Log In</Title>
+      <StyledTitle variant="h3">Log In</StyledTitle>
       <Formik
         initialValues={{
           usernameOrEmail: "",
@@ -178,7 +191,7 @@ const Login = () => {
           </MaxWidthContainer>
         )}
       </Formik>
-    </Container>
+    </StyledLayout>
   );
 };
 

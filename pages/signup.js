@@ -15,6 +15,7 @@ import Button from "@material-ui/core/Button";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
+import Layout from "../components/Layout";
 
 const SIGNUP_USER = gql`
   mutation SignupUser($username: String!, $email: String!, $password: String!) {
@@ -46,7 +47,23 @@ const validationSchema = Yup.object().shape({
     .required("Must enter the password confirmation.")
 });
 
-const StyledTextField = styled(TextField)``;
+const StyledTitle = styled(Title)`
+  && {
+    color: black;
+  }
+`;
+
+const StyledLayout = styled(Layout)`
+  && {
+    background-color: #fff;
+  }
+`;
+
+const StyledTextField = styled(TextField)`
+  && {
+    color: #fff;
+  }
+`;
 
 const MaxWidthContainer = styled(Container)`
   && {
@@ -72,9 +89,9 @@ const Signup = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
-    <Container>
+    <StyledLayout>
       <MainHeader title="Lithium KB - Lithium Knowledge Base" />
-      <Title variant="h3">Sign Up</Title>
+      <StyledTitle variant="h3">Sign Up</StyledTitle>
       <Formik
         initialValues={{
           username: "",
@@ -222,7 +239,7 @@ const Signup = () => {
           </MaxWidthContainer>
         )}
       </Formik>
-    </Container>
+    </StyledLayout>
   );
 };
 
