@@ -51,10 +51,6 @@ const typeDefs = gql`
     parentId: ID
     authorId: ID!
   }
-
-  input InputCreateArticleModification {
-    
-  }
 `;
 
 export default typeDefs;

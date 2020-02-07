@@ -70,6 +70,9 @@ module.exports = {
                 len: [1, 20]
               }
             },
+            content: {
+              type: Sequelize.STRING
+            },
             isFavourite: {
               type: Sequelize.BOOLEAN,
               allowNull: false

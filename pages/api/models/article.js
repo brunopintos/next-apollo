@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
           len: [1, 20]
         }
       },
+      content: {
+        type: DataTypes.STRING
+      },
       parentId: {
         type: DataTypes.INTEGER,
         references: {
