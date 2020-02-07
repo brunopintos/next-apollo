@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         queryInterface.createTable(
-          "users",
+          "Users",
           {
             id: {
               type: Sequelize.INTEGER,
@@ -37,16 +37,18 @@ module.exports = {
               }
             },
             createdAt: {
+              allowNull: false,
               type: Sequelize.DATE
             },
             updatedAt: {
+              allowNull: false,
               type: Sequelize.DATE
             }
           },
           { transaction: t }
         ),
         queryInterface.createTable(
-          "articles",
+          "Articles",
           {
             id: {
               type: Sequelize.INTEGER,
@@ -72,26 +74,37 @@ module.exports = {
               type: Sequelize.BOOLEAN,
               allowNull: false
             },
-            ownerId: {
+            parentId: {
               type: Sequelize.INTEGER,
               references: {
                 model: {
-                  tableName: "users"
+                  tableName: "Articles"
+                },
+                key: "id"
+              }
+            },
+            authorId: {
+              type: Sequelize.INTEGER,
+              references: {
+                model: {
+                  tableName: "Users"
                 },
                 key: "id"
               }
             },
             createdAt: {
+              allowNull: false,
               type: Sequelize.DATE
             },
             updatedAt: {
+              allowNull: false,
               type: Sequelize.DATE
             }
           },
           { transaction: t }
         ),
         queryInterface.createTable(
-          "tags",
+          "Tags",
           {
             id: {
               type: Sequelize.INTEGER,
@@ -107,80 +120,57 @@ module.exports = {
               }
             },
             createdAt: {
+              allowNull: false,
               type: Sequelize.DATE
             },
             updatedAt: {
+              allowNull: false,
               type: Sequelize.DATE
             }
           },
           { transaction: t }
         ),
         queryInterface.createTable(
-          "contents",
+          "ArticleTags",
           {
             id: {
-              type: Sequelize.INTEGER,
+              allowNull: false,
+              autoIncrement: true,
               primaryKey: true,
-              autoIncrement: true
-            },
-            data: {
-              type: Sequelize.STRING,
-              allowNull: false
+              type: Sequelize.INTEGER
             },
             articleId: {
               type: Sequelize.INTEGER,
+              allowNull: false,
               references: {
-                model: {
-                  tableName: "articles"
-                },
+                model: "Articles",
+                key: "id"
+              }
+            },
+            tagId: {
+              type: Sequelize.INTEGER,
+              allowNull: false,
+              references: {
+                model: "Tags",
                 key: "id"
               }
             },
             createdAt: {
+              allowNull: false,
               type: Sequelize.DATE
             },
             updatedAt: {
+              allowNull: false,
               type: Sequelize.DATE
             }
           },
           { transaction: t }
-        ),
-        queryInterface
-          .createTable(
-            "articleTags",
-            {
-              articleId: {
-                type: Sequelize.INTEGER,
-                references: {
-                  model: {
-                    tableName: "articles"
-                  },
-                  key: "id"
-                }
-              },
-              tagId: {
-                type: Sequelize.INTEGER,
-                references: {
-                  model: {
-                    tableName: "tags"
-                  },
-                  key: "id"
-                }
-              },
-              createdAt: {
-                type: Sequelize.DATE
-              },
-              updatedAt: {
-                type: Sequelize.DATE
-              }
-            },
-            { transaction: t }
-          )
-          .then(() => {
-            queryInterface.sequelize.query(
-              'ALTER TABLE "articleTags" ADD CONSTRAINT "articleTagIds" PRIMARY KEY ("articleId", "tagId")'
-            );
-          })
+        )
+        // .then(() => {
+        //   queryInterface.sequelize.query(
+        //     'ALTER TABLE "ArticleTags" ADD CONSTRAINT "articleTagIds" PRIMARY KEY ("articleId", "tagId")'
+        //   );
+        // })
       ]);
     });
   },
@@ -188,10 +178,10 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
-        queryInterface.dropTable("users", { transaction: t }),
-        queryInterface.dropTable("articles", { transaction: t }),
-        queryInterface.dropTable("contents", { transaction: t }),
-        queryInterface.dropTable("tags", { transaction: t })
+        queryInterface.dropTable("Users", { transaction: t }),
+        queryInterface.dropTable("Articles", { transaction: t }),
+        queryInterface.dropTable("Tags", { transaction: t }),
+        queryInterface.dropTable("ArticleTags", { transaction: t })
       ]);
     });
   }

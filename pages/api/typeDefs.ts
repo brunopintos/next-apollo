@@ -28,10 +28,10 @@ const typeDefs = gql`
     id: ID!
     title: String!
     icon: String!
-    content: Content
-    tags: [Tag]!
+    content: String!
+    tags: [Tag!]!
     parent: Article
-    owner: User!
+    author: User!
     isFavourite: Boolean!
     createdAt: Date
     updatedAt: Date
@@ -40,13 +40,7 @@ const typeDefs = gql`
   type Tag {
     id: ID!
     name: String!
-    createdAt: Date
-    createdAt: Date
-  }
-
-  type Content {
-    id: ID!
-    data: String!
+    articles: [Article!]!
     createdAt: Date
     updatedAt: Date
   }
@@ -55,7 +49,11 @@ const typeDefs = gql`
     title: String!
     icon: String
     parentId: ID
-    ownerId: ID!
+    authorId: ID!
+  }
+
+  input InputCreateArticleModification {
+    
   }
 `;
 

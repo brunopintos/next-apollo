@@ -1,49 +1,52 @@
-import dataBase from "./index";
-import Article from "./article";
+"use-strict";
 
-const User = dataBase.sequelize.define(
-  "user",
-  {
-    id: {
-      type: dataBase.Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
-    username: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [8, 100]
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define(
+    "User",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          len: [8, 100]
+        }
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: true,
+          len: [2, 320]
+        }
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          len: [8, 100]
+        }
+      },
+      createdAt: {
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        type: DataTypes.DATE
       }
     },
-    email: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-        len: [2, 320]
-      }
-    },
-    password: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [8, 100]
-      }
-    },
-    createdAt: {
-      type: dataBase.Sequelize.DATE
-    },
-    updatedAt: {
-      type: dataBase.Sequelize.DATE
-    }
-  },
-  {}
-);
+    {}
+  );
 
-User.hasMany(Article);
+  User.associate = function(models) {
+    User.hasMany(models.Article, { foreignKey: "authorId", as: "articles" });
+  };
 
-export default User;
+  return User;
+};

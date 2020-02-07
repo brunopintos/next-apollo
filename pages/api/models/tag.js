@@ -1,32 +1,38 @@
-import dataBase from "./index";
-import Article from "./article";
+"use-strict";
 
-const Tag = dataBase.sequelize.define(
-  "tag",
-  {
-    id: {
-      type: dataBase.Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
-    name: {
-      type: dataBase.Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [1, 30]
+module.exports = (sequelize, DataTypes) => {
+  const Tag = sequelize.define(
+    "Tag",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          len: [1, 30]
+        }
+      },
+      createdAt: {
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        type: DataTypes.DATE
       }
     },
-    createdAt: {
-      type: dataBase.Sequelize.DATE
-    },
-    updatedAt: {
-      type: dataBase.Sequelize.DATE
-    }
-  },
-  {}
-);
+    {}
+  );
 
-Tag.belongsToMany(Article, { through: "articleTags" });
+  Tag.associate = function(models) {
+    Tag.belongsToMany(models.Article, {
+      through: "articleTag",
+      foreignKey: "tagId"
+    });
+  };
 
-export default Tag;
+  return Tag;
+};
