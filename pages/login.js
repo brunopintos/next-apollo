@@ -21,7 +21,7 @@ import Typography from "@material-ui/core/Typography";
 const LOGIN = gql`
   mutation login($usernameOrEmail: String!, $password: String!) {
     login(usernameOrEmail: $usernameOrEmail, password: $password) {
-      username
+      token
     }
   }
 `;
@@ -98,7 +98,7 @@ const Login = () => {
             }
           })
             .then(data => {
-              enqueueSnackbar(`User ${data.data.login.username} logged in!!`, {
+              enqueueSnackbar(`User ${data.data.login.token} logged in!!`, {
                 variant: "success"
               });
               router.push("/onboarding");

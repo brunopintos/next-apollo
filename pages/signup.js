@@ -19,7 +19,7 @@ import Layout from "../components/Layout";
 const SIGNUP_USER = gql`
   mutation SignupUser($username: String!, $email: String!, $password: String!) {
     signupUser(username: $username, email: $email, password: $password) {
-      username
+      token
     }
   }
 `;
@@ -108,12 +108,9 @@ const Signup = () => {
             }
           })
             .then(() => {
-              enqueueSnackbar(
-                `User ${values.username} created successfully!!`,
-                {
-                  variant: "success"
-                }
-              );
+              enqueueSnackbar(`User ${values.token} created successfully!!`, {
+                variant: "success"
+              });
               router.push("/onboarding");
             })
             .catch(err => {

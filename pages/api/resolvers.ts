@@ -40,16 +40,19 @@ const resolvers = {
           [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
         }
       }).then(user => {
-        if (user && user.dataValues) {
-          if (!bcrypt.compareSync(password, user.dataValues.password)) {
-            throw new UserInputError("Incorrect password.");
-          }
-        } else {
+        if (!user || !user.dataValues) {
           throw new UserInputError(
             "The username or email address is not registered."
           );
         }
-        return user;
+        if (!bcrypt.compareSync(password, user.dataValues.password)) {
+          throw new UserInputError("Incorrect password.");
+        }
+        return {
+          token: jwt.sign(user.toJSON(), "supersecret", {
+            expiresIn: "30m"
+          })
+        };
       });
     },
     signupUser: (_, { username, email, password }, { dataBase }) => {
@@ -58,23 +61,31 @@ const resolvers = {
         email: email,
         role: "ADMIN",
         password: bcrypt.hashSync(password, 3)
-      }).catch(err => {
-        if (err.errors[0].message.includes("username")) {
-          return dataBase.User.findOne({
-            where: { email: email }
-          }).then(user => {
-            if (user && user.dataValues) {
-              throw new UserInputError(
-                "Both username and email addres are already in use."
-              );
-            } else {
-              throw new UserInputError("Username is already in use.");
-            }
-          });
-        } else {
-          throw new UserInputError("Email address is already in use.");
-        }
-      });
+      })
+        .then(user => {
+          return {
+            token: jwt.sign(user.toJSON(), "supersecret", {
+              expiresIn: "30m"
+            })
+          };
+        })
+        .catch(err => {
+          if (err.errors[0].message.includes("username")) {
+            return dataBase.User.findOne({
+              where: { email: email }
+            }).then(user => {
+              if (user && user.dataValues) {
+                throw new UserInputError(
+                  "Both username and email addres are already in use."
+                );
+              } else {
+                throw new UserInputError("Username is already in use.");
+              }
+            });
+          } else {
+            throw new UserInputError("Email address is already in use.");
+          }
+        });
     },
     createArticle: async (
       _,

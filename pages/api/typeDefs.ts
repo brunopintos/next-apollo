@@ -10,8 +10,12 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    signupUser(username: String!, email: String!, password: String!): User!
-    login(usernameOrEmail: String!, password: String!): User
+    signupUser(
+      username: String!
+      email: String!
+      password: String!
+    ): AuthPayLoad
+    login(usernameOrEmail: String!, password: String!): AuthPayLoad
     createArticle(input: InputCreateArticle!): Article!
   }
 
@@ -43,6 +47,10 @@ const typeDefs = gql`
     articles: [Article!]!
     createdAt: Date
     updatedAt: Date
+  }
+
+  type AuthPayLoad {
+    token: String!
   }
 
   input InputCreateArticle {
