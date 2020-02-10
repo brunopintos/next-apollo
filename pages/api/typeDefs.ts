@@ -14,8 +14,8 @@ const typeDefs = gql`
       username: String!
       email: String!
       password: String!
-    ): AuthPayLoad
-    login(usernameOrEmail: String!, password: String!): AuthPayLoad
+    ): AuthPayLoad!
+    login(usernameOrEmail: String!, password: String!): AuthPayLoad!
     createArticle(input: InputCreateArticle!): Article!
   }
 
