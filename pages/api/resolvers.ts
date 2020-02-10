@@ -3,6 +3,7 @@ import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -40,7 +41,7 @@ const resolvers = {
         }
       }).then(user => {
         if (user && user.dataValues) {
-          if (user.dataValues.password !== password) {
+          if (!bcrypt.compareSync(password, user.dataValues.password)) {
             throw new UserInputError("Incorrect password.");
           }
         } else {
@@ -56,7 +57,7 @@ const resolvers = {
         username: username,
         email: email,
         role: "ADMIN",
-        password: password
+        password: bcrypt.hashSync(password, 3)
       }).catch(err => {
         if (err.errors[0].message.includes("username")) {
           return dataBase.User.findOne({
@@ -83,6 +84,7 @@ const resolvers = {
       const article = await dataBase.Article.create({
         title: title,
         icon: icon || "-",
+        content: "",
         parentId: parentId || null,
         authorId: authorId,
         isFavourite: false
