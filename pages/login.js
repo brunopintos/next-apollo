@@ -8,15 +8,15 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
 
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
+import Layout from "../components/Layout";
+
 import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-
-import MainHeader from "../components/MainHeader";
-import Title from "../components/Title";
-import Layout from "../components/Layout";
 
 const LOGIN = gql`
   mutation login($usernameOrEmail: String!, $password: String!) {

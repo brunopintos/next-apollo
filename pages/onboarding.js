@@ -1,12 +1,15 @@
 import React from "react";
 import styled from "styled-components";
-
-import { Typography, Container, Button } from "@material-ui/core";
+import Link from "next/link";
+import withAuth from "../lib/jwt";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 import Layout from "../components/Layout";
-import Link from "next/link";
+
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
+import Button from "@material-ui/core/Button";
 
 const Subtitle = styled(Typography)`
   && {
@@ -63,4 +66,4 @@ const Onboarding = () => {
   );
 };
 
-export default Onboarding;
+export default withAuth(["USER", "ADMIN"])(Onboarding);
