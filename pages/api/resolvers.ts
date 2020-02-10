@@ -2,6 +2,7 @@ import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
+import jwt from "jsonwebtoken";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -54,6 +55,7 @@ const resolvers = {
       return dataBase.User.create({
         username: username,
         email: email,
+        role: "ADMIN",
         password: password
       }).catch(err => {
         if (err.errors[0].message.includes("username")) {

@@ -20,6 +20,7 @@ const typeDefs = gql`
     username: String!
     email: String!
     password: String!
+    role: Role!
     createdAt: Date
     updatedAt: Date
   }
@@ -50,6 +51,11 @@ const typeDefs = gql`
     icon: String
     parentId: ID
     authorId: ID!
+  }
+
+  enum Role {
+    USER
+    ADMIN
   }
 `;
 
