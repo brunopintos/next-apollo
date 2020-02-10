@@ -1,5 +1,4 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
 import { Typography, Container, Button } from "@material-ui/core";
@@ -64,4 +63,4 @@ const Onboarding = () => {
   );
 };
 
-export default withApollo(Onboarding);
+export default Onboarding;

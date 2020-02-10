@@ -1,5 +1,4 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
 import ArticlesDrawer from "../components/ArticlesDrawer";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -61,4 +60,4 @@ const Articles = () => {
   );
 };
 
-export default withApollo(Articles);
+export default Articles;

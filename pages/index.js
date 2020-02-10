@@ -1,5 +1,4 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
 import styled from "styled-components";
 
 import { Typography, Container } from "@material-ui/core";
@@ -194,4 +193,4 @@ const Welcome = () => {
   );
 };
 
-export default withApollo(Welcome);
+export default Welcome;

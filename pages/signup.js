@@ -1,5 +1,4 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
@@ -243,4 +242,4 @@ const Signup = () => {
   );
 };
 
-export default withApollo(Signup);
+export default Signup;
