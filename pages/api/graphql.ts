@@ -8,7 +8,7 @@ const apolloServer = new ApolloServer({
   resolvers,
   introspection: true,
   playground: true,
-  context: { dataBase }
+  context: ({ req, res }: any) => ({ dataBase, req, res })
 });
 
 export const config = {

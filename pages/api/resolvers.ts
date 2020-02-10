@@ -4,6 +4,7 @@ import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import cookie from "";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -34,7 +35,7 @@ const resolvers = {
     }
   },
   Mutation: {
-    login: (_, { usernameOrEmail, password }, { dataBase }) => {
+    login: (_, { usernameOrEmail, password }, { dataBase, res }) => {
       return dataBase.User.findOne({
         where: {
           [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
@@ -48,14 +49,14 @@ const resolvers = {
         if (!bcrypt.compareSync(password, user.dataValues.password)) {
           throw new UserInputError("Incorrect password.");
         }
-        return {
-          token: jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "30m"
-          })
-        };
+        const token = jwt.sign(user.toJSON(), "supersecret", {
+          expiresIn: "30m"
+        });
+        res.setHeader("Set-Cookie", [`authentication-cookie=${token}`]);
+        return { token: token };
       });
     },
-    signupUser: (_, { username, email, password }, { dataBase }) => {
+    signupUser: (_, { username, email, password }, { dataBase, res }) => {
       return dataBase.User.create({
         username: username,
         email: email,
@@ -63,11 +64,11 @@ const resolvers = {
         password: bcrypt.hashSync(password, 3)
       })
         .then(user => {
-          return {
-            token: jwt.sign(user.toJSON(), "supersecret", {
-              expiresIn: "30m"
-            })
-          };
+          const token = jwt.sign(user.toJSON(), "supersecret", {
+            expiresIn: "30m"
+          });
+          res.setHeader("Set-Cookie", [`authentication-cookie=${token}`]);
+          return { token: token };
         })
         .catch(err => {
           if (err.errors[0].message.includes("username")) {

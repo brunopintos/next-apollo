@@ -61,4 +61,5 @@ const Articles = () => {
   );
 };
 
-export default withAuth(["USER", "ADMIN"])(Articles);
+// export default withAuth()(Articles);
+export default Articles;
