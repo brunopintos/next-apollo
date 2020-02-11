@@ -7,6 +7,7 @@ const typeDefs = gql`
     getUsers: [User]!
     getUser(email: String!): User
     getArticles: [Article]!
+    getUserArticles: [Article]!
   }
 
   type Mutation {

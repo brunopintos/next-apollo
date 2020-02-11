@@ -1,8 +1,10 @@
 import React from "react";
+import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../lib/jwt";
+import { useQuery } from "@apollo/react-hooks";
 
-import ArticlesDrawer from "../components/ArticlesDrawer";
+import ArticlesSideBar from "../components/ArticlesSideBar";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import IconButton from "@material-ui/core/IconButton";
@@ -11,13 +13,26 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 
-const drawerWidth = 170;
+const GET_USER_ARTICLES = gql`
+  query getUserArticles {
+    getUserArticles {
+      id
+      title
+      icon
+      content
+    }
+  }
+`;
+
+const StyledDiv = styled.div`
+  && {
+    flex-grow: 1;
+  }
+`;
 
 const StyledAppBar = styled(Container)`
   && {
     background-color: Gold;
-    width: calc(100% - ${drawerWidth}px);
-    margin-left: ${drawerWidth}px;
   }
 `;
 
@@ -32,10 +47,14 @@ const Title = styled(Typography)`
 `;
 
 const Articles = () => {
-  let actualArticle = null; //ask the db
+  const { loading, error, data } = useQuery(GET_USER_ARTICLES);
+  if (loading) return <p>Loading ...</p>;
+  if (error) {
+    return <p>hola</p>;
+  }
 
   return (
-    <div>
+    <StyledDiv>
       <CssBaseline />
       <StyledAppBar position="fixed">
         <Toolbar>
@@ -45,19 +64,12 @@ const Articles = () => {
           <Title variant="h6">Articles</Title>
         </Toolbar>
       </StyledAppBar>
-      <ArticlesDrawer
-        list={[
-          { id: 1, icon: "!", name: "ARTICLE 1" },
-          { id: 2, icon: "@", name: "ARTICLE 2" },
-          { id: 3, icon: "#", name: "ARTICLE 3" },
-          { id: 4, icon: "$", name: "ARTICLE 4" }
-        ]}
-      />
-      <main>
+      <ArticlesSideBar list={data.getUserArticles} />
+      {/* <main>
         <div />
         <Typography paragraph>Hola</Typography>
-      </main>
-    </div>
+      </main> */}
+    </StyledDiv>
   );
 };
 

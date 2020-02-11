@@ -31,6 +31,18 @@ const resolvers = {
     },
     getArticles: (_, __, { dataBase }) => {
       return dataBase.Article.findAll();
+    },
+    getUserArticles: (_, __, { dataBase, userId }) => {
+      return dataBase.User.findByPk(userId)
+        .then(user => {
+          if (!user || !user.dataValues) {
+            throw new UserInputError("Authentication Error.");
+          }
+          return dataBase.Article.findAll({ where: { authorId: userId } });
+        })
+        .catch(() => {
+          throw new UserInputError("Authentication Error.");
+        });
     }
   },
   Mutation: {
@@ -94,7 +106,7 @@ const resolvers = {
     ) => {
       const article = await dataBase.Article.create({
         title: title,
-        icon: icon || "-",
+        icon: icon || "📒",
         content: "",
         parentId: parentId || null,
         authorId: authorId,
