@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Tag.associate = function(models) {
     Tag.belongsToMany(models.Article, {
-      through: "articleTag",
+      through: "ArticleTag",
       foreignKey: "tagId"
     });
   };

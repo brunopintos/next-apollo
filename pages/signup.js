@@ -1,5 +1,4 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
@@ -7,6 +6,7 @@ import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import Cookies from "js-cookie";
 
 import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
@@ -20,7 +20,7 @@ import Layout from "../components/Layout";
 const SIGNUP_USER = gql`
   mutation SignupUser($username: String!, $email: String!, $password: String!) {
     signupUser(username: $username, email: $email, password: $password) {
-      username
+      token
     }
   }
 `;
@@ -109,12 +109,10 @@ const Signup = () => {
             }
           })
             .then(() => {
-              enqueueSnackbar(
-                `User ${values.username} created successfully!!`,
-                {
-                  variant: "success"
-                }
-              );
+              enqueueSnackbar(`User ${values.token} created successfully!!`, {
+                variant: "success"
+              });
+              Cookies.set("token", data.data.login.token);
               router.push("/onboarding");
             })
             .catch(err => {
@@ -243,4 +241,4 @@ const Signup = () => {
   );
 };
 
-export default withApollo(Signup);
+export default Signup;

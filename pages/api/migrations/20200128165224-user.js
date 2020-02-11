@@ -1,16 +1,15 @@
-"use-strict";
+"use strict";
 
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define(
-    "User",
-    {
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable("Users", {
       id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
       username: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -18,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       email: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -27,31 +26,29 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       password: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
         validate: {
           len: [8, 100]
         }
       },
       role: {
-        type: DataTypes.ENUM,
+        type: Sequelize.ENUM,
         allowNull: false,
         values: ["USER", "ADMIN"]
       },
       createdAt: {
-        type: DataTypes.DATE
+        allowNull: false,
+        type: Sequelize.DATE
       },
       updatedAt: {
-        type: DataTypes.DATE
+        allowNull: false,
+        type: Sequelize.DATE
       }
-    },
-    {}
-  );
+    });
+  },
 
-  User.associate = function(models) {
-    User.hasMany(models.Article, { foreignKey: "authorId", as: "articles" });
-  };
-
-  return User;
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable("Users");
+  }
 };

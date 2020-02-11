@@ -63,7 +63,7 @@ module.exports = (sequelize, DataTypes) => {
     Article.belongsTo(models.Article, { foreignKey: "parentId", as: "parent" });
     Article.belongsTo(models.User, { foreignKey: "authorId", as: "author" });
     Article.belongsToMany(models.Tag, {
-      through: "articleTag",
+      through: "ArticleTag",
       foreignKey: "articleId"
     });
   };

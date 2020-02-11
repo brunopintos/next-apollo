@@ -2,6 +2,8 @@ import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -32,46 +34,58 @@ const resolvers = {
     }
   },
   Mutation: {
-    login: (_, { usernameOrEmail, password }, { dataBase }) => {
+    login: (_, { usernameOrEmail, password }, { dataBase, res }) => {
       return dataBase.User.findOne({
         where: {
           [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
         }
       }).then(user => {
-        if (user && user.dataValues) {
-          if (user.dataValues.password !== password) {
-            throw new UserInputError("Incorrect password.");
-          }
-        } else {
+        if (!user || !user.dataValues) {
           throw new UserInputError(
             "The username or email address is not registered."
           );
         }
-        return user;
+        if (!bcrypt.compareSync(password, user.dataValues.password)) {
+          throw new UserInputError("Incorrect password.");
+        }
+        const token = jwt.sign(user.toJSON(), "supersecret", {
+          expiresIn: "30m"
+        });
+        res.setHeader("Set-Cookie", [`token=${token}`]);
+        return { token: token };
       });
     },
-    signupUser: (_, { username, email, password }, { dataBase }) => {
+    signupUser: (_, { username, email, password }, { dataBase, res }) => {
       return dataBase.User.create({
         username: username,
         email: email,
-        password: password
-      }).catch(err => {
-        if (err.errors[0].message.includes("username")) {
-          return dataBase.User.findOne({
-            where: { email: email }
-          }).then(user => {
-            if (user && user.dataValues) {
-              throw new UserInputError(
-                "Both username and email addres are already in use."
-              );
-            } else {
-              throw new UserInputError("Username is already in use.");
-            }
+        role: "ADMIN",
+        password: bcrypt.hashSync(password, 3)
+      })
+        .then(user => {
+          const token = jwt.sign(user.toJSON(), "supersecret", {
+            expiresIn: "30m"
           });
-        } else {
-          throw new UserInputError("Email address is already in use.");
-        }
-      });
+          res.setHeader("Set-Cookie", [`token=${token}`]);
+          return { token: token };
+        })
+        .catch(err => {
+          if (err.errors[0].message.includes("username")) {
+            return dataBase.User.findOne({
+              where: { email: email }
+            }).then(user => {
+              if (user && user.dataValues) {
+                throw new UserInputError(
+                  "Both username and email addres are already in use."
+                );
+              } else {
+                throw new UserInputError("Username is already in use.");
+              }
+            });
+          } else {
+            throw new UserInputError("Email address is already in use.");
+          }
+        });
     },
     createArticle: async (
       _,
@@ -81,6 +95,7 @@ const resolvers = {
       const article = await dataBase.Article.create({
         title: title,
         icon: icon || "-",
+        content: "",
         parentId: parentId || null,
         authorId: authorId,
         isFavourite: false

@@ -10,8 +10,12 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    signupUser(username: String!, email: String!, password: String!): User!
-    login(usernameOrEmail: String!, password: String!): User
+    signupUser(
+      username: String!
+      email: String!
+      password: String!
+    ): AuthPayLoad!
+    login(usernameOrEmail: String!, password: String!): AuthPayLoad!
     createArticle(input: InputCreateArticle!): Article!
   }
 
@@ -19,7 +23,7 @@ const typeDefs = gql`
     id: ID!
     username: String!
     email: String!
-    password: String!
+    role: Role!
     createdAt: Date
     updatedAt: Date
   }
@@ -45,11 +49,20 @@ const typeDefs = gql`
     updatedAt: Date
   }
 
+  type AuthPayLoad {
+    token: String!
+  }
+
   input InputCreateArticle {
     title: String!
     icon: String
     parentId: ID
     authorId: ID!
+  }
+
+  enum Role {
+    USER
+    ADMIN
   }
 `;
 

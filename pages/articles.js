@@ -1,15 +1,15 @@
 import React from "react";
-import { withApollo } from "../lib/apollo";
+import styled from "styled-components";
+import withAuth from "../lib/jwt";
+
 import ArticlesDrawer from "../components/ArticlesDrawer";
-import AppBar from "@material-ui/core/AppBar";
+
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import styled from "styled-components";
-import { Container } from "@material-ui/core";
+import Container from "@material-ui/core/Container";
 
 const drawerWidth = 170;
 
@@ -61,4 +61,4 @@ const Articles = () => {
   );
 };
 
-export default withApollo(Articles);
+export default withAuth()(Articles);

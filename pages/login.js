@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { withApollo } from "../lib/apollo";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
@@ -8,6 +7,11 @@ import { useSnackbar } from "notistack";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
+import Cookies from "js-cookie";
+
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
+import Layout from "../components/Layout";
 
 import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
@@ -15,14 +19,10 @@ import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
-import MainHeader from "../components/MainHeader";
-import Title from "../components/Title";
-import Layout from "../components/Layout";
-
 const LOGIN = gql`
   mutation login($usernameOrEmail: String!, $password: String!) {
     login(usernameOrEmail: $usernameOrEmail, password: $password) {
-      username
+      token
     }
   }
 `;
@@ -99,9 +99,10 @@ const Login = () => {
             }
           })
             .then(data => {
-              enqueueSnackbar(`User ${data.data.login.username} logged in!!`, {
+              enqueueSnackbar(`User ${data.data.login.token} logged in!!`, {
                 variant: "success"
               });
+              Cookies.set("token", data.data.login.token);
               router.push("/onboarding");
             })
             .catch(err => {
@@ -195,4 +196,4 @@ const Login = () => {
   );
 };
 
-export default withApollo(Login);
+export default Login;
