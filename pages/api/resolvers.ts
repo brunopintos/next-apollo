@@ -4,7 +4,6 @@ import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import cookie from "";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -52,7 +51,7 @@ const resolvers = {
         const token = jwt.sign(user.toJSON(), "supersecret", {
           expiresIn: "30m"
         });
-        res.setHeader("Set-Cookie", [`authentication-cookie=${token}`]);
+        res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
       });
     },
@@ -67,7 +66,7 @@ const resolvers = {
           const token = jwt.sign(user.toJSON(), "supersecret", {
             expiresIn: "30m"
           });
-          res.setHeader("Set-Cookie", [`authentication-cookie=${token}`]);
+          res.setHeader("Set-Cookie", [`token=${token}`]);
           return { token: token };
         })
         .catch(err => {

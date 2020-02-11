@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import Cookies from "js-cookie";
 
 import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
@@ -111,6 +112,7 @@ const Signup = () => {
               enqueueSnackbar(`User ${values.token} created successfully!!`, {
                 variant: "success"
               });
+              Cookies.set("token", data.data.login.token);
               router.push("/onboarding");
             })
             .catch(err => {

@@ -7,6 +7,7 @@ import { useSnackbar } from "notistack";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
@@ -101,6 +102,7 @@ const Login = () => {
               enqueueSnackbar(`User ${data.data.login.token} logged in!!`, {
                 variant: "success"
               });
+              Cookies.set("token", data.data.login.token);
               router.push("/onboarding");
             })
             .catch(err => {

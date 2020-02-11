@@ -66,5 +66,4 @@ const Onboarding = () => {
   );
 };
 
-// export default withAuth()(Onboarding);
-export default Onboarding;
+export default withAuth()(Onboarding);
