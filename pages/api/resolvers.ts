@@ -43,6 +43,12 @@ const resolvers = {
         .catch(() => {
           throw new UserInputError("Authentication Error.");
         });
+    },
+    getSubArticles: (_, { id }, { dataBase }) => {
+      return dataBase.Article.findAll({ where: { parentId: id } });
+    },
+    getRootArticles: (_, __, { dataBase }) => {
+      return dataBase.Article.findAll({ where: { parentId: null } });
     }
   },
   Mutation: {
@@ -61,7 +67,7 @@ const resolvers = {
           throw new UserInputError("Incorrect password.");
         }
         const token = jwt.sign(user.toJSON(), "supersecret", {
-          expiresIn: "30m"
+          expiresIn: "1d"
         });
         res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
@@ -76,7 +82,7 @@ const resolvers = {
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "30m"
+            expiresIn: "1d"
           });
           res.setHeader("Set-Cookie", [`token=${token}`]);
           return { token: token };
@@ -99,35 +105,52 @@ const resolvers = {
           }
         });
     },
-    createArticle: async (
+    createArticle: (
       _,
-      { input: { title, icon, parentId, authorId } },
-      { dataBase }
+      { input: { title, icon, content, parentId } },
+      { dataBase, userId }
     ) => {
-      const article = await dataBase.Article.create({
-        title: title,
-        icon: icon || "📒",
-        content: "",
-        parentId: parentId || null,
-        authorId: authorId,
-        isFavourite: false
-      }).catch(err => {
-        if (err.errors[0].message.includes("title")) {
-          throw new UserInputError("Article title is already in use.");
-        } else {
-          throw new UserInputError("Icon too long");
-        }
-      });
-      return article;
+      return dataBase.User.findByPk(userId)
+        .then(user => {
+          if (!user || !user.dataValues) {
+            throw new UserInputError("Authentication Error.");
+          }
+          return dataBase.Article.create({
+            title: title,
+            icon: icon || "📒",
+            content: content || "Here is some content for your Article",
+            parentId: parentId || null,
+            authorId: userId,
+            isFavourite: false
+          })
+            .then(article => {
+              return article;
+            })
+            .catch(err => {
+              if (err.errors[0].message.includes("title")) {
+                console.log(err.errors[0].message);
+                throw new UserInputError("Article title is already in use.");
+              } else {
+                throw new UserInputError("Icon too long");
+              }
+            });
+        })
+        .catch(() => {
+          throw new UserInputError("Authentication Error.");
+        });
     }
   },
   Article: {
     tags: article => article.getTags(),
     parent: article => article.getParent(),
-    author: article => article.getAuthor()
+    author: article => article.getAuthor(),
+    articles: article => article.getArticles()
   },
   Tag: {
     articles: tag => tag.getArticles()
+  },
+  User: {
+    articles: user => user.getArticles()
   }
 };
 

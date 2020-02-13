@@ -124,11 +124,12 @@ const Signup = () => {
               } else {
                 if (err.message.includes("Username")) {
                   setErrors({
-                    username: err.graphQLErrors.map(x => x.message)
+                    username: err?.graphQLErrors?.map(x => x.message)
                   });
                 } else {
+                  console.log(err);
                   setErrors({
-                    email: err.graphQLErrors.map(x => x.message)
+                    email: err?.graphQLErrors?.map(x => x.message)
                   });
                 }
               }

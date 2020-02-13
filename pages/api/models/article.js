@@ -61,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
 
   Article.associate = function(models) {
     Article.belongsTo(models.Article, { foreignKey: "parentId", as: "parent" });
+    Article.hasMany(models.Article, {
+      foreignKey: "parentId",
+      as: "articles"
+    });
     Article.belongsTo(models.User, { foreignKey: "authorId", as: "author" });
     Article.belongsToMany(models.Tag, {
       through: "ArticleTag",

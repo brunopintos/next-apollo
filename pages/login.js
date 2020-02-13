@@ -99,7 +99,7 @@ const Login = () => {
             }
           })
             .then(data => {
-              enqueueSnackbar(`User ${data.data.login.token} logged in!!`, {
+              enqueueSnackbar(`User logged in!!`, {
                 variant: "success"
               });
               Cookies.set("token", data.data.login.token);
@@ -108,11 +108,11 @@ const Login = () => {
             .catch(err => {
               if (err.message.includes("username")) {
                 setErrors({
-                  usernameOrEmail: err.graphQLErrors.map(x => x.message)
+                  usernameOrEmail: err?.graphQLErrors?.map(x => x.message)
                 });
               } else {
                 setErrors({
-                  password: err.graphQLErrors.map(x => x.message)
+                  password: err?.graphQLErrors?.map(x => x.message)
                 });
               }
               setSubmitting(false);

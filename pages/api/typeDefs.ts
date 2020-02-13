@@ -4,10 +4,13 @@ const typeDefs = gql`
   scalar Date
 
   type Query {
+    #me
     getUsers: [User]!
     getUser(email: String!): User
     getArticles: [Article]!
     getUserArticles: [Article]!
+    getSubArticles(id: ID!): [Article]!
+    getRootArticles: [Article]!
   }
 
   type Mutation {
@@ -25,6 +28,7 @@ const typeDefs = gql`
     username: String!
     email: String!
     role: Role!
+    articles: [Article]!
     createdAt: Date
     updatedAt: Date
   }
@@ -36,6 +40,7 @@ const typeDefs = gql`
     content: String!
     tags: [Tag!]!
     parent: Article
+    articles: [Article]!
     author: User!
     isFavourite: Boolean!
     createdAt: Date
@@ -57,8 +62,8 @@ const typeDefs = gql`
   input InputCreateArticle {
     title: String!
     icon: String
+    content: String
     parentId: ID
-    authorId: ID!
   }
 
   enum Role {
