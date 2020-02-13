@@ -3,7 +3,8 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../lib/jwt";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import { makeStyles } from "@material-ui/core/styles";
+import { fade, makeStyles } from "@material-ui/core/styles";
+import SearchIcon from "@material-ui/icons/Search";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,6 +12,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../components/ArticleItem";
+import Button from "@material-ui/core/Button";
+import InputBase from "@material-ui/core/InputBase";
 
 const GET_ROOT_ARTICLES = gql`
   query getRootArticles {
@@ -19,6 +22,9 @@ const GET_ROOT_ARTICLES = gql`
       title
       icon
       content
+      parent {
+        id
+      }
     }
   }
 `;
@@ -58,6 +64,11 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex"
   },
+  listRoot: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper
+  },
   appBar: {
     zIndex: theme.zIndex.drawer + 1
   },
@@ -72,6 +83,44 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     padding: theme.spacing(3)
   },
+  search: {
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    "&:hover": {
+      backgroundColor: fade(theme.palette.common.white, 0.25)
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto"
+    }
+  },
+  searchIcon: {
+    width: theme.spacing(7),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "black"
+  },
+  inputRoot: {
+    color: "black"
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 7),
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: 120,
+      "&:focus": {
+        width: 200
+      }
+    }
+  },
   toolbar: theme.mixins.toolbar
 }));
 
@@ -84,7 +133,7 @@ const Articles = () => {
 
   if (loading) return <p>Loading ...</p>;
   if (error) {
-    return <p>{"error"}</p>;
+    return <p>{error.message}</p>;
   }
 
   if (data.getRootArticles === 0) {
@@ -99,6 +148,19 @@ const Articles = () => {
           <Title variant="h6" noWrap>
             Articles
           </Title>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              inputProps={{ "aria-label": "search" }}
+            />
+          </div>
         </Toolbar>
       </StyledAppBar>
       <Drawer
@@ -109,9 +171,9 @@ const Articles = () => {
         }}
       >
         <div className={classes.toolbar} />
-        <List>
+        <List className={classes.listRoot}>
           {data.getRootArticles.map(article => (
-            <ArticleItem article={article}>{console.log(article)}</ArticleItem>
+            <ArticleItem article={article} />
           ))}
         </List>
       </Drawer>
