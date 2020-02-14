@@ -4,13 +4,14 @@ const typeDefs = gql`
   scalar Date
 
   type Query {
-    #me
+    me: User!
     getUsers: [User]!
-    getUser(email: String!): User
+    getUser(email: String!): User!
     getArticles: [Article]!
-    getUserArticles: [Article]!
+    getArticle(id: ID!): Article!
     getSubArticles(id: ID!): [Article]!
     getRootArticles: [Article]!
+    getFirstArticle: Article
   }
 
   type Mutation {

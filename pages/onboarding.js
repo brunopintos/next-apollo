@@ -1,4 +1,6 @@
 import React from "react";
+import gql from "graphql-tag";
+import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 import Link from "next/link";
 import withAuth from "../lib/jwt";
@@ -10,6 +12,15 @@ import Layout from "../components/Layout";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
+
+const GET_FIRST_ARTICLE = gql`
+  query getFirstArticle {
+    getFirstArticle {
+      id
+      title
+    }
+  }
+`;
 
 const Subtitle = styled(Typography)`
   && {
@@ -46,6 +57,10 @@ const StyledButton = styled(Button)`
 `;
 
 const Onboarding = () => {
+  const { loading, error, data } = useQuery(GET_FIRST_ARTICLE);
+  if (loading) return <p>Loading ...</p>;
+  const article = data?.getFirstArticle;
+
   return (
     <Layout>
       <MainHeader title="Lithium KB - Lithium Knowledge Base" />
@@ -53,7 +68,10 @@ const Onboarding = () => {
       <Subtitle variant="h5">
         Create articles to start sharing knowledge with your partners!
       </Subtitle>
-      <Link href="/articles">
+      <Link
+        href="/article/[article]"
+        as={`/article/${article.title}-${article.id}`}
+      >
         <StyledButton aria-label="Continue">Let's Go!</StyledButton>
       </Link>
       <StyledContainer>

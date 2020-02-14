@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
+import Link from "next/link";
 import { useQuery } from "@apollo/react-hooks";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -72,10 +73,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ArticleItem = ({ article }) => {
+const ArticleItem = ({ article, handleClick, selectedArticle }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
-  const [selected, setSelected] = useState(false);
+  const [selected, setSelected] = useState(selectedArticle === article.id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
@@ -93,10 +94,6 @@ const ArticleItem = ({ article }) => {
     setExpanded(!expanded);
   };
 
-  const handleItemClick = () => {
-    setSelected(!selected);
-  };
-
   const handleDialog = () => {
     setDialogOpen(!dialogOpen);
   };
@@ -108,7 +105,7 @@ const ArticleItem = ({ article }) => {
           key={article.id}
           className={article.parent ? classes.nested : undefined}
           selected={selected}
-          onClick={handleItemClick}
+          onClick={handleClick}
         >
           {data.getSubArticles.length > 0 &&
             (expanded ? (
@@ -116,7 +113,12 @@ const ArticleItem = ({ article }) => {
             ) : (
               <ExpandMore onClick={handleExpandClick} />
             ))}
-          <ListItemText primary={article.title} />
+          <Link
+            href="/article/[article]"
+            as={`/article/${article.title}-${article.id}`}
+          >
+            <ListItemText primary={article.title} onClick={handleClick} />
+          </Link>
           <IconButton edge="end" aria-label="delete" onClick={handleDialog}>
             <AddIcon />
           </IconButton>

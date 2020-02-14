@@ -1,7 +1,8 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
-import withAuth from "../lib/jwt";
+import withAuth from "../../lib/jwt";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
@@ -11,9 +12,19 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
-import ArticleItem from "../components/ArticleItem";
+import ArticleItem from "../../components/ArticleItem";
 import Button from "@material-ui/core/Button";
 import InputBase from "@material-ui/core/InputBase";
+
+const GET_ARTICLE = gql`
+  query getArticle($id: ID!) {
+    getArticle(id: $id) {
+      id
+      title
+      content
+    }
+  }
+`;
 
 const GET_ROOT_ARTICLES = gql`
   query getRootArticles {
@@ -29,18 +40,18 @@ const GET_ROOT_ARTICLES = gql`
   }
 `;
 
-const CREATE_GET_STARTED_ARTICLE = gql`
-  mutation createArticle {
-    createArticle(
-      input: { title: "Get Started", icon: "?", content: "👋 Welcome!" }
-    ) {
-      id
-      title
-      icon
-      content
-    }
-  }
-`;
+// const CREATE_GET_STARTED_ARTICLE = gql`
+//   mutation createArticle {
+//     createArticle(
+//       input: { title: "Get Started", icon: "?", content: "👋 Welcome!" }
+//     ) {
+//       id
+//       title
+//       icon
+//       content
+//     }
+//   }
+// `;
 
 const StyledAppBar = styled(AppBar)`
   && {
@@ -124,21 +135,38 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar
 }));
 
-const Articles = () => {
+const Article = () => {
   const classes = useStyles();
+  const router = useRouter();
 
-  const [selectedArticle, setSelectedArticle] = useState(null);
-  const { loading, error, data } = useQuery(GET_ROOT_ARTICLES);
-  const [createGetStartedArticle] = useMutation(CREATE_GET_STARTED_ARTICLE);
+  const idRegEx = /(.*)\-(\d+)$/;
+  const [articleTitleId, articleTitle, articleId] = idRegEx.exec(
+    router.query.article
+  );
 
-  if (loading) return <p>Loading ...</p>;
-  if (error) {
-    return <p>{error.message}</p>;
+  const rootArticles = useQuery(GET_ROOT_ARTICLES);
+  const article = useQuery(GET_ARTICLE, {
+    variables: {
+      id: articleId
+    }
+  });
+  // const [createGetStartedArticle] = useMutation(CREATE_GET_STARTED_ARTICLE);
+
+  if (rootArticles.loading || article.loading) return <p>Loading ...</p>;
+  if (rootArticles.error || article.error) {
+    return (
+      <>
+        <p>{rootArticles.error?.message}</p>
+        <p>{article.error?.message}</p>
+      </>
+    );
   }
 
-  if (data.getRootArticles === 0) {
-    createGetStartedArticle();
-  }
+  // if (data.getRootArticles === 0) {
+  //   createGetStartedArticle();
+  // }
+
+  const articleContent = article.data.getArticle.content;
 
   return (
     <div className={classes.root}>
@@ -146,7 +174,7 @@ const Articles = () => {
       <StyledAppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Title variant="h6" noWrap>
-            Articles
+            {articleTitle}
           </Title>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -172,19 +200,19 @@ const Articles = () => {
       >
         <div className={classes.toolbar} />
         <List className={classes.listRoot}>
-          {data.getRootArticles.map(article => (
-            <ArticleItem article={article} />
+          {rootArticles.data.getRootArticles.map(article => (
+            <ArticleItem article={article} selectedArticle={article.id} />
           ))}
         </List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Typography paragraph>
-          {selectedArticle ? selectedArticle.content : "No article seleceted"}
+          {articleContent ? articleContent : "No article seleceted"}
         </Typography>
       </main>
     </div>
   );
 };
 
-export default withAuth()(Articles);
+export default withAuth()(Article);

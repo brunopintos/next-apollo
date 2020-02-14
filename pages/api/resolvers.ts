@@ -23,6 +23,9 @@ const resolvers = {
     }
   }),
   Query: {
+    me: (_, __, { dataBase, userId }) => {
+      return dataBase.User.findByPk(userId);
+    },
     getUsers: (_, __, { dataBase }) => {
       return dataBase.User.findAll();
     },
@@ -32,23 +35,19 @@ const resolvers = {
     getArticles: (_, __, { dataBase }) => {
       return dataBase.Article.findAll();
     },
-    getUserArticles: (_, __, { dataBase, userId }) => {
-      return dataBase.User.findByPk(userId)
-        .then(user => {
-          if (!user || !user.dataValues) {
-            throw new UserInputError("Authentication Error.");
-          }
-          return dataBase.Article.findAll({ where: { authorId: userId } });
-        })
-        .catch(() => {
-          throw new UserInputError("Authentication Error.");
-        });
+    getArticle: (_, { id }, { dataBase }) => {
+      return dataBase.Article.findByPk(id);
     },
     getSubArticles: (_, { id }, { dataBase }) => {
       return dataBase.Article.findAll({ where: { parentId: id } });
     },
     getRootArticles: (_, __, { dataBase }) => {
       return dataBase.Article.findAll({ where: { parentId: null } });
+    },
+    getFirstArticle: (_, __, { dataBase }) => {
+      return dataBase.Article.findAll().then(articles => {
+        return articles[0];
+      });
     }
   },
   Mutation: {
