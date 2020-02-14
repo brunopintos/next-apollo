@@ -166,7 +166,7 @@ const Article = () => {
   //   createGetStartedArticle();
   // }
 
-  const articleContent = article.data.getArticle.content;
+  const thisArticle = article.data.getArticle;
 
   return (
     <div className={classes.root}>
@@ -201,14 +201,14 @@ const Article = () => {
         <div className={classes.toolbar} />
         <List className={classes.listRoot}>
           {rootArticles.data.getRootArticles.map(article => (
-            <ArticleItem article={article} selectedArticle={article.id} />
+            <ArticleItem article={article} selectedArticle={thisArticle.id} />
           ))}
         </List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Typography paragraph>
-          {articleContent ? articleContent : "No article seleceted"}
+          {thisArticle.content ? thisArticle.content : "No article seleceted"}
         </Typography>
       </main>
     </div>
