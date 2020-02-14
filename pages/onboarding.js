@@ -56,14 +56,15 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const Onboarding = () => {
+const Onboarding = props => {
   const { loading, error, data } = useQuery(GET_FIRST_ARTICLE);
   if (loading) return <p>Loading ...</p>;
   const article = data?.getFirstArticle;
 
   return (
     <Layout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <Title variant="h3">Welcome to Lithium KB!</Title>
       <Subtitle variant="h5">
         Create articles to start sharing knowledge with your partners!

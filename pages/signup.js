@@ -83,14 +83,15 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const Signup = () => {
+const Signup = props => {
   const [signupUser, { data }] = useMutation(SIGNUP_USER);
   const router = useRouter();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <StyledLayout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <StyledTitle variant="h3">Sign Up</StyledTitle>
       <Formik
         initialValues={{

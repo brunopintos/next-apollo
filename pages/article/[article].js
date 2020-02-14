@@ -15,6 +15,7 @@ import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import Button from "@material-ui/core/Button";
 import InputBase from "@material-ui/core/InputBase";
+import RichText from "../../components/RichText";
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -207,6 +208,7 @@ const Article = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
+        <RichText />
         <Typography paragraph>
           {thisArticle.content ? thisArticle.content : "No article seleceted"}
         </Typography>

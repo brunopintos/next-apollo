@@ -76,14 +76,15 @@ const LittleText = styled(Typography)`
   }
 `;
 
-const Login = () => {
+const Login = props => {
   const [login, { data }] = useMutation(LOGIN);
   const router = useRouter();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <StyledLayout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <StyledTitle variant="h3">Log In</StyledTitle>
       <Formik
         initialValues={{
