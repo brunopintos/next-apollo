@@ -13,8 +13,36 @@ import {
 import * as React from "react";
 
 const RichText = () => {
+  const quickToolbarSettings = {
+    //hacer uno con text etc y ya esta
+    image: [
+      "Replace",
+      "Align",
+      "Caption",
+      "Remove",
+      "InsertLink",
+      "OpenImageLink",
+      "-",
+      "EditImageLink",
+      "RemoveImageLink",
+      "Display",
+      "AltText",
+      "Dimension",
+      {
+        template:
+          '<button class="e-tbar-btn e-btn" id="roatateLeft"><span class="e-btn-icon e-icons e-rotate-left"></span>',
+        tooltipText: "Rotate Left"
+      },
+      {
+        template:
+          '<button class="e-tbar-btn e-btn" id="roatateRight"><span class="e-btn-icon e-icons e-rotate-right"></span>',
+        tooltipText: "Rotate Right"
+      }
+    ]
+  };
+
   return (
-    <RichTextEditorComponent>
+    <RichTextEditorComponent quickToolbarSettings={quickToolbarSettings}>
       <p>
         The RichTextEditor component is WYSIWYG ("what you see is what you get")
         editor that provides the best user experience to create and update the
