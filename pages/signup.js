@@ -83,14 +83,15 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const Signup = () => {
+const Signup = props => {
   const [signupUser, { data }] = useMutation(SIGNUP_USER);
   const router = useRouter();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <StyledLayout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <StyledTitle variant="h3">Sign Up</StyledTitle>
       <Formik
         initialValues={{
@@ -124,11 +125,12 @@ const Signup = () => {
               } else {
                 if (err.message.includes("Username")) {
                   setErrors({
-                    username: err.graphQLErrors.map(x => x.message)
+                    username: err?.graphQLErrors?.map(x => x.message)
                   });
                 } else {
+                  console.log(err);
                   setErrors({
-                    email: err.graphQLErrors.map(x => x.message)
+                    email: err?.graphQLErrors?.map(x => x.message)
                   });
                 }
               }

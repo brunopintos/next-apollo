@@ -76,14 +76,15 @@ const LittleText = styled(Typography)`
   }
 `;
 
-const Login = () => {
+const Login = props => {
   const [login, { data }] = useMutation(LOGIN);
   const router = useRouter();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   return (
     <StyledLayout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <StyledTitle variant="h3">Log In</StyledTitle>
       <Formik
         initialValues={{
@@ -99,7 +100,7 @@ const Login = () => {
             }
           })
             .then(data => {
-              enqueueSnackbar(`User ${data.data.login.token} logged in!!`, {
+              enqueueSnackbar(`User logged in!!`, {
                 variant: "success"
               });
               Cookies.set("token", data.data.login.token);
@@ -108,11 +109,11 @@ const Login = () => {
             .catch(err => {
               if (err.message.includes("username")) {
                 setErrors({
-                  usernameOrEmail: err.graphQLErrors.map(x => x.message)
+                  usernameOrEmail: err?.graphQLErrors?.map(x => x.message)
                 });
               } else {
                 setErrors({
-                  password: err.graphQLErrors.map(x => x.message)
+                  password: err?.graphQLErrors?.map(x => x.message)
                 });
               }
               setSubmitting(false);

@@ -87,10 +87,11 @@ const StyledCard = styled(Card)`
   display: inline-block; /* si estoy en celular esto se tiene que borrar asi pasan a estar en fila hacia abajo*/
 `;
 
-const Welcome = () => {
+const Welcome = props => {
   return (
     <Layout>
-      <MainHeader title="Lithium KB - Lithium Knowledge Base" />
+      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      <MainHeader />
       <WelcomeToLKB>
         <StyledTitle variant="h3">Welcome to Lithium KB!</StyledTitle>
         <Description variant="h6">
