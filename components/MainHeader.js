@@ -21,17 +21,10 @@ const StyledDiv = styled(Container)`
   }
 `;
 
-const StyledAppBar = styled(AppBar)`
-  && {
-    background-color: Gold;
-  }
-`;
-
 const Title = styled(Typography)`
   && {
     flex-grow: 1;
     display: "block";
-    color: black;
     padding-left: 5px;
     height: 100%;
   }
@@ -39,22 +32,24 @@ const Title = styled(Typography)`
 
 const MainHeader = () => (
   <StyledDiv>
-    <StyledAppBar position="fixed">
+    <AppBar color="primary" position="fixed">
       <Toolbar>
         <Link href="/">
-          <IconButton color="inherit" edge="start" aria-label="home page">
+          <IconButton color="secondary" edge="start" aria-label="home page">
             <HomeIcon />
           </IconButton>
         </Link>
-        <Title variant="h6">Lithium Knowledge Base</Title>
+        <Title color="secondary" variant="h6">
+          Lithium Knowledge Base
+        </Title>
         <Link href="/login">
-          <Button>Log in</Button>
+          <Button color="secondary">Log in</Button>
         </Link>
         <Link href="/signup">
-          <Button>Sign up</Button>
+          <Button color="secondary">Sign up</Button>
         </Link>
       </Toolbar>
-    </StyledAppBar>
+    </AppBar>
   </StyledDiv>
 );
 

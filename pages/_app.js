@@ -2,6 +2,19 @@ import { withApollo } from "../lib/apollo";
 import { SnackbarProvider } from "notistack";
 import React, { useState } from "react";
 import Head from "next/head";
+import { yellow, grey } from "@material-ui/core/colors";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: yellow[700]
+    },
+    secondary: {
+      main: grey[700]
+    }
+  }
+});
 
 function MyApp({ Component, pageProps }) {
   const [title, setTitle] = useState("Lithium KB - Lithium Knowledge Base");
@@ -19,13 +32,15 @@ function MyApp({ Component, pageProps }) {
           rel="stylesheet"
         />
       </Head>
-      <SnackbarProvider
-        maxSnack={3}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        autoHideDuration={3500}
-      >
-        <Component {...pageProps} changeTitle={changeTitle} />
-      </SnackbarProvider>
+      <ThemeProvider theme={theme}>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          autoHideDuration={3500}
+        >
+          <Component {...pageProps} changeTitle={changeTitle} />
+        </SnackbarProvider>
+      </ThemeProvider>
     </>
   );
 }

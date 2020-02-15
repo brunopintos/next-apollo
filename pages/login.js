@@ -50,8 +50,6 @@ const StyledLayout = styled(Layout)`
   }
 `;
 
-const StyledTextField = styled(TextField)``;
-
 const MaxWidthContainer = styled(Container)`
   && {
     max-width: 250px;
@@ -61,12 +59,6 @@ const MaxWidthContainer = styled(Container)`
 const StyledGrid = styled(Grid)`
   && {
     padding-top: 20px;
-  }
-`;
-
-const StyledButton = styled(Button)`
-  && {
-    background-color: Gold;
   }
 `;
 
@@ -138,7 +130,8 @@ const Login = props => {
                 alignItems="center"
               >
                 <Grid item>
-                  <StyledTextField
+                  <TextField
+                    color="primary"
                     name="usernameOrEmail"
                     label="Username/Email"
                     variant="outlined"
@@ -156,7 +149,8 @@ const Login = props => {
                   />
                 </Grid>
                 <Grid item>
-                  <StyledTextField
+                  <TextField
+                    color="primary"
                     name="password"
                     label="Password"
                     variant="outlined"
@@ -172,13 +166,15 @@ const Login = props => {
                   />
                 </Grid>
                 <Grid item>
-                  <StyledButton
+                  <Button
+                    color="primary"
+                    variant="contained"
                     type="submit"
                     aria-label="Continue"
                     disabled={isSubmitting}
                   >
                     Continue
-                  </StyledButton>
+                  </Button>
                 </Grid>
                 <Grid item>
                   <LittleText variant="h6">
