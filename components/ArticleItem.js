@@ -67,10 +67,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ArticleItem = ({ article, handleClick, selectedArticle }) => {
+const ArticleItem = ({ article, selectedArticle }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
-  const [selected, setSelected] = useState(selectedArticle === article.id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
@@ -95,7 +94,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
   if (article) {
     return (
       <>
-        <ListItem key={article.id} selected={selected} onClick={handleClick}>
+        <ListItem key={article.id} selected={selectedArticle === article.id}>
           {data.getSubArticles.length > 0 &&
             (expanded ? (
               <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -106,11 +105,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
             href="/article/[article]"
             as={`/article/${article.title}-${article.id}`}
           >
-            <ListItemText
-              color="secondary"
-              primary={article.title}
-              onClick={handleClick}
-            />
+            <ListItemText color="secondary" primary={article.title} />
           </Link>
           <IconButton
             color="primary"
