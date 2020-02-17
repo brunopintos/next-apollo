@@ -55,12 +55,6 @@ const validationSchema = Yup.object().shape({
     .required("Must enter a title.")
 });
 
-const StyledButton = styled(Button)`
-  && {
-    background-color: Gold;
-  }
-`;
-
 const CustomDialog = styled(Dialog)`
   && {
     min-width: 50%;
@@ -109,17 +103,26 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
         >
           {data.getSubArticles.length > 0 &&
             (expanded ? (
-              <ExpandLess onClick={handleExpandClick} />
+              <ExpandLess color="primary" onClick={handleExpandClick} />
             ) : (
-              <ExpandMore onClick={handleExpandClick} />
+              <ExpandMore color="primary" onClick={handleExpandClick} />
             ))}
           <Link
             href="/article/[article]"
             as={`/article/${article.title}-${article.id}`}
           >
-            <ListItemText primary={article.title} onClick={handleClick} />
+            <ListItemText
+              color="secondary"
+              primary={article.title}
+              onClick={handleClick}
+            />
           </Link>
-          <IconButton edge="end" aria-label="delete" onClick={handleDialog}>
+          <IconButton
+            color="primary"
+            edge="end"
+            aria-label="delete"
+            onClick={handleDialog}
+          >
             <AddIcon />
           </IconButton>
         </ListItem>
@@ -178,6 +181,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
                 <Form onSubmit={handleSubmit} noValidate>
                   <DialogContent>
                     <TextField
+                      color="secondary"
                       name="title"
                       label="Title"
                       variant="outlined"
@@ -195,14 +199,22 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
                     />
                   </DialogContent>
                   <DialogActions>
-                    <StyledButton onClick={handleDialog}>Cancel</StyledButton>
-                    <StyledButton
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleDialog}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
                       type="submit"
                       aria-label="Continue"
                       disabled={isSubmitting}
                     >
                       Create
-                    </StyledButton>
+                    </Button>
                   </DialogActions>
                 </Form>
               )}

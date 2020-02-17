@@ -226,13 +226,15 @@ const Signup = props => {
                   />
                 </Grid>
                 <Grid item>
-                  <StyledButton
+                  <Button
+                    color="primary"
+                    variant="contained"
                     type="submit"
                     aria-label="Continue"
                     disabled={isSubmitting}
                   >
                     Continue
-                  </StyledButton>
+                  </Button>
                 </Grid>
               </StyledGrid>
             </Form>
