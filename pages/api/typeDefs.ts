@@ -22,6 +22,7 @@ const typeDefs = gql`
     ): AuthPayLoad!
     login(usernameOrEmail: String!, password: String!): AuthPayLoad!
     createArticle(input: InputCreateArticle!): Article!
+    createModification(input: InputCreateModification!): Modification!
   }
 
   type User {
@@ -74,6 +75,11 @@ const typeDefs = gql`
     icon: String
     content: String
     parentId: ID
+  }
+
+  input InputCreateModification {
+    newContent: String!
+    articleId: ID
   }
 
   enum Role {
