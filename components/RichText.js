@@ -75,8 +75,9 @@ const RichText = ({ content }) => {
       }
     ]
   };
-  const onSave = () => {
-    console.log("algo");
+  const onSave = newContent => {
+    console.log(newContent);
+    //crear modificacion
   };
 
   return (
@@ -90,8 +91,8 @@ const RichText = ({ content }) => {
       format={format}
       showCharCount={true}
       fontFamily={fontFamily}
-      change={() => onSave}
-      saveInterval={1000}
+      change={valueTemplate => onSave(valueTemplate.value)}
+      saveInterval={10000}
       valueTemplate={`<p>${content}</p>`}
     >
       <Inject
