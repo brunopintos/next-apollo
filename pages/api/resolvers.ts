@@ -137,6 +137,36 @@ const resolvers = {
         .catch(() => {
           throw new UserInputError("Authentication Error.");
         });
+    },
+    createModification: async (
+      _,
+      { input: { newContent, articleId } },
+      { dataBase, userId }
+    ) => {
+      const user = await dataBase.User.findByPk(userId);
+      if (!user || !user.dataValues) {
+        throw new UserInputError("Authentication Error.");
+      }
+      const article = await dataBase.Article.findByPk(articleId);
+      if (!article || !article.dataValues) {
+        throw new UserInputError("Article not found Error.");
+      }
+      const previousContent = article.dataValues.content;
+      await dataBase.Article.update(
+        { content: newContent || "" },
+        {
+          where: {
+            id: articleId
+          }
+        }
+      );
+      console.log(previousContent);
+      const modification = await dataBase.Modification.create({
+        previousContent: previousContent,
+        articleId: articleId,
+        authorId: userId
+      });
+      return modification;
     }
   },
   Article: {
@@ -150,6 +180,10 @@ const resolvers = {
   },
   User: {
     articles: user => user.getArticles()
+  },
+  Modification: {
+    article: modification => modification.getArticle(),
+    author: modification => modification.getAuthor()
   }
 };
 

@@ -51,7 +51,7 @@ const typeDefs = gql`
 
   type Modification {
     id: ID!
-    previuosContent: String!
+    previousContent: String!
     article: Article!
     author: User!
     createdAt: Date
