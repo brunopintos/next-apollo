@@ -48,6 +48,15 @@ const typeDefs = gql`
     updatedAt: Date
   }
 
+  type Modification {
+    id: ID!
+    previuosContent: String!
+    article: Article!
+    author: User!
+    createdAt: Date
+    updatedAt: Date
+  }
+
   type Tag {
     id: ID!
     name: String!
