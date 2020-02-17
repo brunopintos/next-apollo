@@ -63,7 +63,7 @@ const CustomDialog = styled(Dialog)`
 
 const useStyles = makeStyles(theme => ({
   nested: {
-    paddingLeft: theme.spacing(6)
+    paddingLeft: theme.spacing(4)
   }
 }));
 
@@ -95,12 +95,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
   if (article) {
     return (
       <>
-        <ListItem
-          key={article.id}
-          className={article.parent ? classes.nested : undefined}
-          selected={selected}
-          onClick={handleClick}
-        >
+        <ListItem key={article.id} selected={selected} onClick={handleClick}>
           {data.getSubArticles.length > 0 &&
             (expanded ? (
               <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -127,7 +122,12 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
           </IconButton>
         </ListItem>
         {data.getSubArticles.map(article => (
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Collapse
+            className={classes.nested}
+            in={expanded}
+            timeout="auto"
+            unmountOnExit
+          >
             <List component="div" disablePadding>
               <ArticleItem article={article} />
             </List>

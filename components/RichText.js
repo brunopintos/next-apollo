@@ -76,7 +76,7 @@ const RichText = ({ content }) => {
     ]
   };
   const onSave = () => {
-    content = valueTemplate;
+    console.log("algo");
   };
 
   return (
@@ -91,8 +91,8 @@ const RichText = ({ content }) => {
       showCharCount={true}
       fontFamily={fontFamily}
       change={() => onSave}
-      saveInterval={10000}
-      valueTemplate={content}
+      saveInterval={1000}
+      valueTemplate={`<p>${content}</p>`}
     >
       <Inject
         services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}

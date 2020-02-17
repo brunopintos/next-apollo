@@ -208,10 +208,11 @@ const Article = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText />
-        <Typography paragraph>
-          {thisArticle.content ? thisArticle.content : "No article seleceted"}
-        </Typography>
+        <RichText
+          content={
+            thisArticle.content ? thisArticle.content : "No article seleceted"
+          }
+        />
       </main>
     </div>
   );
