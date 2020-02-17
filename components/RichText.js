@@ -2,21 +2,56 @@
  * Initilaize RichTextEditor from React element
  */
 import {
-  HtmlEditor,
-  Image,
-  Inject,
-  Link,
-  QuickToolbar,
   RichTextEditorComponent,
-  Toolbar
+  Inject,
+  QuickToolbar,
+  Image,
+  Link,
+  HtmlEditor,
+  Toolbar,
+  Count
 } from "@syncfusion/ej2-react-richtexteditor";
 import * as React from "react";
 
-const RichText = () => {
-  const quickToolbarSettings = {
-    //hacer uno con text etc y ya esta
+const RichText = ({ content }) => {
+  const inlineMode = {
+    enable: true,
+    onSelection: true
+  };
+  const format = {
+    width: "auto"
+  };
+  const fontFamily = {
+    width: "auto"
+  };
+  const toolbarSettings = {
+    enable: true,
+    items: [
+      "Formats",
+      "Alignments",
+      "OrderedList",
+      "UnorderedList",
+      "|",
+      "FontName",
+      "FontColor",
+      "FontSize",
+      "BackgroundColor",
+      "-",
+      "Bold",
+      "Italic",
+      "Underline",
+      "StrikeThrough",
+      "|",
+      "CreateLink",
+      "Image",
+      "|",
+      "SubScript",
+      "SuperScript",
+      "|",
+      "Print",
+      "SourceCode"
+    ],
     image: [
-      "Replace",
       "Align",
       "Caption",
       "Remove",
@@ -40,54 +75,28 @@ const RichText = () => {
       }
     ]
   };
+  const onSave = () => {
+    content = valueTemplate;
+  };
 
   return (
-    <RichTextEditorComponent quickToolbarSettings={quickToolbarSettings}>
-      <p>
-        The RichTextEditor component is WYSIWYG ("what you see is what you get")
-        editor that provides the best user experience to create and update the
-        content. Users can format their content using standard toolbar commands.
-      </p>
-
-      <p>
-        <b>Key features:</b>
-      </p>
-      <ul>
-        <li>
-          <p>Provides &lt;IFRAME&gt; and &lt;DIV&gt; modes</p>
-        </li>
-        <li>
-          <p>Capable of handling markdown editing.</p>
-        </li>
-        <li>
-          <p>
-            Contains a modular library to load the necessary functionality on
-            demand.
-          </p>
-        </li>
-        <li>
-          <p>Provides a fully customizable toolbar.</p>
-        </li>
-        <li>
-          <p>Provides HTML view to edit the source directly for developers.</p>
-        </li>
-        <li>
-          <p>Supports third-party library integration.</p>
-        </li>
-        <li>
-          <p>Allows preview of modified content before saving it.</p>
-        </li>
-        <li>
-          <p>Handles images, hyperlinks, video, hyperlinks, uploads, etc.</p>
-        </li>
-        <li>
-          <p>Contains undo/redo manager.</p>
-        </li>
-        <li>
-          <p>Creates bulleted and numbered lists.</p>
-        </li>
-      </ul>
-      <Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
+    <RichTextEditorComponent
+      id="inlineRTE"
+      enableResize={false}
+      enableTabKey={true}
+      inlineMode={inlineMode}
+      locale={"es-AR"}
+      toolbarSettings={toolbarSettings}
+      format={format}
+      showCharCount={true}
+      fontFamily={fontFamily}
+      change={() => onSave}
+      saveInterval={10000}
+      valueTemplate={content}
+    >
+      <Inject
+        services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}
+      />
     </RichTextEditorComponent>
   );
 };
