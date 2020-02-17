@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../../lib/jwt";
@@ -13,7 +13,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
-import Button from "@material-ui/core/Button";
 import InputBase from "@material-ui/core/InputBase";
 import RichText from "../../components/RichText";
 
@@ -40,19 +39,6 @@ const GET_ROOT_ARTICLES = gql`
     }
   }
 `;
-
-// const CREATE_GET_STARTED_ARTICLE = gql`
-//   mutation createArticle {
-//     createArticle(
-//       input: { title: "Get Started", icon: "?", content: "👋 Welcome!" }
-//     ) {
-//       id
-//       title
-//       icon
-//       content
-//     }
-//   }
-// `;
 
 const StyledAppBar = styled(AppBar)`
   && {
@@ -151,7 +137,6 @@ const Article = () => {
       id: articleId
     }
   });
-  // const [createGetStartedArticle] = useMutation(CREATE_GET_STARTED_ARTICLE);
 
   if (rootArticles.loading || article.loading) return <p>Loading ...</p>;
   if (rootArticles.error || article.error) {
@@ -162,10 +147,6 @@ const Article = () => {
       </>
     );
   }
-
-  // if (data.getRootArticles === 0) {
-  //   createGetStartedArticle();
-  // }
 
   const thisArticle = article.data.getArticle;
 
@@ -208,10 +189,11 @@ const Article = () => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText />
-        <Typography paragraph>
-          {thisArticle.content ? thisArticle.content : "No article seleceted"}
-        </Typography>
+        <RichText
+          content={
+            thisArticle.content ? thisArticle.content : "No article seleceted"
+          }
+        />
       </main>
     </div>
   );

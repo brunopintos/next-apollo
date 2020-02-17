@@ -63,14 +63,13 @@ const CustomDialog = styled(Dialog)`
 
 const useStyles = makeStyles(theme => ({
   nested: {
-    paddingLeft: theme.spacing(6)
+    paddingLeft: theme.spacing(4)
   }
 }));
 
-const ArticleItem = ({ article, handleClick, selectedArticle }) => {
+const ArticleItem = ({ article, selectedArticle }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
-  const [selected, setSelected] = useState(selectedArticle === article.id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
@@ -95,12 +94,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
   if (article) {
     return (
       <>
-        <ListItem
-          key={article.id}
-          className={article.parent ? classes.nested : undefined}
-          selected={selected}
-          onClick={handleClick}
-        >
+        <ListItem key={article.id} selected={selectedArticle === article.id}>
           {data.getSubArticles.length > 0 &&
             (expanded ? (
               <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -111,11 +105,7 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
             href="/article/[article]"
             as={`/article/${article.title}-${article.id}`}
           >
-            <ListItemText
-              color="secondary"
-              primary={article.title}
-              onClick={handleClick}
-            />
+            <ListItemText color="secondary" primary={article.title} />
           </Link>
           <IconButton
             color="primary"
@@ -127,7 +117,12 @@ const ArticleItem = ({ article, handleClick, selectedArticle }) => {
           </IconButton>
         </ListItem>
         {data.getSubArticles.map(article => (
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <Collapse
+            className={classes.nested}
+            in={expanded}
+            timeout="auto"
+            unmountOnExit
+          >
             <List component="div" disablePadding>
               <ArticleItem article={article} />
             </List>
