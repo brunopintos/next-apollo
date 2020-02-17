@@ -70,6 +70,10 @@ module.exports = (sequelize, DataTypes) => {
       through: "ArticleTag",
       foreignKey: "articleId"
     });
+    Article.hasMany(models.Modification, {
+      foreignKey: "articleId",
+      as: "modifications"
+    });
   };
 
   return Article;
