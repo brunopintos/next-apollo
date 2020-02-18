@@ -48,6 +48,9 @@ const resolvers = {
       return dataBase.Article.findAll().then(articles => {
         return articles[0];
       });
+    },
+    getModifications: (_, __, { dataBase }) => {
+      return dataBase.Modification.findAll();
     }
   },
   Mutation: {

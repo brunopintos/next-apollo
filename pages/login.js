@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
@@ -75,7 +75,7 @@ const Login = props => {
 
   return (
     <StyledLayout>
-      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      {props.changeTitle("LKB - Log In")}
       <MainHeader />
       <StyledTitle variant="h3">Log In</StyledTitle>
       <Formik

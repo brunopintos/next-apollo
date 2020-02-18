@@ -12,8 +12,22 @@ import {
   Count
 } from "@syncfusion/ej2-react-richtexteditor";
 import * as React from "react";
+import { useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-const RichText = ({ content }) => {
+const CREATE_MODIFICATION = gql`
+  mutation createModification($newContent: String!, $articleId: ID!) {
+    createModification(
+      input: { newContent: $newContent, articleId: $articleId }
+    ) {
+      id
+    }
+  }
+`;
+
+const RichText = ({ articleId, content }) => {
+  const [createModification, { data }] = useMutation(CREATE_MODIFICATION);
+
   const inlineMode = {
     enable: true,
     onSelection: true
@@ -77,7 +91,12 @@ const RichText = ({ content }) => {
   };
   const onSave = newContent => {
     console.log(newContent);
-    //crear modificacion
+    createModification({
+      variables: {
+        newContent: newContent,
+        articleId: articleId
+      }
+    });
   };
 
   return (

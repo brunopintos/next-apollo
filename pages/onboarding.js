@@ -63,7 +63,7 @@ const Onboarding = props => {
 
   return (
     <Layout>
-      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      {props.changeTitle("LKB - Onboarding")}
       <MainHeader />
       <Title variant="h3">Welcome to Lithium KB!</Title>
       <Subtitle variant="h5">

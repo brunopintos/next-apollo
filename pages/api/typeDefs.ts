@@ -12,6 +12,7 @@ const typeDefs = gql`
     getSubArticles(id: ID!): [Article]!
     getRootArticles: [Article]!
     getFirstArticle: Article
+    getModifications: [Modification]!
   }
 
   type Mutation {
@@ -79,7 +80,7 @@ const typeDefs = gql`
 
   input InputCreateModification {
     newContent: String!
-    articleId: ID
+    articleId: ID!
   }
 
   enum Role {

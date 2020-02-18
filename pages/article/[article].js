@@ -122,7 +122,7 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar
 }));
 
-const Article = () => {
+const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
@@ -152,6 +152,7 @@ const Article = () => {
 
   return (
     <div className={classes.root}>
+      {props.changeTitle(`LKB - ${articleTitle}`)}
       <CssBaseline />
       <StyledAppBar position="fixed" className={classes.appBar}>
         <Toolbar>
@@ -190,6 +191,7 @@ const Article = () => {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <RichText
+          articleId={thisArticle.id}
           content={
             thisArticle.content ? thisArticle.content : "No article seleceted"
           }
