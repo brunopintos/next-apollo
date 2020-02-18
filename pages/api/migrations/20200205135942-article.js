@@ -11,9 +11,8 @@ module.exports = {
       title: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
         validate: {
-          len: [8, 100]
+          len: [1, 100]
         }
       },
       icon: {
@@ -24,10 +23,7 @@ module.exports = {
         }
       },
       content: {
-        type: Sequelize.TEXT
-      },
-      isFavourite: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       authorId: {

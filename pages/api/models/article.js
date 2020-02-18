@@ -12,9 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       title: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
-          len: [8, 100]
+          len: [1, 100]
         }
       },
       icon: {
@@ -45,10 +44,6 @@ module.exports = (sequelize, DataTypes) => {
           },
           key: "id"
         }
-      },
-      isFavourite: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
       },
       createdAt: {
         type: DataTypes.DATE

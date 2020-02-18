@@ -45,7 +45,6 @@ const typeDefs = gql`
     parent: Article
     articles: [Article]!
     author: User!
-    isFavourite: Boolean!
     createdAt: Date
     updatedAt: Date
   }

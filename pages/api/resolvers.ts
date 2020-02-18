@@ -122,8 +122,7 @@ const resolvers = {
             icon: icon || "📒",
             content: content || "Here is some content for your Article",
             parentId: parentId || null,
-            authorId: userId,
-            isFavourite: false
+            authorId: userId
           })
             .then(article => {
               return article;
