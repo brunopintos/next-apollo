@@ -112,7 +112,7 @@ const RichText = ({ articleId, content }) => {
       fontFamily={fontFamily}
       change={valueTemplate => onSave(valueTemplate.value)}
       saveInterval={10000}
-      valueTemplate={`<p>${content}</p>`}
+      valueTemplate={content}
     >
       <Inject
         services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}

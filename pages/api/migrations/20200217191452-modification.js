@@ -9,7 +9,7 @@ module.exports = {
         autoIncrement: true
       },
       previousContent: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       articleId: {

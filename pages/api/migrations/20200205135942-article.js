@@ -24,7 +24,7 @@ module.exports = {
         }
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       isFavourite: {
         type: Sequelize.BOOLEAN,
