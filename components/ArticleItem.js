@@ -23,6 +23,12 @@ import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import { useMutation } from "@apollo/react-hooks";
 
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
+
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
     getSubArticles(id: $id) {
@@ -94,6 +100,16 @@ const ArticleItem = ({ article, selectedArticle }) => {
   if (article) {
     return (
       <>
+        {/* pasar a router push en vez de link
+      
+          -poner en el listItem un onClicked y adentro el router push
+          
+          -para que el expandLess y el expandMore tengan comportamiento aparte los pongo dentro de un ListItemSecondaryAction
+
+          -lo mismo hago para el boton de agregar un subarticle
+
+          https://material-ui.com/es/components/lists/#checkbox
+      */}
         <ListItem key={article.id} selected={selectedArticle === article.id}>
           {data.getSubArticles.length > 0 &&
             (expanded ? (

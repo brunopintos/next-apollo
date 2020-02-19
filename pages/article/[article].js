@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../../lib/jwt";
@@ -15,6 +15,7 @@ import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import InputBase from "@material-ui/core/InputBase";
 import RichText from "../../components/RichText";
+import Button from "@material-ui/core/Button";
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -22,6 +23,7 @@ const GET_ARTICLE = gql`
       id
       title
       content
+      updatedAt
     }
   }
 `;
@@ -50,7 +52,6 @@ const Title = styled(Typography)`
   && {
     flex-grow: 1;
     display: "block";
-    color: black;
     padding-left: 5px;
     height: 100%;
   }
@@ -72,14 +73,17 @@ const useStyles = makeStyles(theme => ({
   },
   drawer: {
     width: drawerWidth,
-    flexShrink: 0
+    flexShrink: 0,
+    zIndex: 1150
   },
   drawerPaper: {
     width: drawerWidth
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+    backgroundColor: "white"
   },
   search: {
     position: "relative",
@@ -156,14 +160,15 @@ const Article = props => {
       <CssBaseline />
       <StyledAppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Title variant="h6" noWrap>
+          <Title color="secondary" variant="h6">
             {articleTitle}
           </Title>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <SearchIcon color="secondary" />
             </div>
             <InputBase
+              color="secondary"
               placeholder="Search…"
               classes={{
                 root: classes.inputRoot,
@@ -191,6 +196,7 @@ const Article = props => {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <RichText
+          updatedAt={thisArticle.updatedAt}
           articleId={thisArticle.id}
           content={
             thisArticle.content ? thisArticle.content : "No article seleceted"
