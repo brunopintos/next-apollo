@@ -13,6 +13,7 @@ const typeDefs = gql`
     getRootArticles: [Article]!
     getFirstArticle: Article
     getModifications: [Modification]!
+    getArticleModifications(id: ID!): [Modification]!
   }
 
   type Mutation {

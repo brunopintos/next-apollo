@@ -77,17 +77,13 @@ const ArticleItem = ({ article, selectedArticle }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  //useLazyQuery
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
       id: article.id
     }
   });
   const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
-
-  if (loading) return <p>Loading ...</p>;
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -111,7 +107,7 @@ const ArticleItem = ({ article, selectedArticle }) => {
           https://material-ui.com/es/components/lists/#checkbox
       */}
         <ListItem key={article.id} selected={selectedArticle === article.id}>
-          {data.getSubArticles.length > 0 &&
+          {data?.getSubArticles.length > 0 &&
             (expanded ? (
               <ExpandLess color="primary" onClick={handleExpandClick} />
             ) : (
@@ -132,7 +128,8 @@ const ArticleItem = ({ article, selectedArticle }) => {
             <AddIcon />
           </IconButton>
         </ListItem>
-        {data.getSubArticles.map(article => (
+        {/* poner key */}
+        {data?.getSubArticles.map(article => (
           <Collapse
             className={classes.nested}
             in={expanded}

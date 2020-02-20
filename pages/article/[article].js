@@ -130,29 +130,16 @@ const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
-  const idRegEx = /(.*)\-(\d+)$/;
-  const [articleTitleId, articleTitle, articleId] = idRegEx.exec(
-    router.query.article
-  );
-
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const article = useQuery(GET_ARTICLE, {
+    fetchPolicy: "cache-and-network",
     variables: {
-      id: articleId
+      id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
     }
   });
 
-  if (rootArticles.loading || article.loading) return <p>Loading ...</p>;
-  if (rootArticles.error || article.error) {
-    return (
-      <>
-        <p>{rootArticles.error?.message}</p>
-        <p>{article.error?.message}</p>
-      </>
-    );
-  }
-
-  const thisArticle = article.data.getArticle;
+  const thisArticle = article.data?.getArticle;
+  const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   return (
     <div className={classes.root}>
@@ -188,18 +175,19 @@ const Article = props => {
       >
         <div className={classes.toolbar} />
         <List className={classes.listRoot}>
-          {rootArticles.data.getRootArticles.map(article => (
-            <ArticleItem article={article} selectedArticle={thisArticle.id} />
+          {rootArticles.data?.getRootArticles.map(article => (
+            <ArticleItem article={article} selectedArticle={thisArticle?.id} />
           ))}
         </List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <RichText
-          updatedAt={thisArticle.updatedAt}
-          articleId={thisArticle.id}
+          updatedAt={thisArticle?.updatedAt}
+          articleTitle={thisArticle?.title}
+          articleId={thisArticle?.id}
           content={
-            thisArticle.content ? thisArticle.content : "No article seleceted"
+            thisArticle?.content ? thisArticle.content : "No article seleceted"
           }
         />
       </main>

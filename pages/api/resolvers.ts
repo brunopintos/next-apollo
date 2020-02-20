@@ -51,6 +51,13 @@ const resolvers = {
     },
     getModifications: (_, __, { dataBase }) => {
       return dataBase.Modification.findAll();
+    },
+    getArticleModifications: (_, { id }, { dataBase }) => {
+      return dataBase.Modification.findAll({
+        where: {
+          articleId: id
+        }
+      });
     }
   },
   Mutation: {
@@ -140,6 +147,8 @@ const resolvers = {
           throw new UserInputError("Authentication Error.");
         });
     },
+    //guardar en intervalos de un minuto
+    //cambiar nombre a updateArticle y retornar Article para que se de cuenta que actualizo el cash
     createModification: async (
       _,
       { input: { newContent, articleId } },

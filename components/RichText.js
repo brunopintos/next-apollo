@@ -15,9 +15,9 @@ import * as React from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { useState } from "react";
 import { useEffect } from "react";
-import styled from "styled-components";
 import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
+import NextLink from "next/link";
+import styled from "styled-components";
 import gql from "graphql-tag";
 
 const StyledButton = styled(Button)`
@@ -57,74 +57,78 @@ const CREATE_MODIFICATION = gql`
   }
 `;
 
-const RichText = ({ updatedAt, articleId, content }) => {
-  const [createModification, { data }] = useMutation(CREATE_MODIFICATION);
+const inlineMode = {
+  enable: true,
+  onSelection: true
+};
+const format = {
+  width: "auto"
+};
+const fontFamily = {
+  width: "auto"
+};
+const toolbarSettings = {
+  enable: true,
+  items: [
+    "Formats",
+    "Alignments",
+    "OrderedList",
+    "UnorderedList",
+    "|",
+    "FontName",
+    "FontColor",
+    "FontSize",
+    "BackgroundColor",
+    "-",
+    "Bold",
+    "Italic",
+    "Underline",
+    "StrikeThrough",
+    "|",
+    "CreateLink",
+    "Image",
+    "|",
+    "SubScript",
+    "SuperScript",
+    "|",
+    "Print",
+    "SourceCode"
+  ]
+};
+
+const calculateModificationTime = ({ updatedTime }) => {
+  if (!updatedTime) {
+    return null;
+  }
+  //moment
+  const difference = +new Date() - updatedTime;
+  let modificationTime = {};
+  if (difference > 0) {
+    modificationTime = {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60)
+    };
+  }
+  return modificationTime;
+};
+
+const RichText = ({ updatedAt, articleTitle, articleId, content }) => {
+  const [createModification] = useMutation(CREATE_MODIFICATION);
   const [updatedTime, setUpdatedTime] = useState(updatedAt);
-
-  const inlineMode = {
-    enable: true,
-    onSelection: true
-  };
-  const format = {
-    width: "auto"
-  };
-  const fontFamily = {
-    width: "auto"
-  };
-  const toolbarSettings = {
-    enable: true,
-    items: [
-      "Formats",
-      "Alignments",
-      "OrderedList",
-      "UnorderedList",
-      "|",
-      "FontName",
-      "FontColor",
-      "FontSize",
-      "BackgroundColor",
-      "-",
-      "Bold",
-      "Italic",
-      "Underline",
-      "StrikeThrough",
-      "|",
-      "CreateLink",
-      "Image",
-      "|",
-      "SubScript",
-      "SuperScript",
-      "|",
-      "Print",
-      "SourceCode"
-    ]
-  };
-
-  const calculateModificationTime = () => {
-    if (!updatedTime) {
-      return null;
-    }
-    const difference = +new Date() - updatedTime;
-    let modificationTime = {};
-    if (difference > 0) {
-      modificationTime = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
-      };
-    }
-    return modificationTime;
-  };
-
   const [modificationTime, setModificationTime] = useState(
-    calculateModificationTime()
+    calculateModificationTime({ updatedTime })
   );
   useEffect(() => {
-    setTimeout(() => {
-      setModificationTime(calculateModificationTime());
-    }, 1000);
-  });
+    setModificationTime(calculateModificationTime({ updatedTime }));
+    const timeOut = setInterval(() => {
+      setModificationTime(calculateModificationTime({ updatedTime }));
+    }, 15 * 1000);
+    return () => {
+      clearInterval(timeOut);
+    };
+  }, [updatedTime]);
 
   const onSave = newContent => {
     createModification({
@@ -137,7 +141,7 @@ const RichText = ({ updatedAt, articleId, content }) => {
     });
   };
 
-  const getNiceTime = () => {
+  const getModificationMessage = () => {
     if (modificationTime.days) {
       return `${modificationTime.days} day${
         modificationTime.days > 1 ? "s" : ""
@@ -162,9 +166,14 @@ const RichText = ({ updatedAt, articleId, content }) => {
     <StyledContainer>
       <TopBar>
         {modificationTime ? (
-          <StyledButton color="secondary">
-            Modified {getNiceTime()} ago
-          </StyledButton>
+          <NextLink
+            href="/modifications/article/[article]"
+            as={`/modifications/article/${articleTitle}-${articleId}`}
+          >
+            <StyledButton color="secondary">
+              Modified {getModificationMessage()} ago
+            </StyledButton>
+          </NextLink>
         ) : (
           <></>
         )}
