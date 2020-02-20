@@ -182,14 +182,7 @@ const Article = props => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText
-          updatedAt={thisArticle?.updatedAt}
-          articleTitle={thisArticle?.title}
-          articleId={thisArticle?.id}
-          content={
-            thisArticle?.content ? thisArticle.content : "No article seleceted"
-          }
-        />
+        <RichText article={thisArticle} />
       </main>
     </div>
   );

@@ -132,6 +132,7 @@ const ArticleItem = ({ article, selectedArticle }) => {
         {data?.getSubArticles.map(article => (
           <Collapse
             className={classes.nested}
+            key={article.id}
             in={expanded}
             timeout="auto"
             unmountOnExit

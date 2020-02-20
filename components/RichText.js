@@ -19,6 +19,7 @@ import Button from "@material-ui/core/Button";
 import NextLink from "next/link";
 import styled from "styled-components";
 import gql from "graphql-tag";
+import moment from "moment";
 
 const StyledButton = styled(Button)`
   && {
@@ -96,82 +97,51 @@ const toolbarSettings = {
   ]
 };
 
-const calculateModificationTime = ({ updatedTime }) => {
-  if (!updatedTime) {
-    return null;
-  }
-  //moment
-  const difference = +new Date() - updatedTime;
-  let modificationTime = {};
-  if (difference > 0) {
-    modificationTime = {
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60)
-    };
-  }
-  return modificationTime;
-};
-
-const RichText = ({ updatedAt, articleTitle, articleId, content }) => {
+const RichText = ({ article }) => {
   const [createModification] = useMutation(CREATE_MODIFICATION);
-  const [updatedTime, setUpdatedTime] = useState(updatedAt);
-  const [modificationTime, setModificationTime] = useState(
-    calculateModificationTime({ updatedTime })
+  const [updatedTime, setUpdatedTime] = useState(article?.updatedAt);
+  const [lastModificationTime, setLastModificationTime] = useState(
+    moment(updatedTime).fromNow()
   );
   useEffect(() => {
-    setModificationTime(calculateModificationTime({ updatedTime }));
+    setLastModificationTime(moment(updatedTime).fromNow());
+    setUpdatedTime(article?.updatedAt);
     const timeOut = setInterval(() => {
-      setModificationTime(calculateModificationTime({ updatedTime }));
-    }, 15 * 1000);
+      console.log("esto corre y el valor es este:");
+      console.log(updatedTime);
+      console.log("^^^^^^");
+      console.log(moment(updatedTime).fromNow());
+      setLastModificationTime(moment(updatedTime).fromNow());
+    }, 2 * 1000);
     return () => {
       clearInterval(timeOut);
     };
-  }, [updatedTime]);
+  }, [updatedTime, article?.updatedAt]);
 
   const onSave = newContent => {
     createModification({
       variables: {
         newContent: newContent,
-        articleId: articleId
+        articleId: article?.id
       }
     }).then(data => {
+      console.log(data.data.createModification.createdAt);
       setUpdatedTime(data.data.createModification.createdAt);
+      console.log("mostrame si cambio el tiempo");
+      console.log(updatedTime);
     });
-  };
-
-  const getModificationMessage = () => {
-    if (modificationTime.days) {
-      return `${modificationTime.days} day${
-        modificationTime.days > 1 ? "s" : ""
-      }`;
-    }
-    if (modificationTime.hours) {
-      return `${modificationTime.hours} hour${
-        modificationTime.hours > 1 ? "s" : ""
-      }`;
-    }
-    if (modificationTime.minutes) {
-      return `${modificationTime.minutes} minute${
-        modificationTime.minutes > 1 ? "s" : ""
-      }`;
-    }
-    if (modificationTime.seconds) {
-      return `seconds`;
-    }
   };
 
   return (
     <StyledContainer>
       <TopBar>
-        {modificationTime ? (
+        {lastModificationTime ? (
           <NextLink
             href="/modifications/article/[article]"
-            as={`/modifications/article/${articleTitle}-${articleId}`}
+            as={`/modifications/article/${article?.title}-${article?.id}`}
           >
             <StyledButton color="secondary">
-              Modified {getModificationMessage()} ago
+              Last modified {lastModificationTime}
             </StyledButton>
           </NextLink>
         ) : (
@@ -189,8 +159,8 @@ const RichText = ({ updatedAt, articleTitle, articleId, content }) => {
         showCharCount={true}
         fontFamily={fontFamily}
         change={valueTemplate => onSave(valueTemplate.value)}
-        saveInterval={10000}
-        valueTemplate={content}
+        saveInterval={1000}
+        valueTemplate={article?.content}
       >
         <Inject
           services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}
