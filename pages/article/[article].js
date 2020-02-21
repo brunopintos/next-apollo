@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../../lib/jwt";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import Drawer from "@material-ui/core/Drawer";
@@ -15,7 +15,6 @@ import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import InputBase from "@material-ui/core/InputBase";
 import RichText from "../../components/RichText";
-import Button from "@material-ui/core/Button";
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -23,6 +22,7 @@ const GET_ARTICLE = gql`
       id
       title
       content
+      createdAt
       updatedAt
     }
   }

@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      previousContent: {
+      newContent: {
         type: Sequelize.TEXT,
         allowNull: false
       },

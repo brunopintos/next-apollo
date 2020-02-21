@@ -24,7 +24,7 @@ const typeDefs = gql`
     ): AuthPayLoad!
     login(usernameOrEmail: String!, password: String!): AuthPayLoad!
     createArticle(input: InputCreateArticle!): Article!
-    createModification(input: InputCreateModification!): Modification!
+    updateArticle(input: InputUpdateArticle!): Article!
   }
 
   type User {
@@ -52,7 +52,7 @@ const typeDefs = gql`
 
   type Modification {
     id: ID!
-    previousContent: String!
+    newContent: String!
     article: Article!
     author: User!
     createdAt: Date
@@ -78,7 +78,7 @@ const typeDefs = gql`
     parentId: ID
   }
 
-  input InputCreateModification {
+  input InputUpdateArticle {
     newContent: String!
     articleId: ID!
   }

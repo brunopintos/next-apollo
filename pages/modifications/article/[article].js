@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import gql from "graphql-tag";
-import styled from "styled-components";
 import withAuth from "../../../lib/jwt";
 import { useQuery } from "@apollo/react-hooks";
 import List from "@material-ui/core/List";
@@ -17,11 +16,11 @@ const GET_ARTICLE_MODIFICATIONS = gql`
   query getArticleModifications($id: ID!) {
     getArticleModifications(id: $id) {
       id
-      previousContent
+      newContent
       author {
         username
       }
-      createdAt
+      updatedAt
     }
   }
 `;
@@ -35,9 +34,6 @@ const ArticleModification = props => {
     }
   });
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error.message}</p>;
-
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   return (
@@ -47,9 +43,9 @@ const ArticleModification = props => {
         Lista de Modificaciones del articulo: {articleTitle}
       </Typography>
       <List>
-        {data.getArticleModifications.map(modification => (
+        {data?.getArticleModifications.map(modification => (
           <>
-            <ListItem>
+            <ListItem key={modification.id}>
               <ListItemAvatar>
                 <Avatar>
                   <PersonIcon />
@@ -58,10 +54,10 @@ const ArticleModification = props => {
               <ListItemText
                 primary={
                   <div style={{ maxHeight: 200, overflow: "hidden" }}>
-                    Previous Content:
+                    New Content:
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: modification.previousContent
+                        __html: modification.newContent
                       }}
                     ></div>
                   </div>
@@ -71,12 +67,16 @@ const ArticleModification = props => {
                     <Typography color="secondary">
                       {`Modification author: ${modification.author.username}`}
                     </Typography>
-                    {new Date(modification.createdAt).toString()}
+                    {new Date(modification.updatedAt).toString()}
                   </>
                 }
               />
             </ListItem>
-            <Divider variant="inset" component="li" />
+            <Divider
+              key={"d" + modification.id}
+              variant="inset"
+              component="li"
+            />
           </>
         ))}
       </List>

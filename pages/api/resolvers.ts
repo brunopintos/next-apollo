@@ -4,6 +4,7 @@ import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import moment from "moment";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -56,7 +57,8 @@ const resolvers = {
       return dataBase.Modification.findAll({
         where: {
           articleId: id
-        }
+        },
+        order: [["updatedAt", "DESC"]]
       });
     }
   },
@@ -76,7 +78,7 @@ const resolvers = {
           throw new UserInputError("Incorrect password.");
         }
         const token = jwt.sign(user.toJSON(), "supersecret", {
-          expiresIn: "1d"
+          expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
         });
         res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
@@ -91,7 +93,7 @@ const resolvers = {
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "1d"
+            expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
           });
           res.setHeader("Set-Cookie", [`token=${token}`]);
           return { token: token };
@@ -147,9 +149,7 @@ const resolvers = {
           throw new UserInputError("Authentication Error.");
         });
     },
-    //guardar en intervalos de un minuto
-    //cambiar nombre a updateArticle y retornar Article para que se de cuenta que actualizo el cash
-    createModification: async (
+    updateArticle: async (
       _,
       { input: { newContent, articleId } },
       { dataBase, userId }
@@ -162,22 +162,53 @@ const resolvers = {
       if (!article || !article.dataValues) {
         throw new UserInputError("Article not found Error.");
       }
-      const previousContent = article.dataValues.content;
-      await dataBase.Article.update(
+      const updateReturn = await dataBase.Article.update(
         { content: newContent || "" },
         {
+          returning: true,
           where: {
             id: articleId
           }
         }
       );
-      console.log(previousContent);
-      const modification = await dataBase.Modification.create({
-        previousContent: previousContent,
-        articleId: articleId,
-        authorId: userId
+      const articleToReturn = updateReturn[1][0];
+      const lastModification = await dataBase.Modification.findOne({
+        where: { authorId: userId, articleId: articleId },
+        order: [["updatedAt", "DESC"]]
       });
-      return modification;
+      if (
+        lastModification?.dataValues?.updatedAt &&
+        moment(lastModification.dataValues.updatedAt).isSame(moment(), "minute")
+      ) {
+        await dataBase.Modification.update(
+          {
+            newContent: newContent
+          },
+          {
+            where: {
+              id: lastModification.dataValues.id
+            }
+          }
+        );
+      } else {
+        const nuevaModification = await dataBase.Modification.create({
+          newContent: newContent,
+          articleId: articleId,
+          authorId: userId
+        });
+        console.log(nuevaModification);
+      }
+      console.log(
+        moment(lastModification.dataValues.updatedAt)
+          .seconds(0)
+          .milliseconds(0)
+      );
+      console.log(
+        moment()
+          .seconds(0)
+          .milliseconds(0)
+      );
+      return articleToReturn;
     }
   },
   Article: {

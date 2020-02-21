@@ -47,13 +47,11 @@ const StyledContainer = styled.div`
   }
 `;
 
-const CREATE_MODIFICATION = gql`
-  mutation createModification($newContent: String!, $articleId: ID!) {
-    createModification(
-      input: { newContent: $newContent, articleId: $articleId }
-    ) {
+const UPDATE_ARTICLE = gql`
+  mutation updateArticle($newContent: String!, $articleId: ID!) {
+    updateArticle(input: { newContent: $newContent, articleId: $articleId }) {
       id
-      createdAt
+      updatedAt
     }
   }
 `;
@@ -98,35 +96,38 @@ const toolbarSettings = {
 };
 
 const RichText = ({ article }) => {
-  const [createModification] = useMutation(CREATE_MODIFICATION);
-  const [updatedTime, setUpdatedTime] = useState(article?.updatedAt);
+  const [updateArticle] = useMutation(UPDATE_ARTICLE);
+  const [updatedTime, setUpdatedTime] = useState(
+    article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+  );
   const [lastModificationTime, setLastModificationTime] = useState(
     moment(updatedTime).fromNow()
   );
   useEffect(() => {
     setLastModificationTime(moment(updatedTime).fromNow());
-    setUpdatedTime(article?.updatedAt);
+    setUpdatedTime(
+      article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+    );
     const timeOut = setInterval(() => {
       console.log("esto corre y el valor es este:");
       console.log(updatedTime);
       console.log("^^^^^^");
       console.log(moment(updatedTime).fromNow());
       setLastModificationTime(moment(updatedTime).fromNow());
-    }, 2 * 1000);
+    }, 15 * 1000);
     return () => {
       clearInterval(timeOut);
     };
   }, [updatedTime, article?.updatedAt]);
 
   const onSave = newContent => {
-    createModification({
+    updateArticle({
       variables: {
         newContent: newContent,
         articleId: article?.id
       }
     }).then(data => {
-      console.log(data.data.createModification.createdAt);
-      setUpdatedTime(data.data.createModification.createdAt);
+      setUpdatedTime(data.data.updateArticle.updatedAt);
       console.log("mostrame si cambio el tiempo");
       console.log(updatedTime);
     });
@@ -135,7 +136,7 @@ const RichText = ({ article }) => {
   return (
     <StyledContainer>
       <TopBar>
-        {lastModificationTime ? (
+        {!lastModificationTime.includes("Invalid") && (
           <NextLink
             href="/modifications/article/[article]"
             as={`/modifications/article/${article?.title}-${article?.id}`}
@@ -143,9 +144,8 @@ const RichText = ({ article }) => {
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
             </StyledButton>
+            }
           </NextLink>
-        ) : (
-          <></>
         )}
       </TopBar>
       <RichTextEditorComponent
@@ -159,7 +159,7 @@ const RichText = ({ article }) => {
         showCharCount={true}
         fontFamily={fontFamily}
         change={valueTemplate => onSave(valueTemplate.value)}
-        saveInterval={1000}
+        saveInterval={300}
         valueTemplate={article?.content}
       >
         <Inject
