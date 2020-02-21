@@ -3,7 +3,7 @@ import React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../../lib/jwt";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import Drawer from "@material-ui/core/Drawer";
@@ -22,6 +22,8 @@ const GET_ARTICLE = gql`
       id
       title
       content
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -50,7 +52,6 @@ const Title = styled(Typography)`
   && {
     flex-grow: 1;
     display: "block";
-    color: black;
     padding-left: 5px;
     height: 100%;
   }
@@ -72,14 +73,17 @@ const useStyles = makeStyles(theme => ({
   },
   drawer: {
     width: drawerWidth,
-    flexShrink: 0
+    flexShrink: 0,
+    zIndex: 1150
   },
   drawerPaper: {
     width: drawerWidth
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+    backgroundColor: "white"
   },
   search: {
     position: "relative",
@@ -122,47 +126,36 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar
 }));
 
-const Article = () => {
+const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
-  const idRegEx = /(.*)\-(\d+)$/;
-  const [articleTitleId, articleTitle, articleId] = idRegEx.exec(
-    router.query.article
-  );
-
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const article = useQuery(GET_ARTICLE, {
+    fetchPolicy: "cache-and-network",
     variables: {
-      id: articleId
+      id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
     }
   });
 
-  if (rootArticles.loading || article.loading) return <p>Loading ...</p>;
-  if (rootArticles.error || article.error) {
-    return (
-      <>
-        <p>{rootArticles.error?.message}</p>
-        <p>{article.error?.message}</p>
-      </>
-    );
-  }
-
-  const thisArticle = article.data.getArticle;
+  const thisArticle = article.data?.getArticle;
+  const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   return (
     <div className={classes.root}>
+      {props.changeTitle(`LKB - ${articleTitle}`)}
       <CssBaseline />
       <StyledAppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Title variant="h6" noWrap>
+          <Title color="secondary" variant="h6">
             {articleTitle}
           </Title>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <SearchIcon color="secondary" />
             </div>
             <InputBase
+              color="secondary"
               placeholder="Search…"
               classes={{
                 root: classes.inputRoot,
@@ -182,18 +175,14 @@ const Article = () => {
       >
         <div className={classes.toolbar} />
         <List className={classes.listRoot}>
-          {rootArticles.data.getRootArticles.map(article => (
-            <ArticleItem article={article} selectedArticle={thisArticle.id} />
+          {rootArticles.data?.getRootArticles.map(article => (
+            <ArticleItem article={article} selectedArticle={thisArticle?.id} />
           ))}
         </List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText
-          content={
-            thisArticle.content ? thisArticle.content : "No article seleceted"
-          }
-        />
+        <RichText article={thisArticle} />
       </main>
     </div>
   );

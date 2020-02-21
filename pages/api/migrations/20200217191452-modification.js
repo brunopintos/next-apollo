@@ -2,29 +2,24 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("Articles", {
+    return queryInterface.createTable("Modifications", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          len: [1, 100]
-        }
-      },
-      icon: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          len: [1, 20]
-        }
-      },
-      content: {
+      newContent: {
         type: Sequelize.TEXT,
         allowNull: false
+      },
+      articleId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: {
+            tableName: "Articles"
+          },
+          key: "id"
+        }
       },
       authorId: {
         type: Sequelize.INTEGER,
@@ -47,6 +42,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("Articles");
+    return queryInterface.dropTable("Modifications");
   }
 };

@@ -12,9 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       title: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
-          len: [8, 100]
+          len: [1, 100]
         }
       },
       icon: {
@@ -25,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       content: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT,
+        allowNull: false
       },
       parentId: {
         type: DataTypes.INTEGER,
@@ -44,10 +44,6 @@ module.exports = (sequelize, DataTypes) => {
           },
           key: "id"
         }
-      },
-      isFavourite: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
       },
       createdAt: {
         type: DataTypes.DATE
@@ -69,6 +65,10 @@ module.exports = (sequelize, DataTypes) => {
     Article.belongsToMany(models.Tag, {
       through: "ArticleTag",
       foreignKey: "articleId"
+    });
+    Article.hasMany(models.Modification, {
+      foreignKey: "articleId",
+      as: "modifications"
     });
   };
 

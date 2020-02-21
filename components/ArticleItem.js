@@ -23,6 +23,12 @@ import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import { useMutation } from "@apollo/react-hooks";
 
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
+
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
     getSubArticles(id: $id) {
@@ -71,17 +77,13 @@ const ArticleItem = ({ article, selectedArticle }) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  //useLazyQuery
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
       id: article.id
     }
   });
   const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
-
-  if (loading) return <p>Loading ...</p>;
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -94,8 +96,18 @@ const ArticleItem = ({ article, selectedArticle }) => {
   if (article) {
     return (
       <>
+        {/* pasar a router push en vez de link
+      
+          -poner en el listItem un onClicked y adentro el router push
+          
+          -para que el expandLess y el expandMore tengan comportamiento aparte los pongo dentro de un ListItemSecondaryAction
+
+          -lo mismo hago para el boton de agregar un subarticle
+
+          https://material-ui.com/es/components/lists/#checkbox
+      */}
         <ListItem key={article.id} selected={selectedArticle === article.id}>
-          {data.getSubArticles.length > 0 &&
+          {data?.getSubArticles.length > 0 &&
             (expanded ? (
               <ExpandLess color="primary" onClick={handleExpandClick} />
             ) : (
@@ -116,9 +128,11 @@ const ArticleItem = ({ article, selectedArticle }) => {
             <AddIcon />
           </IconButton>
         </ListItem>
-        {data.getSubArticles.map(article => (
+        {/* poner key */}
+        {data?.getSubArticles.map(article => (
           <Collapse
             className={classes.nested}
+            key={article.id}
             in={expanded}
             timeout="auto"
             unmountOnExit

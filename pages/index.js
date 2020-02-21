@@ -90,7 +90,7 @@ const StyledCard = styled(Card)`
 const Welcome = props => {
   return (
     <Layout>
-      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      {props.changeTitle("LKB - Lithium Knowledge Base")}
       <MainHeader />
       <WelcomeToLKB>
         <StyledTitle variant="h3">Welcome to Lithium KB!</StyledTitle>

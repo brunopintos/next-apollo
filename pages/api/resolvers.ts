@@ -4,6 +4,7 @@ import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import moment from "moment";
 
 const resolvers = {
   Date: new GraphQLScalarType({
@@ -48,6 +49,17 @@ const resolvers = {
       return dataBase.Article.findAll().then(articles => {
         return articles[0];
       });
+    },
+    getModifications: (_, __, { dataBase }) => {
+      return dataBase.Modification.findAll();
+    },
+    getArticleModifications: (_, { id }, { dataBase }) => {
+      return dataBase.Modification.findAll({
+        where: {
+          articleId: id
+        },
+        order: [["updatedAt", "DESC"]]
+      });
     }
   },
   Mutation: {
@@ -66,7 +78,7 @@ const resolvers = {
           throw new UserInputError("Incorrect password.");
         }
         const token = jwt.sign(user.toJSON(), "supersecret", {
-          expiresIn: "1d"
+          expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
         });
         res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
@@ -81,7 +93,7 @@ const resolvers = {
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "1d"
+            expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
           });
           res.setHeader("Set-Cookie", [`token=${token}`]);
           return { token: token };
@@ -119,8 +131,7 @@ const resolvers = {
             icon: icon || "📒",
             content: content || "Here is some content for your Article",
             parentId: parentId || null,
-            authorId: userId,
-            isFavourite: false
+            authorId: userId
           })
             .then(article => {
               return article;
@@ -137,6 +148,67 @@ const resolvers = {
         .catch(() => {
           throw new UserInputError("Authentication Error.");
         });
+    },
+    updateArticle: async (
+      _,
+      { input: { newContent, articleId } },
+      { dataBase, userId }
+    ) => {
+      const user = await dataBase.User.findByPk(userId);
+      if (!user || !user.dataValues) {
+        throw new UserInputError("Authentication Error.");
+      }
+      const article = await dataBase.Article.findByPk(articleId);
+      if (!article || !article.dataValues) {
+        throw new UserInputError("Article not found Error.");
+      }
+      const updateReturn = await dataBase.Article.update(
+        { content: newContent || "" },
+        {
+          returning: true,
+          where: {
+            id: articleId
+          }
+        }
+      );
+      const articleToReturn = updateReturn[1][0];
+      const lastModification = await dataBase.Modification.findOne({
+        where: { authorId: userId, articleId: articleId },
+        order: [["updatedAt", "DESC"]]
+      });
+      if (
+        lastModification?.dataValues?.updatedAt &&
+        moment(lastModification.dataValues.updatedAt).isSame(moment(), "minute")
+      ) {
+        await dataBase.Modification.update(
+          {
+            newContent: newContent
+          },
+          {
+            where: {
+              id: lastModification.dataValues.id
+            }
+          }
+        );
+      } else {
+        const nuevaModification = await dataBase.Modification.create({
+          newContent: newContent,
+          articleId: articleId,
+          authorId: userId
+        });
+        console.log(nuevaModification);
+      }
+      console.log(
+        moment(lastModification.dataValues.updatedAt)
+          .seconds(0)
+          .milliseconds(0)
+      );
+      console.log(
+        moment()
+          .seconds(0)
+          .milliseconds(0)
+      );
+      return articleToReturn;
     }
   },
   Article: {
@@ -150,6 +222,10 @@ const resolvers = {
   },
   User: {
     articles: user => user.getArticles()
+  },
+  Modification: {
+    article: modification => modification.getArticle(),
+    author: modification => modification.getAuthor()
   }
 };
 

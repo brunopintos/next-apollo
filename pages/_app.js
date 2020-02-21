@@ -17,7 +17,7 @@ const theme = createMuiTheme({
 });
 
 function MyApp({ Component, pageProps }) {
-  const [title, setTitle] = useState("Lithium KB - Lithium Knowledge Base");
+  const [title, setTitle] = useState("LKB - Lithium Knowledge Base");
   const changeTitle = newTitle => {
     setTitle(newTitle);
   };

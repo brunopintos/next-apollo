@@ -90,7 +90,7 @@ const Signup = props => {
 
   return (
     <StyledLayout>
-      {props.changeTitle("Lithium KB - Lithium Knowledge Base")}
+      {props.changeTitle("LKB - Sign up")}
       <MainHeader />
       <StyledTitle variant="h3">Sign Up</StyledTitle>
       <Formik

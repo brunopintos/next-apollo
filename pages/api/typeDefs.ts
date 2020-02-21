@@ -12,6 +12,8 @@ const typeDefs = gql`
     getSubArticles(id: ID!): [Article]!
     getRootArticles: [Article]!
     getFirstArticle: Article
+    getModifications: [Modification]!
+    getArticleModifications(id: ID!): [Modification]!
   }
 
   type Mutation {
@@ -22,6 +24,7 @@ const typeDefs = gql`
     ): AuthPayLoad!
     login(usernameOrEmail: String!, password: String!): AuthPayLoad!
     createArticle(input: InputCreateArticle!): Article!
+    updateArticle(input: InputUpdateArticle!): Article!
   }
 
   type User {
@@ -43,7 +46,15 @@ const typeDefs = gql`
     parent: Article
     articles: [Article]!
     author: User!
-    isFavourite: Boolean!
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  type Modification {
+    id: ID!
+    newContent: String!
+    article: Article!
+    author: User!
     createdAt: Date
     updatedAt: Date
   }
@@ -65,6 +76,11 @@ const typeDefs = gql`
     icon: String
     content: String
     parentId: ID
+  }
+
+  input InputUpdateArticle {
+    newContent: String!
+    articleId: ID!
   }
 
   enum Role {
