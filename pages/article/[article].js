@@ -15,6 +15,8 @@ import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import InputBase from "@material-ui/core/InputBase";
 import RichText from "../../components/RichText";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from "@material-ui/icons/Add";
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -123,6 +125,9 @@ const useStyles = makeStyles(theme => ({
       }
     }
   },
+  extendedIcon: {
+    marginRight: theme.spacing(1)
+  },
   toolbar: theme.mixins.toolbar
 }));
 
@@ -144,7 +149,6 @@ const Article = props => {
   return (
     <div className={classes.root}>
       {props.changeTitle(`LKB - ${articleTitle}`)}
-      <CssBaseline />
       <StyledAppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Title color="secondary" variant="h6">
@@ -183,6 +187,10 @@ const Article = props => {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <RichText article={thisArticle} />
+        <Fab variant="extended" color="primary">
+          <AddIcon className={classes.extendedIcon} />
+          Article
+        </Fab>
       </main>
     </div>
   );

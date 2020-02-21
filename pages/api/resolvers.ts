@@ -3,7 +3,7 @@ import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import moment from "moment";
 
 const resolvers = {
@@ -74,9 +74,12 @@ const resolvers = {
             "The username or email address is not registered."
           );
         }
-        if (!bcrypt.compareSync(password, user.dataValues.password)) {
+        if (password !== user.dataValues.password) {
           throw new UserInputError("Incorrect password.");
         }
+        // if (!bcrypt.compareSync(password, user.dataValues.password)) {
+        //   throw new UserInputError("Incorrect password.");
+        // }
         const token = jwt.sign(user.toJSON(), "supersecret", {
           expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
         });
@@ -89,7 +92,8 @@ const resolvers = {
         username: username,
         email: email,
         role: "ADMIN",
-        password: bcrypt.hashSync(password, 3)
+        // password: bcrypt.hashSync(password, 3)
+        password: password
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
@@ -138,7 +142,6 @@ const resolvers = {
             })
             .catch(err => {
               if (err.errors[0].message.includes("title")) {
-                console.log(err.errors[0].message);
                 throw new UserInputError("Article title is already in use.");
               } else {
                 throw new UserInputError("Icon too long");
@@ -196,19 +199,29 @@ const resolvers = {
           articleId: articleId,
           authorId: userId
         });
-        console.log(nuevaModification);
       }
-      console.log(
-        moment(lastModification.dataValues.updatedAt)
-          .seconds(0)
-          .milliseconds(0)
-      );
-      console.log(
-        moment()
-          .seconds(0)
-          .milliseconds(0)
-      );
       return articleToReturn;
+    },
+    moveArticle: (_, { input: { subArticleId, parentId } }, { dataBase }) => {
+      if (subArticleId !== parentId) {
+        return dataBase.Article.update(
+          { parentId: parentId },
+          {
+            returning: true,
+            where: {
+              id: subArticleId
+            }
+          }
+        )
+          .then(updateReturn => {
+            return updateReturn?.[1]?.[0];
+          })
+          .catch(() => {
+            throw new UserInputError("Update could not be done.");
+          });
+      } else {
+        throw new UserInputError("An article can not be his parent.");
+      }
     }
   },
   Article: {

@@ -59,6 +59,7 @@ const StyledButton = styled(Button)`
 const Onboarding = props => {
   const { loading, error, data } = useQuery(GET_FIRST_ARTICLE);
   if (loading) return <p>Loading ...</p>;
+  if (error) return <p>{error.message}</p>;
   const article = data?.getFirstArticle;
 
   return (
