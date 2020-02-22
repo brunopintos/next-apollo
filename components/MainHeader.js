@@ -11,6 +11,12 @@ import HomeIcon from "@material-ui/icons/Home";
 import Link from "next/link";
 import styled from "styled-components";
 
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
+
 const ImageButton = styled(IconButton)`
   width: 5%;
 `;
@@ -43,10 +49,10 @@ const MainHeader = () => (
           Lithium Knowledge Base
         </Title>
         <Link href="/login">
-          <Button color="secondary">Log in</Button>
+          <StyledButton color="secondary">Log in</StyledButton>
         </Link>
         <Link href="/signup">
-          <Button color="secondary">Sign up</Button>
+          <StyledButton color="secondary">Sign up</StyledButton>
         </Link>
       </Toolbar>
     </AppBar>

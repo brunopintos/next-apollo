@@ -6,8 +6,10 @@ import withAuth from "../../lib/jwt";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
+import HomeIcon from "@material-ui/icons/Home";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
+import IconButton from "@material-ui/core/IconButton";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
@@ -26,6 +28,7 @@ import TextField from "@material-ui/core/TextField";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 import Button from "@material-ui/core/Button";
 
 const GET_ARTICLE = gql`
@@ -54,6 +57,12 @@ const GET_ROOT_ARTICLES = gql`
   }
 `;
 
+const LOG_OUT = gql`
+  mutation logout {
+    logout
+  }
+`;
+
 const CREATE_ARTICLE = gql`
   mutation createArticle($title: String!) {
     createArticle(input: { title: $title }) {
@@ -72,6 +81,12 @@ const validationSchema = Yup.object().shape({
     .required("Must enter a title.")
 });
 
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
+
 const CustomDialog = styled(Dialog)`
   && {
     min-width: 50%;
@@ -84,12 +99,10 @@ const StyledAppBar = styled(AppBar)`
   }
 `;
 
-const Title = styled(Typography)`
+const StyledToolBar = styled(Toolbar)`
   && {
-    flex-grow: 1;
-    display: "block";
-    padding-left: 5px;
-    height: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 `;
 
@@ -153,9 +166,9 @@ const useStyles = makeStyles(theme => ({
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("sm")]: {
-      width: 120,
+      width: 300,
       "&:focus": {
-        width: 200
+        width: 400
       }
     }
   },
@@ -182,6 +195,7 @@ const Article = props => {
     }
   });
   const [createArticle] = useMutation(CREATE_ARTICLE);
+  const [logout] = useMutation(LOG_OUT);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const thisArticle = article.data?.getArticle;
@@ -195,10 +209,12 @@ const Article = props => {
     <div className={classes.root}>
       {props.changeTitle(`LKB - ${articleTitle}`)}
       <StyledAppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Title color="secondary" variant="h6">
-            {articleTitle}
-          </Title>
+        <StyledToolBar>
+          <Link href="/">
+            <IconButton color="secondary" edge="start" aria-label="home page">
+              <HomeIcon />
+            </IconButton>
+          </Link>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon color="secondary" />
@@ -213,7 +229,12 @@ const Article = props => {
               inputProps={{ "aria-label": "search" }}
             />
           </div>
-        </Toolbar>
+          <Link href="/">
+            <StyledButton color="secondary" onClick={logout}>
+              Log out
+            </StyledButton>
+          </Link>
+        </StyledToolBar>
       </StyledAppBar>
       <Drawer
         className={classes.drawer}
@@ -307,14 +328,14 @@ const Article = props => {
                   />
                 </DialogContent>
                 <DialogActions>
-                  <Button
+                  <StyledButton
                     variant="contained"
                     color="primary"
                     onClick={handleDialog}
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </StyledButton>
+                  <StyledButton
                     variant="contained"
                     color="primary"
                     type="submit"
@@ -322,7 +343,7 @@ const Article = props => {
                     disabled={isSubmitting}
                   >
                     Create
-                  </Button>
+                  </StyledButton>
                 </DialogActions>
               </Form>
             )}

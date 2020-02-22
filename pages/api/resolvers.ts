@@ -84,6 +84,14 @@ const resolvers = {
         return { token: token };
       });
     },
+    logout: async (_, __, { res }) => {
+      try {
+        res.deleteHeader("Set-Cookie");
+      } catch {
+        return false;
+      }
+      return true;
+    },
     signupUser: (_, { username, email, password }, { dataBase, res }) => {
       return dataBase.User.create({
         username: username,
