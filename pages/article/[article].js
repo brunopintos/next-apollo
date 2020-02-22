@@ -1,22 +1,32 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import withAuth from "../../lib/jwt";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import InputBase from "@material-ui/core/InputBase";
 import RichText from "../../components/RichText";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
+import AddBoxIcon from "@material-ui/icons/Add";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import Button from "@material-ui/core/Button";
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -41,6 +51,30 @@ const GET_ROOT_ARTICLES = gql`
         id
       }
     }
+  }
+`;
+
+const CREATE_ARTICLE = gql`
+  mutation createArticle($title: String!) {
+    createArticle(input: { title: $title }) {
+      id
+      title
+      icon
+      content
+    }
+  }
+`;
+
+const validationSchema = Yup.object().shape({
+  title: Yup.string()
+    .min(1, "Your title must be at least 1 characters.")
+    .max(100, "Your title is too long.")
+    .required("Must enter a title.")
+});
+
+const CustomDialog = styled(Dialog)`
+  && {
+    min-width: 50%;
   }
 `;
 
@@ -125,6 +159,11 @@ const useStyles = makeStyles(theme => ({
       }
     }
   },
+  fab: {
+    position: "absolute",
+    bottom: theme.spacing(2),
+    right: theme.spacing(2)
+  },
   extendedIcon: {
     marginRight: theme.spacing(1)
   },
@@ -142,9 +181,15 @@ const Article = props => {
       id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
     }
   });
+  const [createArticle] = useMutation(CREATE_ARTICLE);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const thisArticle = article.data?.getArticle;
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
+
+  const handleDialog = () => {
+    setDialogOpen(!dialogOpen);
+  };
 
   return (
     <div className={classes.root}>
@@ -183,15 +228,107 @@ const Article = props => {
             <ArticleItem article={article} selectedArticle={thisArticle?.id} />
           ))}
         </List>
+        <Divider />
+        <List className={classes.listRoot}>
+          <ListItem button onClick={handleDialog}>
+            <ListItemIcon>
+              <AddBoxIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="New article" />
+          </ListItem>
+        </List>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <RichText article={thisArticle} />
-        <Fab variant="extended" color="primary">
-          <AddIcon className={classes.extendedIcon} />
-          Article
-        </Fab>
       </main>
+      <CustomDialog
+        fullWidth={true}
+        maxWidth={"sm"}
+        onClose={handleDialog}
+        aria-labelledby="dialog-title"
+        open={dialogOpen}
+      >
+        <DialogTitle id="dialog-title">New Article</DialogTitle>
+        <DialogContent dividers>
+          <Formik
+            initialValues={{
+              title: ""
+            }}
+            validationSchema={validationSchema}
+            onSubmit={(values, { setSubmitting, setErrors }) => {
+              createArticle({
+                variables: {
+                  title: values.title
+                }
+              })
+                .then(() => {
+                  enqueueSnackbar(`Article ${title} created!!`, {
+                    variant: "success"
+                  });
+                  setDialogOpen(!dialogOpen);
+                })
+                .catch(err => {
+                  setErrors({
+                    title: err?.graphQLErrors?.map(x => x.message)
+                  });
+                  setSubmitting(false);
+                  setDialogOpen(!dialogOpen);
+                });
+            }}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting
+            }) => (
+              <Form onSubmit={handleSubmit} noValidate>
+                <DialogContent>
+                  <TextField
+                    color="secondary"
+                    name="title"
+                    label="Title"
+                    variant="outlined"
+                    value={values.title}
+                    type="text"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.title && errors.title}
+                    helperText={
+                      touched.title && errors.title ? errors.title : ""
+                    }
+                    required
+                    autoFocus
+                    fullWidth
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleDialog}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    aria-label="Continue"
+                    disabled={isSubmitting}
+                  >
+                    Create
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </CustomDialog>
     </div>
   );
 };

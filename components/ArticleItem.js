@@ -10,7 +10,7 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
-import AddIcon from "@material-ui/icons/Add";
+import AddBoxIcon from "@material-ui/icons/Add";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -22,7 +22,6 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { useDrag, useDrop } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
 
 const StyledButton = styled(Button)`
   && {
@@ -68,7 +67,7 @@ const MOVE_ARTICLE = gql`
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
-    .min(8, "Your title must be at least 8 characters.")
+    .min(1, "Your title must be at least 1 characters.")
     .max(100, "Your title is too long.")
     .required("Must enter a title.")
 });
@@ -183,7 +182,7 @@ const ArticleItem = ({ article, selectedArticle }) => {
             aria-label="delete"
             onClick={handleDialog}
           >
-            <AddIcon />
+            <AddBoxIcon />
           </StyledIconButton>
         </StyledListItem>
         {/* poner key */}
@@ -266,14 +265,14 @@ const ArticleItem = ({ article, selectedArticle }) => {
                     />
                   </DialogContent>
                   <DialogActions>
-                    <Button
+                    <StyledButton
                       variant="contained"
                       color="primary"
                       onClick={handleDialog}
                     >
                       Cancel
-                    </Button>
-                    <Button
+                    </StyledButton>
+                    <StyledButton
                       variant="contained"
                       color="primary"
                       type="submit"
@@ -281,7 +280,7 @@ const ArticleItem = ({ article, selectedArticle }) => {
                       disabled={isSubmitting}
                     >
                       Create
-                    </Button>
+                    </StyledButton>
                   </DialogActions>
                 </Form>
               )}

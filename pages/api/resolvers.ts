@@ -3,7 +3,7 @@ import { Kind } from "graphql/language";
 import { UserInputError } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import moment from "moment";
 
 const resolvers = {
@@ -74,12 +74,9 @@ const resolvers = {
             "The username or email address is not registered."
           );
         }
-        if (password !== user.dataValues.password) {
+        if (!bcrypt.compareSync(password, user.dataValues.password)) {
           throw new UserInputError("Incorrect password.");
         }
-        // if (!bcrypt.compareSync(password, user.dataValues.password)) {
-        //   throw new UserInputError("Incorrect password.");
-        // }
         const token = jwt.sign(user.toJSON(), "supersecret", {
           expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
         });
@@ -92,8 +89,7 @@ const resolvers = {
         username: username,
         email: email,
         role: "ADMIN",
-        // password: bcrypt.hashSync(password, 3)
-        password: password
+        password: bcrypt.hashSync(password, 3)
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
