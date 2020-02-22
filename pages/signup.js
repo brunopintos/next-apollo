@@ -128,7 +128,6 @@ const Signup = props => {
                     username: err?.graphQLErrors?.map(x => x.message)
                   });
                 } else {
-                  console.log(err);
                   setErrors({
                     email: err?.graphQLErrors?.map(x => x.message)
                   });

@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import Head from "next/head";
 import { yellow, grey } from "@material-ui/core/colors";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import { DndProvider } from "react-dnd";
+import Backend from "react-dnd-html5-backend";
 
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: yellow[700]
+      main: yellow["A700"]
     },
     secondary: {
       main: grey[800]
@@ -38,7 +40,9 @@ function MyApp({ Component, pageProps }) {
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           autoHideDuration={3500}
         >
-          <Component {...pageProps} changeTitle={changeTitle} />
+          <DndProvider backend={Backend}>
+            <Component {...pageProps} changeTitle={changeTitle} />
+          </DndProvider>
         </SnackbarProvider>
       </ThemeProvider>
     </>

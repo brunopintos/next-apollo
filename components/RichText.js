@@ -34,7 +34,7 @@ const TopBar = styled.div`
     left: 0;
     top: 75px;
     z-index: 1050;
-    width: 100%;
+    width: 80%;
     justify-content: flex-end;
     padding-left: 255px;
     padding-right: 20px;
@@ -109,10 +109,6 @@ const RichText = ({ article }) => {
       article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
     );
     const timeOut = setInterval(() => {
-      console.log("esto corre y el valor es este:");
-      console.log(updatedTime);
-      console.log("^^^^^^");
-      console.log(moment(updatedTime).fromNow());
       setLastModificationTime(moment(updatedTime).fromNow());
     }, 15 * 1000);
     return () => {
@@ -128,8 +124,6 @@ const RichText = ({ article }) => {
       }
     }).then(data => {
       setUpdatedTime(data.data.updateArticle.updatedAt);
-      console.log("mostrame si cambio el tiempo");
-      console.log(updatedTime);
     });
   };
 
@@ -144,7 +138,6 @@ const RichText = ({ article }) => {
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
             </StyledButton>
-            }
           </NextLink>
         )}
       </TopBar>

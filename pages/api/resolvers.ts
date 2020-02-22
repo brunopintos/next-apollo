@@ -138,7 +138,6 @@ const resolvers = {
             })
             .catch(err => {
               if (err.errors[0].message.includes("title")) {
-                console.log(err.errors[0].message);
                 throw new UserInputError("Article title is already in use.");
               } else {
                 throw new UserInputError("Icon too long");
@@ -196,19 +195,29 @@ const resolvers = {
           articleId: articleId,
           authorId: userId
         });
-        console.log(nuevaModification);
       }
-      console.log(
-        moment(lastModification.dataValues.updatedAt)
-          .seconds(0)
-          .milliseconds(0)
-      );
-      console.log(
-        moment()
-          .seconds(0)
-          .milliseconds(0)
-      );
       return articleToReturn;
+    },
+    moveArticle: (_, { input: { subArticleId, parentId } }, { dataBase }) => {
+      if (subArticleId !== parentId) {
+        return dataBase.Article.update(
+          { parentId: parentId },
+          {
+            returning: true,
+            where: {
+              id: subArticleId
+            }
+          }
+        )
+          .then(updateReturn => {
+            return updateReturn?.[1]?.[0];
+          })
+          .catch(() => {
+            throw new UserInputError("Update could not be done.");
+          });
+      } else {
+        throw new UserInputError("An article can not be his parent.");
+      }
     }
   },
   Article: {
