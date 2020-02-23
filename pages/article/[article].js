@@ -30,6 +30,16 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
 import Button from "@material-ui/core/Button";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+
+const GET_ARTICLES = gql`
+  query GET_ARTICLES {
+    getArticles {
+      title
+      content
+    }
+  }
+`;
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -187,6 +197,10 @@ const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [value, setValue] = React.useState(null);
+  const [dialogValue, setDialogValue] = React.useState("");
+
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const article = useQuery(GET_ARTICLE, {
     fetchPolicy: "cache-and-network",
@@ -196,12 +210,13 @@ const Article = props => {
   });
   const [createArticle] = useMutation(CREATE_ARTICLE);
   const [logout] = useMutation(LOG_OUT);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const articles = useQuery(GET_ARTICLES);
 
   const thisArticle = article.data?.getArticle;
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   const handleDialog = () => {
+    setDialogValue("");
     setDialogOpen(!dialogOpen);
   };
 
@@ -215,7 +230,93 @@ const Article = props => {
               <HomeIcon />
             </IconButton>
           </Link>
-          <div className={classes.search}>
+          <Autocomplete
+            id="combo-box-demo"
+            options={articles.data?.getArticles}
+            getOptionLabel={option => option.title}
+            style={{ width: 300 }}
+            disableOpenOnFocus
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Combo box"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
+          {/* <Autocomplete
+            value={value}
+            onChange={(event, newValue) => {
+              if (typeof newValue === "string") {
+                // timeout to avoid instant validation of the dialog's form.
+                setTimeout(() => {
+                  toggleOpen(true);
+                  setDialogValue(newValue);
+                });
+                return;
+              }
+
+              if (newValue && newValue.inputValue) {
+                toggleOpen(true);
+                setDialogValue(newValue.inputValue);
+                return;
+              }
+
+              setValue(newValue);
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+
+              if (params.inputValue !== "") {
+                filtered.push({
+                  inputValue: params.inputValue,
+                  title: `Add article: "${params.inputValue}"`
+                });
+              }
+
+              return filtered;
+            }}
+            id="free-solo-dialog-demo"
+            options={articles.data?.getArticles}
+            getOptionLabel={option => {
+              // e.g value selected with enter, right from the input
+              if (typeof option === "string") {
+                return option;
+              }
+              if (option.inputValue) {
+                return option.inputValue;
+              }
+              return option.title;
+            }}
+            renderOption={option => option.title}
+            style={{ width: 400 }}
+            freeSolo
+            renderInput={params => (
+              <div className={classes.search}>
+                <div className={classes.searchIcon}>
+                  <SearchIcon color="secondary" />
+                </div>
+                <InputBase
+                  {...params}
+                  color="secondary"
+                  placeholder="Search…"
+                  classes={{
+                    root: classes.inputRoot,
+                    input: classes.inputInput
+                  }}
+                  inputProps={{ "aria-label": "search" }}
+                />
+              </div>
+              // <TextField
+              //   {...params}
+              //   label="Search article"
+              //   variant="outlined"
+              //   fullWidth
+              // />
+            )}
+          /> */}
+          {/* <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon color="secondary" />
             </div>
@@ -228,7 +329,7 @@ const Article = props => {
               }}
               inputProps={{ "aria-label": "search" }}
             />
-          </div>
+          </div> */}
           <Link href="/">
             <StyledButton color="secondary" onClick={logout}>
               Log out
@@ -274,7 +375,7 @@ const Article = props => {
         <DialogContent dividers>
           <Formik
             initialValues={{
-              title: ""
+              title: dialogValue
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -287,14 +388,14 @@ const Article = props => {
                   enqueueSnackbar(`Article ${title} created!!`, {
                     variant: "success"
                   });
-                  setDialogOpen(!dialogOpen);
+                  handleDialog();
                 })
                 .catch(err => {
                   setErrors({
                     title: err?.graphQLErrors?.map(x => x.message)
                   });
                   setSubmitting(false);
-                  setDialogOpen(!dialogOpen);
+                  handleDialog();
                 });
             }}
           >
