@@ -23,12 +23,6 @@ import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { useDrag, useDrop } from "react-dnd";
 
-const StyledButton = styled(Button)`
-  && {
-    text-transform: none;
-  }
-`;
-
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
     getSubArticles(id: $id) {
@@ -71,6 +65,12 @@ const validationSchema = Yup.object().shape({
     .max(100, "Your title is too long.")
     .required("Must enter a title.")
 });
+
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
 
 const CustomDialog = styled(Dialog)`
   && {

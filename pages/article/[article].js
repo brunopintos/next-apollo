@@ -6,8 +6,10 @@ import withAuth from "../../lib/jwt";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
+import HomeIcon from "@material-ui/icons/Home";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
+import IconButton from "@material-ui/core/IconButton";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
@@ -26,7 +28,20 @@ import TextField from "@material-ui/core/TextField";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 import Button from "@material-ui/core/Button";
+import Autocomplete, {
+  createFilterOptions
+} from "@material-ui/lab/Autocomplete";
+
+const GET_ARTICLES = gql`
+  query GET_ARTICLES {
+    getArticles {
+      title
+      content
+    }
+  }
+`;
 
 const GET_ARTICLE = gql`
   query getArticle($id: ID!) {
@@ -54,6 +69,12 @@ const GET_ROOT_ARTICLES = gql`
   }
 `;
 
+const LOG_OUT = gql`
+  mutation logout {
+    logout
+  }
+`;
+
 const CREATE_ARTICLE = gql`
   mutation createArticle($title: String!) {
     createArticle(input: { title: $title }) {
@@ -72,6 +93,12 @@ const validationSchema = Yup.object().shape({
     .required("Must enter a title.")
 });
 
+const StyledButton = styled(Button)`
+  && {
+    text-transform: none;
+  }
+`;
+
 const CustomDialog = styled(Dialog)`
   && {
     min-width: 50%;
@@ -84,14 +111,14 @@ const StyledAppBar = styled(AppBar)`
   }
 `;
 
-const Title = styled(Typography)`
+const StyledToolBar = styled(Toolbar)`
   && {
-    flex-grow: 1;
-    display: "block";
-    padding-left: 5px;
-    height: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 `;
+
+const filter = createFilterOptions();
 
 const drawerWidth = 240;
 
@@ -153,9 +180,9 @@ const useStyles = makeStyles(theme => ({
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("sm")]: {
-      width: 120,
+      width: 300,
       "&:focus": {
-        width: 200
+        width: 400
       }
     }
   },
@@ -174,6 +201,10 @@ const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [value, setValue] = React.useState(null);
+  const [dialogValue, setDialogValue] = React.useState("");
+
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const article = useQuery(GET_ARTICLE, {
     fetchPolicy: "cache-and-network",
@@ -182,12 +213,15 @@ const Article = props => {
     }
   });
   const [createArticle] = useMutation(CREATE_ARTICLE);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [logout] = useMutation(LOG_OUT);
+  const articles = useQuery(GET_ARTICLES);
 
   const thisArticle = article.data?.getArticle;
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   const handleDialog = () => {
+    setDialogValue("");
+    setValue("");
     setDialogOpen(!dialogOpen);
   };
 
@@ -195,25 +229,81 @@ const Article = props => {
     <div className={classes.root}>
       {props.changeTitle(`LKB - ${articleTitle}`)}
       <StyledAppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Title color="secondary" variant="h6">
-            {articleTitle}
-          </Title>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon color="secondary" />
-            </div>
-            <InputBase
-              color="secondary"
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ "aria-label": "search" }}
-            />
-          </div>
-        </Toolbar>
+        <StyledToolBar>
+          <Link href="/">
+            <IconButton color="secondary" edge="start" aria-label="home page">
+              <HomeIcon />
+            </IconButton>
+          </Link>
+          <Autocomplete
+            value={value}
+            onChange={(event, newValue) => {
+              if (typeof newValue === "string") {
+                // timeout to avoid instant validation of the dialog's form.
+                setTimeout(() => {
+                  setDialogOpen(true);
+                  setDialogValue(newValue);
+                });
+                return;
+              }
+
+              if (newValue && newValue.inputValue) {
+                setDialogOpen(true);
+                setDialogValue(newValue.inputValue);
+                return;
+              }
+
+              setValue(newValue);
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+
+              if (params.inputValue !== "") {
+                filtered.push({
+                  inputValue: params.inputValue,
+                  title: `Add article: "${params.inputValue}"`
+                });
+              }
+
+              return filtered;
+            }}
+            options={articles.data?.getArticles}
+            getOptionLabel={option => {
+              // e.g value selected with enter, right from the input
+              if (typeof option === "string") {
+                return option;
+              }
+              if (option.inputValue) {
+                return option.inputValue;
+              }
+              return option.title;
+            }}
+            renderOption={option => option.title}
+            style={{ width: 400 }}
+            freeSolo
+            renderInput={params => (
+              <div className={classes.search}>
+                {/* <div className={classes.searchIcon}>
+                  <SearchIcon color="secondary" />
+                </div> */}
+                <TextField
+                  {...params}
+                  color="secondary"
+                  label="Search article..."
+                  classes={{
+                    root: classes.inputRoot
+                  }}
+                  fullWidth
+                />
+              </div>
+            )}
+          />
+          <Link href="/">
+            <StyledButton color="secondary" onClick={logout}>
+              Log out
+            </StyledButton>
+          </Link>
+        </StyledToolBar>
       </StyledAppBar>
       <Drawer
         className={classes.drawer}
@@ -253,7 +343,7 @@ const Article = props => {
         <DialogContent dividers>
           <Formik
             initialValues={{
-              title: ""
+              title: dialogValue
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -266,14 +356,14 @@ const Article = props => {
                   enqueueSnackbar(`Article ${title} created!!`, {
                     variant: "success"
                   });
-                  setDialogOpen(!dialogOpen);
+                  handleDialog();
                 })
                 .catch(err => {
                   setErrors({
                     title: err?.graphQLErrors?.map(x => x.message)
                   });
                   setSubmitting(false);
-                  setDialogOpen(!dialogOpen);
+                  handleDialog();
                 });
             }}
           >
@@ -307,14 +397,14 @@ const Article = props => {
                   />
                 </DialogContent>
                 <DialogActions>
-                  <Button
+                  <StyledButton
                     variant="contained"
                     color="primary"
                     onClick={handleDialog}
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </StyledButton>
+                  <StyledButton
                     variant="contained"
                     color="primary"
                     type="submit"
@@ -322,7 +412,7 @@ const Article = props => {
                     disabled={isSubmitting}
                   >
                     Create
-                  </Button>
+                  </StyledButton>
                 </DialogActions>
               </Form>
             )}
