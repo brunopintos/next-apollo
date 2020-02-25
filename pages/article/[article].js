@@ -34,6 +34,7 @@ import Autocomplete, {
 const GET_ARTICLES = gql`
   query GET_ARTICLES {
     getArticles {
+      id
       title
       content
     }
@@ -250,6 +251,7 @@ const Article = props => {
               }
 
               setValue(newValue);
+              router.push(`/article/${newValue.title}-${newValue.id}`);
             }}
             filterOptions={(options, params) => {
               const filtered = filter(options, params);
@@ -276,7 +278,8 @@ const Article = props => {
             }}
             renderOption={option => option.title}
             style={{ width: 400 }}
-            freeSolo
+            autoComplete
+            autoHighlight
             renderInput={params => (
               <div className={classes.search}>
                 {/* <div className={classes.searchIcon}>

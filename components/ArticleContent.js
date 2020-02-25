@@ -107,10 +107,10 @@ const toolbarSettings = {
 
 const ArticleContent = ({ articleWithParents }) => {
   const [updateArticle] = useMutation(UPDATE_ARTICLE);
-  console.log(articleWithParents);
   const [updatedTime, setUpdatedTime] = useState(
-    articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
-      ? articleWithParents?.[0]?.updatedAt
+    articleWithParents?.[articleWithParents.length - 1]?.updatedAt !==
+      articleWithParents?.[articleWithParents.length - 1]?.createdAt
+      ? articleWithParents?.[articleWithParents.length - 1]?.updatedAt
       : null
   );
   const [lastModificationTime, setLastModificationTime] = useState(
@@ -119,8 +119,9 @@ const ArticleContent = ({ articleWithParents }) => {
   useEffect(() => {
     setLastModificationTime(moment(updatedTime).fromNow());
     setUpdatedTime(
-      articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
-        ? articleWithParents?.[0]?.updatedAt
+      articleWithParents?.[articleWithParents.length - 1]?.updatedAt !==
+        articleWithParents?.[articleWithParents.length - 1]?.createdAt
+        ? articleWithParents?.[articleWithParents.length - 1]?.updatedAt
         : null
     );
     const timeOut = setInterval(() => {
@@ -129,13 +130,16 @@ const ArticleContent = ({ articleWithParents }) => {
     return () => {
       clearInterval(timeOut);
     };
-  }, [updatedTime, articleWithParents?.[0]?.updatedAt]);
+  }, [
+    updatedTime,
+    articleWithParents?.[articleWithParents.length - 1]?.updatedAt
+  ]);
 
   const onSave = newContent => {
     updateArticle({
       variables: {
         newContent: newContent,
-        articleId: articleWithParents?.[0]?.id
+        articleId: articleWithParents?.[articleWithParents.length - 1]?.id
       }
     }).then(data => {
       setUpdatedTime(data.data.updateArticle.updatedAt);
@@ -160,7 +164,9 @@ const ArticleContent = ({ articleWithParents }) => {
         {!lastModificationTime.includes("Invalid") && (
           <NextLink
             href="/modifications/article/[article]"
-            as={`/modifications/article/${articleWithParents?.[0]?.title}-${articleWithParents?.[0]?.id}`}
+            as={`/modifications/article/${
+              articleWithParents?.[articleWithParents.length - 1]?.title
+            }-${articleWithParents?.[articleWithParents.length - 1]?.id}`}
           >
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
@@ -180,7 +186,9 @@ const ArticleContent = ({ articleWithParents }) => {
         fontFamily={fontFamily}
         change={valueTemplate => onSave(valueTemplate.value)}
         saveInterval={300}
-        valueTemplate={articleWithParents?.[0]?.content}
+        valueTemplate={
+          articleWithParents?.[articleWithParents.length - 1]?.content
+        }
       >
         <Inject
           services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}

@@ -124,7 +124,6 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.ARTICLE,
     drop: dragObject => {
-      console.log(dragObject);
       moveArticle({
         variables: {
           subArticleId: dragObject.id,
