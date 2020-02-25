@@ -61,7 +61,7 @@ const resolvers = {
           ? await dataBase.Article.findByPk(newParentId)
           : null;
       }
-      return articleWithParents;
+      return articleWithParents.reverse();
     },
     getModifications: (_, __, { dataBase }) => {
       return dataBase.Modification.findAll();

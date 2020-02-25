@@ -99,9 +99,11 @@ const ItemTypes = {
   ARTICLE: "article"
 };
 
-const ArticleItem = ({ article, selectedArticle }) => {
+const ArticleItem = ({ article, selectedArticleWithParents }) => {
   const classes = useStyles();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(
+    selectedArticleWithParents?.includes(article)
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   //useLazyQuery?
   const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
@@ -162,7 +164,7 @@ const ArticleItem = ({ article, selectedArticle }) => {
             backgroundColor: isOver ? "#ffd600" : "transparent"
           }}
           key={article.id}
-          selected={selectedArticle === article.id}
+          selected={selectedArticleWithParents?.[0] === article.id}
         >
           {data?.getSubArticles.length > 0 &&
             (expanded ? (

@@ -30,6 +30,13 @@ const StyledButton = styled(Button)`
     text-transform: none;
   }
 `;
+
+const ClickableText = styled.a`
+  && {
+    color: #424242;
+  }
+`;
+
 const TopBar = styled.div`
   && {
     display: flex;
@@ -98,10 +105,13 @@ const toolbarSettings = {
   ]
 };
 
-const ArticleContent = ({ article }) => {
+const ArticleContent = ({ articleWithParents }) => {
   const [updateArticle] = useMutation(UPDATE_ARTICLE);
+  console.log(articleWithParents);
   const [updatedTime, setUpdatedTime] = useState(
-    article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+    articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
+      ? articleWithParents?.[0]?.updatedAt
+      : null
   );
   const [lastModificationTime, setLastModificationTime] = useState(
     moment(updatedTime).fromNow()
@@ -109,7 +119,9 @@ const ArticleContent = ({ article }) => {
   useEffect(() => {
     setLastModificationTime(moment(updatedTime).fromNow());
     setUpdatedTime(
-      article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+      articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
+        ? articleWithParents?.[0]?.updatedAt
+        : null
     );
     const timeOut = setInterval(() => {
       setLastModificationTime(moment(updatedTime).fromNow());
@@ -117,13 +129,13 @@ const ArticleContent = ({ article }) => {
     return () => {
       clearInterval(timeOut);
     };
-  }, [updatedTime, article?.updatedAt]);
+  }, [updatedTime, articleWithParents?.[0]?.updatedAt]);
 
   const onSave = newContent => {
     updateArticle({
       variables: {
         newContent: newContent,
-        articleId: article?.id
+        articleId: articleWithParents?.[0]?.id
       }
     }).then(data => {
       setUpdatedTime(data.data.updateArticle.updatedAt);
@@ -134,19 +146,21 @@ const ArticleContent = ({ article }) => {
     <StyledContainer>
       <TopBar>
         <Breadcrumbs maxItems={4} aria-label="breadcrumb">
-          <NextLink
-            color="inherit"
-            href="/article/[article]"
-            as="/article/adentroteimaginas-7"
-          >
-            breadcrumb2
-          </NextLink>
-          <Typography color="secondary">{article?.title}</Typography>
+          {articleWithParents?.map(article => (
+            <NextLink
+              color="secondary"
+              href="/article/[article]"
+              as={`/article/${article.title}-${article.id}`}
+              passHref
+            >
+              <ClickableText>{article.title}</ClickableText>
+            </NextLink>
+          ))}
         </Breadcrumbs>
         {!lastModificationTime.includes("Invalid") && (
           <NextLink
             href="/modifications/article/[article]"
-            as={`/modifications/article/${article?.title}-${article?.id}`}
+            as={`/modifications/article/${articleWithParents?.[0]?.title}-${articleWithParents?.[0]?.id}`}
           >
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
@@ -166,7 +180,7 @@ const ArticleContent = ({ article }) => {
         fontFamily={fontFamily}
         change={valueTemplate => onSave(valueTemplate.value)}
         saveInterval={300}
-        valueTemplate={article?.content}
+        valueTemplate={articleWithParents?.[0]?.content}
       >
         <Inject
           services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}
