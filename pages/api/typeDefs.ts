@@ -12,6 +12,7 @@ const typeDefs = gql`
     getSubArticles(id: ID!): [Article]!
     getRootArticles: [Article]!
     getFirstArticle: Article
+    getArticleWithParents(id: ID!): [Article]!
     getModifications: [Modification]!
     getArticleModifications(id: ID!): [Modification]!
   }
