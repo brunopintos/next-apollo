@@ -30,7 +30,9 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
 import Button from "@material-ui/core/Button";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete, {
+  createFilterOptions
+} from "@material-ui/lab/Autocomplete";
 
 const GET_ARTICLES = gql`
   query GET_ARTICLES {
@@ -115,6 +117,8 @@ const StyledToolBar = styled(Toolbar)`
     justify-content: space-between;
   }
 `;
+
+const filter = createFilterOptions();
 
 const drawerWidth = 240;
 
@@ -217,6 +221,7 @@ const Article = props => {
 
   const handleDialog = () => {
     setDialogValue("");
+    setValue("");
     setDialogOpen(!dialogOpen);
   };
 
@@ -231,34 +236,19 @@ const Article = props => {
             </IconButton>
           </Link>
           <Autocomplete
-            id="combo-box-demo"
-            options={articles.data?.getArticles}
-            getOptionLabel={option => option.title}
-            style={{ width: 300 }}
-            disableOpenOnFocus
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Combo box"
-                variant="outlined"
-                fullWidth
-              />
-            )}
-          />
-          {/* <Autocomplete
             value={value}
             onChange={(event, newValue) => {
               if (typeof newValue === "string") {
                 // timeout to avoid instant validation of the dialog's form.
                 setTimeout(() => {
-                  toggleOpen(true);
+                  setDialogOpen(true);
                   setDialogValue(newValue);
                 });
                 return;
               }
 
               if (newValue && newValue.inputValue) {
-                toggleOpen(true);
+                setDialogOpen(true);
                 setDialogValue(newValue.inputValue);
                 return;
               }
@@ -277,7 +267,6 @@ const Article = props => {
 
               return filtered;
             }}
-            id="free-solo-dialog-demo"
             options={articles.data?.getArticles}
             getOptionLabel={option => {
               // e.g value selected with enter, right from the input
@@ -294,42 +283,21 @@ const Article = props => {
             freeSolo
             renderInput={params => (
               <div className={classes.search}>
-                <div className={classes.searchIcon}>
+                {/* <div className={classes.searchIcon}>
                   <SearchIcon color="secondary" />
-                </div>
-                <InputBase
+                </div> */}
+                <TextField
                   {...params}
                   color="secondary"
-                  placeholder="Search…"
+                  label="Search article..."
                   classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput
+                    root: classes.inputRoot
                   }}
-                  inputProps={{ "aria-label": "search" }}
+                  fullWidth
                 />
               </div>
-              // <TextField
-              //   {...params}
-              //   label="Search article"
-              //   variant="outlined"
-              //   fullWidth
-              // />
             )}
-          /> */}
-          {/* <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon color="secondary" />
-            </div>
-            <InputBase
-              color="secondary"
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ "aria-label": "search" }}
-            />
-          </div> */}
+          />
           <Link href="/">
             <StyledButton color="secondary" onClick={logout}>
               Log out
