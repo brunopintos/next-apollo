@@ -17,9 +17,12 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import NextLink from "next/link";
+import MaterialLink from "@material-ui/core/Link";
 import styled from "styled-components";
 import gql from "graphql-tag";
 import moment from "moment";
+import Typography from "@material-ui/core/Typography";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 
 const StyledButton = styled(Button)`
   && {
@@ -27,6 +30,13 @@ const StyledButton = styled(Button)`
     text-transform: none;
   }
 `;
+
+const ClickableText = styled.a`
+  && {
+    color: #424242;
+  }
+`;
+
 const TopBar = styled.div`
   && {
     display: flex;
@@ -35,7 +45,7 @@ const TopBar = styled.div`
     top: 75px;
     z-index: 1050;
     width: 80%;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding-left: 255px;
     padding-right: 20px;
     background-color: #fff;
@@ -95,10 +105,13 @@ const toolbarSettings = {
   ]
 };
 
-const RichText = ({ article }) => {
+const ArticleContent = ({ articleWithParents }) => {
   const [updateArticle] = useMutation(UPDATE_ARTICLE);
+  console.log(articleWithParents);
   const [updatedTime, setUpdatedTime] = useState(
-    article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+    articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
+      ? articleWithParents?.[0]?.updatedAt
+      : null
   );
   const [lastModificationTime, setLastModificationTime] = useState(
     moment(updatedTime).fromNow()
@@ -106,7 +119,9 @@ const RichText = ({ article }) => {
   useEffect(() => {
     setLastModificationTime(moment(updatedTime).fromNow());
     setUpdatedTime(
-      article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
+      articleWithParents?.[0]?.updatedAt !== articleWithParents?.[0]?.createdAt
+        ? articleWithParents?.[0]?.updatedAt
+        : null
     );
     const timeOut = setInterval(() => {
       setLastModificationTime(moment(updatedTime).fromNow());
@@ -114,13 +129,13 @@ const RichText = ({ article }) => {
     return () => {
       clearInterval(timeOut);
     };
-  }, [updatedTime, article?.updatedAt]);
+  }, [updatedTime, articleWithParents?.[0]?.updatedAt]);
 
   const onSave = newContent => {
     updateArticle({
       variables: {
         newContent: newContent,
-        articleId: article?.id
+        articleId: articleWithParents?.[0]?.id
       }
     }).then(data => {
       setUpdatedTime(data.data.updateArticle.updatedAt);
@@ -130,10 +145,22 @@ const RichText = ({ article }) => {
   return (
     <StyledContainer>
       <TopBar>
+        <Breadcrumbs maxItems={4} aria-label="breadcrumb">
+          {articleWithParents?.map(article => (
+            <NextLink
+              color="secondary"
+              href="/article/[article]"
+              as={`/article/${article.title}-${article.id}`}
+              passHref
+            >
+              <ClickableText>{article.title}</ClickableText>
+            </NextLink>
+          ))}
+        </Breadcrumbs>
         {!lastModificationTime.includes("Invalid") && (
           <NextLink
             href="/modifications/article/[article]"
-            as={`/modifications/article/${article?.title}-${article?.id}`}
+            as={`/modifications/article/${articleWithParents?.[0]?.title}-${articleWithParents?.[0]?.id}`}
           >
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
@@ -153,7 +180,7 @@ const RichText = ({ article }) => {
         fontFamily={fontFamily}
         change={valueTemplate => onSave(valueTemplate.value)}
         saveInterval={300}
-        valueTemplate={article?.content}
+        valueTemplate={articleWithParents?.[0]?.content}
       >
         <Inject
           services={[Count, Image, Link, QuickToolbar, HtmlEditor, Toolbar]}
@@ -163,4 +190,4 @@ const RichText = ({ article }) => {
   );
 };
 
-export default RichText;
+export default ArticleContent;

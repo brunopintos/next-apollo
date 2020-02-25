@@ -1,6 +1,6 @@
 import { GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
-import { UserInputError } from "apollo-server-micro";
+import { UserInputError, decorateWithLogger } from "apollo-server-micro";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -49,6 +49,19 @@ const resolvers = {
       return dataBase.Article.findAll().then(articles => {
         return articles[0];
       });
+    },
+    getArticleWithParents: async (_, { id }, { dataBase }) => {
+      const article = await dataBase.Article.findByPk(id);
+      const articleWithParents = [article];
+      let parent = await dataBase.Article.findByPk(article.parentId);
+      while (parent) {
+        articleWithParents.push(parent);
+        const newParentId = parent.parentId;
+        parent = newParentId
+          ? await dataBase.Article.findByPk(newParentId)
+          : null;
+      }
+      return articleWithParents.reverse();
     },
     getModifications: (_, __, { dataBase }) => {
       return dataBase.Modification.findAll();

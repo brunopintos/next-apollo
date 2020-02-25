@@ -5,17 +5,14 @@ import styled from "styled-components";
 import withAuth from "../../lib/jwt";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import SearchIcon from "@material-ui/icons/Search";
 import HomeIcon from "@material-ui/icons/Home";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import IconButton from "@material-ui/core/IconButton";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
-import InputBase from "@material-ui/core/InputBase";
-import RichText from "../../components/RichText";
+import ArticleContent from "../../components/ArticleContent";
 import AddBoxIcon from "@material-ui/icons/Add";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -43,9 +40,9 @@ const GET_ARTICLES = gql`
   }
 `;
 
-const GET_ARTICLE = gql`
-  query getArticle($id: ID!) {
-    getArticle(id: $id) {
+const GET_ARTICLE_WITH_PARENTS = gql`
+  query getArticleWithParents($id: ID!) {
+    getArticleWithParents(id: $id) {
       id
       title
       content
@@ -206,7 +203,7 @@ const Article = props => {
   const [dialogValue, setDialogValue] = React.useState("");
 
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
-  const article = useQuery(GET_ARTICLE, {
+  const articleWithParents = useQuery(GET_ARTICLE_WITH_PARENTS, {
     fetchPolicy: "cache-and-network",
     variables: {
       id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
@@ -216,7 +213,6 @@ const Article = props => {
   const [logout] = useMutation(LOG_OUT);
   const articles = useQuery(GET_ARTICLES);
 
-  const thisArticle = article.data?.getArticle;
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
   const handleDialog = () => {
@@ -315,7 +311,12 @@ const Article = props => {
         <div className={classes.toolbar} />
         <List className={classes.listRoot}>
           {rootArticles.data?.getRootArticles.map(article => (
-            <ArticleItem article={article} selectedArticle={thisArticle?.id} />
+            <ArticleItem
+              article={article}
+              selectedArticleWithParents={
+                articleWithParents.data?.getArticleWithParents
+              }
+            />
           ))}
         </List>
         <Divider />
@@ -330,7 +331,9 @@ const Article = props => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText article={thisArticle} />
+        <ArticleContent
+          articleWithParents={articleWithParents.data?.getArticleWithParents}
+        />
       </main>
       <CustomDialog
         fullWidth={true}
