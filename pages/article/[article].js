@@ -13,7 +13,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import ArticleItem from "../../components/ArticleItem";
 import ArticleContent from "../../components/ArticleContent";
-import AddBoxIcon from "@material-ui/icons/Add";
+import AddIcon from "@material-ui/icons/Add";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -34,6 +34,7 @@ import Autocomplete, {
 const GET_ARTICLES = gql`
   query GET_ARTICLES {
     getArticles {
+      id
       title
       content
     }
@@ -96,6 +97,15 @@ const StyledButton = styled(Button)`
   }
 `;
 
+const ItemsContainer = styled.div`
+  && {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+`;
+
 const CustomDialog = styled(Dialog)`
   && {
     min-width: 50%;
@@ -141,8 +151,9 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    paddingLeft: theme.spacing(3),
-    paddingRight: theme.spacing(3),
+    paddingTop: 112 + 40,
+    paddingLeft: theme.spacing(30),
+    paddingRight: theme.spacing(30),
     backgroundColor: "white"
   },
   search: {
@@ -250,6 +261,7 @@ const Article = props => {
               }
 
               setValue(newValue);
+              router.push(`/article/${newValue.title}-${newValue.id}`);
             }}
             filterOptions={(options, params) => {
               const filtered = filter(options, params);
@@ -276,7 +288,8 @@ const Article = props => {
             }}
             renderOption={option => option.title}
             style={{ width: 400 }}
-            freeSolo
+            autoComplete
+            autoHighlight
             renderInput={params => (
               <div className={classes.search}>
                 {/* <div className={classes.searchIcon}>
@@ -308,29 +321,34 @@ const Article = props => {
           paper: classes.drawerPaper
         }}
       >
-        <div className={classes.toolbar} />
-        <List className={classes.listRoot}>
-          {rootArticles.data?.getRootArticles.map(article => (
-            <ArticleItem
-              article={article}
-              selectedArticleWithParents={
-                articleWithParents.data?.getArticleWithParents
-              }
-            />
-          ))}
-        </List>
-        <Divider />
-        <List className={classes.listRoot}>
-          <ListItem button onClick={handleDialog}>
-            <ListItemIcon>
-              <AddBoxIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText primary="New article" />
-          </ListItem>
-        </List>
+        <ItemsContainer>
+          <div>
+            <div className={classes.toolbar} />
+            <List className={classes.listRoot}>
+              {rootArticles.data?.getRootArticles.map(article => (
+                <ArticleItem
+                  article={article}
+                  selectedArticleWithParents={
+                    articleWithParents.data?.getArticleWithParents
+                  }
+                />
+              ))}
+            </List>
+          </div>
+          <div>
+            <Divider />
+            <List className={classes.listRoot}>
+              <ListItem button onClick={handleDialog}>
+                <ListItemIcon>
+                  <AddIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="New article" />
+              </ListItem>
+            </List>
+          </div>
+        </ItemsContainer>
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         <ArticleContent
           articleWithParents={articleWithParents.data?.getArticleWithParents}
         />

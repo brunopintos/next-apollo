@@ -10,9 +10,10 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
-import AddBoxIcon from "@material-ui/icons/Add";
+import AddIcon from "@material-ui/icons/Add";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -78,6 +79,25 @@ const CustomDialog = styled(Dialog)`
   }
 `;
 
+const ItemContent = styled.div`
+  && {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+`;
+
+const ItemExpandAndText = styled.div`
+  && {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 180px;
+    align-items: center;
+  }
+`;
+
 const StyledListItem = styled(ListItem)``;
 
 const StyledIconButton = styled(IconButton)`
@@ -124,7 +144,6 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.ARTICLE,
     drop: dragObject => {
-      console.log(dragObject);
       moveArticle({
         variables: {
           subArticleId: dragObject.id,
@@ -166,26 +185,34 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
           key={article.id}
           selected={selectedArticleWithParents?.[0] === article.id}
         >
-          {data?.getSubArticles.length > 0 &&
-            (expanded ? (
-              <ExpandLess color="primary" onClick={handleExpandClick} />
-            ) : (
-              <ExpandMore color="primary" onClick={handleExpandClick} />
-            ))}
-          <Link
-            href="/article/[article]"
-            as={`/article/${article.title}-${article.id}`}
-          >
-            <ListItemText color="secondary" primary={article.title} />
-          </Link>
-          <StyledIconButton
-            color="primary"
-            edge="end"
-            aria-label="delete"
-            onClick={handleDialog}
-          >
-            <AddBoxIcon />
-          </StyledIconButton>
+          <ItemContent>
+            <ItemExpandAndText>
+              {data?.getSubArticles.length > 0 &&
+                (expanded ? (
+                  <ExpandLess color="primary" onClick={handleExpandClick} />
+                ) : (
+                  <ExpandMore color="primary" onClick={handleExpandClick} />
+                ))}
+              <Link
+                href="/article/[article]"
+                as={`/article/${article.title}-${article.id}`}
+              >
+                <ListItemText
+                  color="secondary"
+                  disableTypography
+                  primary={<Typography noWrap>{article.title}</Typography>}
+                />
+              </Link>
+            </ItemExpandAndText>
+            <StyledIconButton
+              color="primary"
+              edge="end"
+              aria-label="delete"
+              onClick={handleDialog}
+            >
+              <AddIcon />
+            </StyledIconButton>
+          </ItemContent>
         </StyledListItem>
         {data?.getSubArticles.map(article => (
           <Collapse
