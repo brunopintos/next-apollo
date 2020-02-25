@@ -28,25 +28,31 @@ const resolvers = {
       return dataBase.User.findByPk(userId);
     },
     getUsers: (_, __, { dataBase }) => {
-      return dataBase.User.findAll();
+      return dataBase.User.findAll({ order: [["username"]] });
     },
     getUser: (_, { email }, { dataBase }) => {
       return dataBase.User.findOne({ where: { email: email } });
     },
     getArticles: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll();
+      return dataBase.Article.findAll({ order: [["title"]] });
     },
     getArticle: (_, { id }, { dataBase }) => {
       return dataBase.Article.findByPk(id);
     },
     getSubArticles: (_, { id }, { dataBase }) => {
-      return dataBase.Article.findAll({ where: { parentId: id } });
+      return dataBase.Article.findAll({
+        where: { parentId: id },
+        order: [["title"]]
+      });
     },
     getRootArticles: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll({ where: { parentId: null } });
+      return dataBase.Article.findAll({
+        where: { parentId: null },
+        order: [["title"]]
+      });
     },
     getFirstArticle: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll().then(articles => {
+      return dataBase.Article.findAll({ order: [["title"]] }).then(articles => {
         return articles[0];
       });
     },
@@ -64,7 +70,7 @@ const resolvers = {
       return articleWithParents.reverse();
     },
     getModifications: (_, __, { dataBase }) => {
-      return dataBase.Modification.findAll();
+      return dataBase.Modification.findAll({ order: [["updatedAt", "DESC"]] });
     },
     getArticleModifications: (_, { id }, { dataBase }) => {
       return dataBase.Modification.findAll({

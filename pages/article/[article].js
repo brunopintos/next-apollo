@@ -13,7 +13,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import ArticleItem from "../../components/ArticleItem";
 import ArticleContent from "../../components/ArticleContent";
-import AddBoxIcon from "@material-ui/icons/Add";
+import AddIcon from "@material-ui/icons/Add";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -94,6 +94,15 @@ const validationSchema = Yup.object().shape({
 const StyledButton = styled(Button)`
   && {
     text-transform: none;
+  }
+`;
+
+const ItemsContainer = styled.div`
+  && {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
   }
 `;
 
@@ -312,26 +321,32 @@ const Article = props => {
           paper: classes.drawerPaper
         }}
       >
-        <div className={classes.toolbar} />
-        <List className={classes.listRoot}>
-          {rootArticles.data?.getRootArticles.map(article => (
-            <ArticleItem
-              article={article}
-              selectedArticleWithParents={
-                articleWithParents.data?.getArticleWithParents
-              }
-            />
-          ))}
-        </List>
-        <Divider />
-        <List className={classes.listRoot}>
-          <ListItem button onClick={handleDialog}>
-            <ListItemIcon>
-              <AddBoxIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText primary="New article" />
-          </ListItem>
-        </List>
+        <ItemsContainer>
+          <div>
+            <div className={classes.toolbar} />
+            <List className={classes.listRoot}>
+              {rootArticles.data?.getRootArticles.map(article => (
+                <ArticleItem
+                  article={article}
+                  selectedArticleWithParents={
+                    articleWithParents.data?.getArticleWithParents
+                  }
+                />
+              ))}
+            </List>
+          </div>
+          <div>
+            <Divider />
+            <List className={classes.listRoot}>
+              <ListItem button onClick={handleDialog}>
+                <ListItemIcon>
+                  <AddIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="New article" />
+              </ListItem>
+            </List>
+          </div>
+        </ItemsContainer>
       </Drawer>
       <main className={classes.content}>
         <ArticleContent
