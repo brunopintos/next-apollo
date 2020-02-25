@@ -142,8 +142,9 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    paddingLeft: theme.spacing(3),
-    paddingRight: theme.spacing(3),
+    paddingTop: 112 + 40,
+    paddingLeft: theme.spacing(30),
+    paddingRight: theme.spacing(30),
     backgroundColor: "white"
   },
   search: {
@@ -333,7 +334,6 @@ const Article = props => {
         </List>
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         <ArticleContent
           articleWithParents={articleWithParents.data?.getArticleWithParents}
         />
