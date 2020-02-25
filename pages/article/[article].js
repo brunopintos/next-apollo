@@ -15,7 +15,7 @@ import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import ArticleItem from "../../components/ArticleItem";
 import InputBase from "@material-ui/core/InputBase";
-import RichText from "../../components/RichText";
+import ArticleContent from "../../components/ArticleContent";
 import AddBoxIcon from "@material-ui/icons/Add";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -330,7 +330,7 @@ const Article = props => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <RichText article={thisArticle} />
+        <ArticleContent article={thisArticle} />
       </main>
       <CustomDialog
         fullWidth={true}

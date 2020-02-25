@@ -185,7 +185,6 @@ const ArticleItem = ({ article, selectedArticle }) => {
             <AddBoxIcon />
           </StyledIconButton>
         </StyledListItem>
-        {/* poner key */}
         {data?.getSubArticles.map(article => (
           <Collapse
             className={classes.nested}

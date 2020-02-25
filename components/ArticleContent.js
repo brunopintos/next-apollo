@@ -17,9 +17,12 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import NextLink from "next/link";
+import MaterialLink from "@material-ui/core/Link";
 import styled from "styled-components";
 import gql from "graphql-tag";
 import moment from "moment";
+import Typography from "@material-ui/core/Typography";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 
 const StyledButton = styled(Button)`
   && {
@@ -35,7 +38,7 @@ const TopBar = styled.div`
     top: 75px;
     z-index: 1050;
     width: 80%;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding-left: 255px;
     padding-right: 20px;
     background-color: #fff;
@@ -95,7 +98,7 @@ const toolbarSettings = {
   ]
 };
 
-const RichText = ({ article }) => {
+const ArticleContent = ({ article }) => {
   const [updateArticle] = useMutation(UPDATE_ARTICLE);
   const [updatedTime, setUpdatedTime] = useState(
     article?.updatedAt !== article?.createdAt ? article?.updatedAt : null
@@ -130,6 +133,16 @@ const RichText = ({ article }) => {
   return (
     <StyledContainer>
       <TopBar>
+        <Breadcrumbs maxItems={4} aria-label="breadcrumb">
+          <NextLink
+            color="inherit"
+            href="/article/[article]"
+            as="/article/adentroteimaginas-7"
+          >
+            breadcrumb2
+          </NextLink>
+          <Typography color="secondary">{article?.title}</Typography>
+        </Breadcrumbs>
         {!lastModificationTime.includes("Invalid") && (
           <NextLink
             href="/modifications/article/[article]"
@@ -163,4 +176,4 @@ const RichText = ({ article }) => {
   );
 };
 
-export default RichText;
+export default ArticleContent;
