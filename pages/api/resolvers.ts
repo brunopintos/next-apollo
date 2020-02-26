@@ -94,6 +94,15 @@ const resolvers = {
           });
         }
       );
+    },
+    isArticleFavorite: (_, { id }, { dataBase, userId }) => {
+      return dataBase.Favorites.findOne({
+        where: { articleId: id, userId: userId }
+      })
+        .then(favorite => {
+          return !!favorite;
+        })
+        .catch(() => false);
     }
   },
   Mutation: {

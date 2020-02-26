@@ -32,7 +32,7 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 
 const GET_ARTICLES = gql`
-  query GET_ARTICLES {
+  query getArticles {
     getArticles {
       id
       title
@@ -49,6 +49,14 @@ const GET_ARTICLE_WITH_PARENTS = gql`
       content
       createdAt
       updatedAt
+    }
+  }
+`;
+
+const GET_USER_FAVORITES = gql`
+  query getUserFavorites {
+    getUserFavorites {
+      id
     }
   }
 `;
@@ -220,9 +228,11 @@ const Article = props => {
       id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
     }
   });
+  const favoriteArticles = useQuery(GET_USER_FAVORITES);
+  const articles = useQuery(GET_ARTICLES);
+
   const [createArticle] = useMutation(CREATE_ARTICLE);
   const [logout] = useMutation(LOG_OUT);
-  const articles = useQuery(GET_ARTICLES);
 
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
 
@@ -331,6 +341,7 @@ const Article = props => {
                   selectedArticleWithParents={
                     articleWithParents.data?.getArticleWithParents
                   }
+                  favorites={favoriteArticles.data?.getUserFavorites}
                 />
               ))}
             </List>

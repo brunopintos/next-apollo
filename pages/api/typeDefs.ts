@@ -15,7 +15,8 @@ const typeDefs = gql`
     getArticleWithParents(id: ID!): [Article]!
     getModifications: [Modification]!
     getArticleModifications(id: ID!): [Modification]!
-    getUserFavorites: [Article]
+    getUserFavorites: [Article]!
+    isArticleFavorite(id: ID!): Boolean!
   }
 
   type Mutation {
