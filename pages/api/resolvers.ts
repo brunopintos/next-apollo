@@ -81,6 +81,19 @@ const resolvers = {
         },
         order: [["updatedAt", "DESC"]]
       });
+    },
+    getUserFavorites: (_, __, { dataBase, userId }) => {
+      return dataBase.Favorites.findAll({ where: { userId: userId } }).then(
+        favorites => {
+          console.log(favorites);
+          console.log(favorites.map(favorite => favorite.articleId));
+          return dataBase.Articles.findAll({
+            where: {
+              id: { [Op.in]: favorites.map(favorite => favorite.articleId) }
+            }
+          });
+        }
+      );
     }
   },
   Mutation: {
@@ -247,19 +260,67 @@ const resolvers = {
       } else {
         throw new UserInputError("An article can not be his parent.");
       }
+    },
+    favoriteArticle: (_, { id }, { dataBase, userId }) => {
+      return dataBase.Articles.findByPk(id).then(article => {
+        return dataBase.Favorites.findAll({
+          where: { articleId: id, userId: userId }
+        })
+          .then(favorites => {
+            return !favorites || favorites.length === 0
+              ? dataBase.Favorites.create({
+                  articleId: id,
+                  userId: userId
+                }).then(() => {
+                  return article;
+                })
+              : article;
+          })
+          .catch(() => {
+            return dataBase.Favorites.create({
+              articleId: id,
+              userId: userId
+            }).then(favorite => {
+              return article;
+            });
+          });
+      });
+    },
+    unfavoriteArticle: (_, { id }, { dataBase, userId }) => {
+      return dataBase.Articles.findByPk(id)
+        .then(() => {
+          return dataBase.Favorites.findOne({
+            where: { articleId: id, userId: userId }
+          })
+            .then(favorite => {
+              return favorite
+                ? favorite.destroy().then(() => {
+                    return true;
+                  })
+                : true;
+            })
+            .catch(() => {
+              return true;
+            });
+        })
+        .catch(() => {
+          throw new UserInputError("Article to be favorited does not exists.");
+        });
     }
   },
   Article: {
     tags: article => article.getTags(),
     parent: article => article.getParent(),
     author: article => article.getAuthor(),
-    articles: article => article.getArticles()
+    articles: article => article.getArticles(),
+    favorites: article => article.getFavorites()
   },
   Tag: {
     articles: tag => tag.getArticles()
   },
   User: {
-    articles: user => user.getArticles()
+    articles: user => user.getArticles(),
+    favorites: user => user.getFavorites()
   },
   Modification: {
     article: modification => modification.getArticle(),

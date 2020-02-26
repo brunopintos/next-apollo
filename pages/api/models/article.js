@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
       as: "articles"
     });
     Articles.belongsTo(models.Users, { foreignKey: "authorId", as: "author" });
-    Articles.belongsToMany(models.Tag, {
+    Articles.belongsToMany(models.Tags, {
       through: "ArticleTags",
       foreignKey: "articleId"
     });
@@ -75,7 +75,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     Articles.belongsToMany(models.Users, {
       through: "Favorites",
-      as: "favoriteUsers",
+      as: "favorites",
       foreignKey: "articleId"
     });
   };
