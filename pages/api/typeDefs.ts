@@ -15,6 +15,8 @@ const typeDefs = gql`
     getArticleWithParents(id: ID!): [Article]!
     getModifications: [Modification]!
     getArticleModifications(id: ID!): [Modification]!
+    getUserFavorites: [Article]!
+    isArticleFavorite(id: ID!): Boolean!
   }
 
   type Mutation {
@@ -28,6 +30,8 @@ const typeDefs = gql`
     createArticle(input: InputCreateArticle!): Article!
     updateArticle(input: InputUpdateArticle!): Article!
     moveArticle(input: InputMoveArticle!): Article!
+    favoriteArticle(id: ID!): Article!
+    unfavoriteArticle(id: ID!): Boolean!
   }
 
   type User {
@@ -36,6 +40,7 @@ const typeDefs = gql`
     email: String!
     role: Role!
     articles: [Article]!
+    favorites: [Article]!
     createdAt: Date
     updatedAt: Date
   }
@@ -48,6 +53,7 @@ const typeDefs = gql`
     tags: [Tag!]!
     parent: Article
     articles: [Article]!
+    favorites: [User]!
     author: User!
     createdAt: Date
     updatedAt: Date

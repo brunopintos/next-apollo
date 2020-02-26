@@ -11,6 +11,8 @@ import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -46,6 +48,20 @@ const CREATE_SUB_ARTICLE = gql`
       icon
       content
     }
+  }
+`;
+
+const FAVORITE_ARTICLE = gql`
+  mutation favoriteArticle($id: ID!) {
+    favoriteArticle(id: $id) {
+      id
+    }
+  }
+`;
+
+const UNFAVORITE_ARTICLE = gql`
+  mutation unfavoriteArticle($id: ID!) {
+    unfavoriteArticle(id: $id)
   }
 `;
 
@@ -88,24 +104,39 @@ const ItemContent = styled.div`
   }
 `;
 
-const ItemExpandAndText = styled.div`
+const ItemExpandAndTextContent = styled.div`
   && {
     display: flex;
     justify-content: flex-start;
     width: 100%;
-    max-width: 180px;
+    align-items: center;
+  }
+`;
+
+const ItemButtonsContent = styled.div`
+  && {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
     align-items: center;
   }
 `;
 
 const StyledListItem = styled(ListItem)``;
 
-const StyledIconButton = styled(IconButton)`
+const StyledIconButtonWithHover = styled(IconButton)`
   && {
     opacity: 0;
+    padding: 2px;
     ${StyledListItem}:hover & {
       opacity: 1;
     }
+  }
+`;
+
+const StyledIconButton = styled(IconButton)`
+  && {
+    padding: 2px;
   }
 `;
 
@@ -119,10 +150,15 @@ const ItemTypes = {
   ARTICLE: "article"
 };
 
-const ArticleItem = ({ article, selectedArticleWithParents }) => {
+const ArticleItem = ({ article, selectedArticleWithParents, favorites }) => {
   const classes = useStyles();
+  const [favorite, setFavorite] = useState(
+    !!favorites?.filter(favoriteArticle => favoriteArticle.id === article?.id)
+  );
   const [expanded, setExpanded] = useState(
-    selectedArticleWithParents?.includes(article)
+    !!selectedArticleWithParents?.filter(parent => parent.id === article?.id) &&
+      selectedArticleWithParents?.[selectedArticleWithParents.length - 1].id !==
+        article?.id
   );
   const [dialogOpen, setDialogOpen] = useState(false);
   //useLazyQuery?
@@ -132,6 +168,8 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
     }
   });
   const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
+  const [favoriteArticle] = useMutation(FAVORITE_ARTICLE);
+  const [unfavoriteArticle] = useMutation(UNFAVORITE_ARTICLE);
   const [moveArticle] = useMutation(MOVE_ARTICLE);
 
   const [{ isDragging }, drag] = useDrag({
@@ -164,10 +202,26 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
     setDialogOpen(!dialogOpen);
   };
 
-  if (article) {
-    return (
-      <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-        {/* pasar a router push en vez de link
+  const handleFavorite = () => {
+    if (favorite) {
+      unfavoriteArticle({
+        variables: {
+          id: article.id
+        }
+      });
+    } else {
+      favoriteArticle({
+        variables: {
+          id: article.id
+        }
+      });
+    }
+    setFavorite(!favorite);
+  };
+
+  return (
+    <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+      {/* pasar a router push en vez de link
       
           -poner en el listItem un onClicked y adentro el router push
           
@@ -177,149 +231,172 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
 
           https://material-ui.com/es/components/lists/#checkbox
       */}
-        <StyledListItem
-          ref={drop}
-          style={{
-            backgroundColor: isOver ? "#ffd600" : "transparent"
-          }}
-          key={article.id}
-          selected={selectedArticleWithParents?.[0] === article.id}
-        >
-          <ItemContent>
-            <ItemExpandAndText>
-              {data?.getSubArticles.length > 0 &&
-                (expanded ? (
-                  <ExpandLess color="primary" onClick={handleExpandClick} />
-                ) : (
-                  <ExpandMore color="primary" onClick={handleExpandClick} />
-                ))}
-              <Link
-                href="/article/[article]"
-                as={`/article/${article.title}-${article.id}`}
+      <StyledListItem
+        ref={drop}
+        style={{
+          backgroundColor: isOver ? "#ffd600" : "transparent"
+        }}
+        key={article?.id}
+        selected={
+          selectedArticleWithParents?.[
+            selectedArticleWithParents.length - 1
+          ] === article?.id
+        }
+      >
+        <ItemContent>
+          <ItemExpandAndTextContent>
+            {data?.getSubArticles.length > 0 &&
+              (expanded ? (
+                <ExpandLess color="primary" onClick={handleExpandClick} />
+              ) : (
+                <ExpandMore color="primary" onClick={handleExpandClick} />
+              ))}
+            <Link
+              href="/article/[article]"
+              as={`/article/${article?.title}-${article?.id}`}
+            >
+              <ListItemText
+                color="secondary"
+                disableTypography
+                primary={<Typography noWrap>{article?.title}</Typography>}
+              />
+            </Link>
+          </ItemExpandAndTextContent>
+          <ItemButtonsContent>
+            {favorite ? (
+              <StyledIconButton
+                color="primary"
+                aria-label="favorite"
+                onClick={handleFavorite}
               >
-                <ListItemText
-                  color="secondary"
-                  disableTypography
-                  primary={<Typography noWrap>{article.title}</Typography>}
-                />
-              </Link>
-            </ItemExpandAndText>
-            <StyledIconButton
+                <FavoriteIcon />
+              </StyledIconButton>
+            ) : (
+              <StyledIconButtonWithHover
+                color="secondary"
+                aria-label="favorite"
+                onClick={handleFavorite}
+              >
+                <FavoriteBorderIcon />
+              </StyledIconButtonWithHover>
+            )}
+            <StyledIconButtonWithHover
               color="primary"
-              edge="end"
               aria-label="delete"
               onClick={handleDialog}
             >
               <AddIcon />
-            </StyledIconButton>
-          </ItemContent>
-        </StyledListItem>
-        {data?.getSubArticles.map(article => (
-          <Collapse
-            className={classes.nested}
-            key={article.id}
-            in={expanded}
-            timeout="auto"
-            unmountOnExit
-          >
-            <List component="div" disablePadding>
-              <ArticleItem article={article} />
-            </List>
-          </Collapse>
-        ))}
-        <CustomDialog
-          fullWidth={true}
-          maxWidth={"sm"}
-          onClose={handleDialog}
-          aria-labelledby="dialog-title"
-          open={dialogOpen}
+            </StyledIconButtonWithHover>
+          </ItemButtonsContent>
+        </ItemContent>
+      </StyledListItem>
+      {data?.getSubArticles.map(article => (
+        <Collapse
+          className={classes.nested}
+          key={article.id}
+          in={expanded}
+          timeout="auto"
+          unmountOnExit
         >
-          <DialogTitle id="dialog-title">New Article</DialogTitle>
-          <DialogContent dividers>
-            <Formik
-              initialValues={{
-                title: ""
-              }}
-              validationSchema={validationSchema}
-              onSubmit={(values, { setSubmitting, setErrors }) => {
-                createSubArticle({
-                  variables: {
-                    title: values.title,
-                    parentId: article.id
-                  }
-                })
-                  .then(() => {
-                    enqueueSnackbar(`Article ${title} in!!`, {
-                      variant: "success"
-                    });
-                    setDialogOpen(!dialogOpen);
-                  })
-                  .catch(err => {
-                    setErrors({
-                      title: err?.graphQLErrors?.map(x => x.message)
-                    });
-                    setSubmitting(false);
-                    setDialogOpen(!dialogOpen);
+          <List component="div" disablePadding>
+            <ArticleItem
+              article={article}
+              selectedArticleWithParents={selectedArticleWithParents}
+              favorites={favorites}
+            />
+          </List>
+        </Collapse>
+      ))}
+      <CustomDialog
+        fullWidth={true}
+        maxWidth={"sm"}
+        onClose={handleDialog}
+        aria-labelledby="dialog-title"
+        open={dialogOpen}
+      >
+        <DialogTitle id="dialog-title">New Article</DialogTitle>
+        <DialogContent dividers>
+          <Formik
+            initialValues={{
+              title: ""
+            }}
+            validationSchema={validationSchema}
+            onSubmit={(values, { setSubmitting, setErrors }) => {
+              createSubArticle({
+                variables: {
+                  title: values.title,
+                  parentId: article?.id
+                }
+              })
+                .then(() => {
+                  enqueueSnackbar(`Article ${title} in!!`, {
+                    variant: "success"
                   });
-              }}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                isSubmitting
-              }) => (
-                <Form onSubmit={handleSubmit} noValidate>
-                  <DialogContent>
-                    <TextField
-                      color="secondary"
-                      name="title"
-                      label="Title"
-                      variant="outlined"
-                      value={values.title}
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.title && errors.title}
-                      helperText={
-                        touched.title && errors.title ? errors.title : ""
-                      }
-                      required
-                      autoFocus
-                      fullWidth
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <StyledButton
-                      variant="contained"
-                      color="primary"
-                      onClick={handleDialog}
-                    >
-                      Cancel
-                    </StyledButton>
-                    <StyledButton
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      aria-label="Continue"
-                      disabled={isSubmitting}
-                    >
-                      Create
-                    </StyledButton>
-                  </DialogActions>
-                </Form>
-              )}
-            </Formik>
-          </DialogContent>
-        </CustomDialog>
-      </div>
-    );
-  } else {
-    return <></>;
-  }
+                  setDialogOpen(!dialogOpen);
+                })
+                .catch(err => {
+                  setErrors({
+                    title: err?.graphQLErrors?.map(x => x.message)
+                  });
+                  setSubmitting(false);
+                  setDialogOpen(!dialogOpen);
+                });
+            }}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting
+            }) => (
+              <Form onSubmit={handleSubmit} noValidate>
+                <DialogContent>
+                  <TextField
+                    color="secondary"
+                    name="title"
+                    label="Title"
+                    variant="outlined"
+                    value={values.title}
+                    type="text"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.title && errors.title}
+                    helperText={
+                      touched.title && errors.title ? errors.title : ""
+                    }
+                    required
+                    autoFocus
+                    fullWidth
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <StyledButton
+                    variant="contained"
+                    color="primary"
+                    onClick={handleDialog}
+                  >
+                    Cancel
+                  </StyledButton>
+                  <StyledButton
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    aria-label="Continue"
+                    disabled={isSubmitting}
+                  >
+                    Create
+                  </StyledButton>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </CustomDialog>
+    </div>
+  );
 };
 
 export default ArticleItem;

@@ -1,8 +1,8 @@
 "use-strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define(
-    "User",
+  const Users = sequelize.define(
+    "Users",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -49,13 +49,18 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
 
-  User.associate = function(models) {
-    User.hasMany(models.Article, { foreignKey: "authorId", as: "articles" });
-    User.hasMany(models.Modification, {
+  Users.associate = function(models) {
+    Users.hasMany(models.Articles, { foreignKey: "authorId", as: "articles" });
+    Users.hasMany(models.Modifications, {
       foreignKey: "authorId",
       as: "modifications"
     });
+    Users.belongsToMany(models.Articles, {
+      through: "Favorites",
+      as: "favorites",
+      foreignKey: "userId"
+    });
   };
 
-  return User;
+  return Users;
 };

@@ -159,7 +159,6 @@ const ArticleContent = ({ articleWithParents }) => {
         <Breadcrumbs maxItems={4} aria-label="breadcrumb">
           {articleWithParents?.map(article => (
             <NextLink
-              color="secondary"
               href="/article/[article]"
               as={`/article/${article.title}-${article.id}`}
               passHref
