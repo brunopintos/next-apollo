@@ -11,6 +11,8 @@ import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -88,24 +90,39 @@ const ItemContent = styled.div`
   }
 `;
 
-const ItemExpandAndText = styled.div`
+const ItemExpandAndTextContent = styled.div`
   && {
     display: flex;
     justify-content: flex-start;
     width: 100%;
-    max-width: 180px;
+    align-items: center;
+  }
+`;
+
+const ItemButtonsContent = styled.div`
+  && {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
     align-items: center;
   }
 `;
 
 const StyledListItem = styled(ListItem)``;
 
-const StyledIconButton = styled(IconButton)`
+const StyledIconButtonWithHover = styled(IconButton)`
   && {
     opacity: 0;
+    padding: 2px;
     ${StyledListItem}:hover & {
       opacity: 1;
     }
+  }
+`;
+
+const StyledIconButton = styled(IconButton)`
+  && {
+    padding: 2px;
   }
 `;
 
@@ -121,6 +138,7 @@ const ItemTypes = {
 
 const ArticleItem = ({ article, selectedArticleWithParents }) => {
   const classes = useStyles();
+  const [favorite, setFavorite] = useState(false);
   const [expanded, setExpanded] = useState(
     selectedArticleWithParents?.includes(article)
   );
@@ -164,6 +182,10 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
     setDialogOpen(!dialogOpen);
   };
 
+  const handleFavorite = () => {
+    setFavorite(!favorite);
+  };
+
   if (article) {
     return (
       <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
@@ -186,7 +208,7 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
           selected={selectedArticleWithParents?.[0] === article.id}
         >
           <ItemContent>
-            <ItemExpandAndText>
+            <ItemExpandAndTextContent>
               {data?.getSubArticles.length > 0 &&
                 (expanded ? (
                   <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -203,15 +225,32 @@ const ArticleItem = ({ article, selectedArticleWithParents }) => {
                   primary={<Typography noWrap>{article.title}</Typography>}
                 />
               </Link>
-            </ItemExpandAndText>
-            <StyledIconButton
+            </ItemExpandAndTextContent>
+            {favorite ? (
+              <StyledIconButton
+                color="primary"
+                aria-label="favorite"
+                onClick={handleFavorite}
+              >
+                <FavoriteIcon />
+              </StyledIconButton>
+            ) : (
+              <StyledIconButtonWithHover
+                color="secondary"
+                aria-label="favorite"
+                onClick={handleFavorite}
+              >
+                <FavoriteBorderIcon />
+              </StyledIconButtonWithHover>
+            )}
+            <StyledIconButtonWithHover
               color="primary"
               edge="end"
               aria-label="delete"
               onClick={handleDialog}
             >
               <AddIcon />
-            </StyledIconButton>
+            </StyledIconButtonWithHover>
           </ItemContent>
         </StyledListItem>
         {data?.getSubArticles.map(article => (
