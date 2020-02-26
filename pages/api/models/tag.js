@@ -1,8 +1,8 @@
 "use-strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Tag = sequelize.define(
-    "Tag",
+  const Tags = sequelize.define(
+    "Tags",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -27,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
 
-  Tag.associate = function(models) {
-    Tag.belongsToMany(models.Article, {
-      through: "ArticleTag",
+  Tags.associate = function(models) {
+    Tags.belongsToMany(models.Articles, {
+      through: "ArticleTags",
       foreignKey: "tagId"
     });
   };
 
-  return Tag;
+  return Tags;
 };

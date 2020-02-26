@@ -1,8 +1,8 @@
 "use-strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Modification = sequelize.define(
-    "Modification",
+  const Modifications = sequelize.define(
+    "Modifications",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -41,16 +41,16 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
 
-  Modification.associate = function(models) {
-    Modification.belongsTo(models.Article, {
+  Modifications.associate = function(models) {
+    Modifications.belongsTo(models.Articles, {
       foreignKey: "articleId",
       as: "article"
     });
-    Modification.belongsTo(models.User, {
+    Modifications.belongsTo(models.Users, {
       foreignKey: "authorId",
       as: "author"
     });
   };
 
-  return Modification;
+  return Modifications;
 };

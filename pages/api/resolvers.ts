@@ -25,55 +25,57 @@ const resolvers = {
   }),
   Query: {
     me: (_, __, { dataBase, userId }) => {
-      return dataBase.User.findByPk(userId);
+      return dataBase.Users.findByPk(userId);
     },
     getUsers: (_, __, { dataBase }) => {
-      return dataBase.User.findAll({ order: [["username"]] });
+      return dataBase.Users.findAll({ order: [["username"]] });
     },
     getUser: (_, { email }, { dataBase }) => {
-      return dataBase.User.findOne({ where: { email: email } });
+      return dataBase.Users.findOne({ where: { email: email } });
     },
     getArticles: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll({ order: [["title"]] });
+      return dataBase.Articles.findAll({ order: [["title"]] });
     },
     getArticle: (_, { id }, { dataBase }) => {
-      return dataBase.Article.findByPk(id);
+      return dataBase.Articles.findByPk(id);
     },
     getSubArticles: (_, { id }, { dataBase }) => {
-      return dataBase.Article.findAll({
+      return dataBase.Articles.findAll({
         where: { parentId: id },
         order: [["title"]]
       });
     },
     getRootArticles: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll({
+      return dataBase.Articles.findAll({
         where: { parentId: null },
         order: [["title"]]
       });
     },
     getFirstArticle: (_, __, { dataBase }) => {
-      return dataBase.Article.findAll({ order: [["title"]] }).then(articles => {
-        return articles[0];
-      });
+      return dataBase.Articles.findAll({ order: [["title"]] }).then(
+        articles => {
+          return articles[0];
+        }
+      );
     },
     getArticleWithParents: async (_, { id }, { dataBase }) => {
-      const article = await dataBase.Article.findByPk(id);
+      const article = await dataBase.Articles.findByPk(id);
       const articleWithParents = [article];
-      let parent = await dataBase.Article.findByPk(article.parentId);
+      let parent = await dataBase.Articles.findByPk(article.parentId);
       while (parent) {
         articleWithParents.push(parent);
         const newParentId = parent.parentId;
         parent = newParentId
-          ? await dataBase.Article.findByPk(newParentId)
+          ? await dataBase.Articles.findByPk(newParentId)
           : null;
       }
       return articleWithParents.reverse();
     },
     getModifications: (_, __, { dataBase }) => {
-      return dataBase.Modification.findAll({ order: [["updatedAt", "DESC"]] });
+      return dataBase.Modifications.findAll({ order: [["updatedAt", "DESC"]] });
     },
     getArticleModifications: (_, { id }, { dataBase }) => {
-      return dataBase.Modification.findAll({
+      return dataBase.Modifications.findAll({
         where: {
           articleId: id
         },
@@ -83,7 +85,7 @@ const resolvers = {
   },
   Mutation: {
     login: (_, { usernameOrEmail, password }, { dataBase, res }) => {
-      return dataBase.User.findOne({
+      return dataBase.Users.findOne({
         where: {
           [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
         }
@@ -112,7 +114,7 @@ const resolvers = {
       return true;
     },
     signupUser: (_, { username, email, password }, { dataBase, res }) => {
-      return dataBase.User.create({
+      return dataBase.Users.create({
         username: username,
         email: email,
         role: "ADMIN",
@@ -127,7 +129,7 @@ const resolvers = {
         })
         .catch(err => {
           if (err.errors[0].message.includes("username")) {
-            return dataBase.User.findOne({
+            return dataBase.Users.findOne({
               where: { email: email }
             }).then(user => {
               if (user && user.dataValues) {
@@ -148,12 +150,12 @@ const resolvers = {
       { input: { title, icon, content, parentId } },
       { dataBase, userId }
     ) => {
-      return dataBase.User.findByPk(userId)
+      return dataBase.Users.findByPk(userId)
         .then(user => {
           if (!user || !user.dataValues) {
             throw new UserInputError("Authentication Error.");
           }
-          return dataBase.Article.create({
+          return dataBase.Articles.create({
             title: title,
             icon: icon || "📒",
             content: content || "Here is some content for your Article",
@@ -180,15 +182,15 @@ const resolvers = {
       { input: { newContent, articleId } },
       { dataBase, userId }
     ) => {
-      const user = await dataBase.User.findByPk(userId);
+      const user = await dataBase.Users.findByPk(userId);
       if (!user || !user.dataValues) {
         throw new UserInputError("Authentication Error.");
       }
-      const article = await dataBase.Article.findByPk(articleId);
+      const article = await dataBase.Articles.findByPk(articleId);
       if (!article || !article.dataValues) {
         throw new UserInputError("Article not found Error.");
       }
-      const updateReturn = await dataBase.Article.update(
+      const updateReturn = await dataBase.Articles.update(
         { content: newContent || "" },
         {
           returning: true,
@@ -198,7 +200,7 @@ const resolvers = {
         }
       );
       const articleToReturn = updateReturn[1][0];
-      const lastModification = await dataBase.Modification.findOne({
+      const lastModification = await dataBase.Modifications.findOne({
         where: { authorId: userId, articleId: articleId },
         order: [["updatedAt", "DESC"]]
       });
@@ -206,7 +208,7 @@ const resolvers = {
         lastModification?.dataValues?.updatedAt &&
         moment(lastModification.dataValues.updatedAt).isSame(moment(), "minute")
       ) {
-        await dataBase.Modification.update(
+        await dataBase.Modifications.update(
           {
             newContent: newContent
           },
@@ -217,7 +219,7 @@ const resolvers = {
           }
         );
       } else {
-        const nuevaModification = await dataBase.Modification.create({
+        const nuevaModification = await dataBase.Modifications.create({
           newContent: newContent,
           articleId: articleId,
           authorId: userId
@@ -227,7 +229,7 @@ const resolvers = {
     },
     moveArticle: (_, { input: { subArticleId, parentId } }, { dataBase }) => {
       if (subArticleId !== parentId) {
-        return dataBase.Article.update(
+        return dataBase.Articles.update(
           { parentId: parentId },
           {
             returning: true,

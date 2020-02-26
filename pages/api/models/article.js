@@ -1,8 +1,8 @@
 "use-strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Article = sequelize.define(
-    "Article",
+  const Articles = sequelize.define(
+    "Articles",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -55,22 +55,30 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
 
-  Article.associate = function(models) {
-    Article.belongsTo(models.Article, { foreignKey: "parentId", as: "parent" });
-    Article.hasMany(models.Article, {
+  Articles.associate = function(models) {
+    Articles.belongsTo(models.Articles, {
+      foreignKey: "parentId",
+      as: "parent"
+    });
+    Articles.hasMany(models.Articles, {
       foreignKey: "parentId",
       as: "articles"
     });
-    Article.belongsTo(models.User, { foreignKey: "authorId", as: "author" });
-    Article.belongsToMany(models.Tag, {
-      through: "ArticleTag",
+    Articles.belongsTo(models.Users, { foreignKey: "authorId", as: "author" });
+    Articles.belongsToMany(models.Tag, {
+      through: "ArticleTags",
       foreignKey: "articleId"
     });
-    Article.hasMany(models.Modification, {
+    Articles.hasMany(models.Modifications, {
       foreignKey: "articleId",
       as: "modifications"
     });
+    Articles.belongsToMany(models.Users, {
+      through: "Favorites",
+      as: "favoriteUsers",
+      foreignKey: "articleId"
+    });
   };
 
-  return Article;
+  return Articles;
 };
