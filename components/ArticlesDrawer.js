@@ -77,9 +77,11 @@ const ArticlesDrawer = ({ articleWithParents }) => {
   const favoriteArticles = useQuery(GET_USER_FAVORITES);
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogValue, setDialogValue] = React.useState("");
+  const [dialogValue, setDialogValue] = useState("");
+  const [parentId, setParentId] = useState(null);
 
-  const handleDialog = (newDialogValue, newDialogOpen) => {
+  const handleDialog = (newParentId, newDialogValue, newDialogOpen) => {
+    setParentId(newParentId);
     setDialogValue(newDialogValue);
     setDialogOpen(newDialogOpen != null ? newDialogOpen : !dialogOpen);
   };
@@ -100,6 +102,7 @@ const ArticlesDrawer = ({ articleWithParents }) => {
             <StyledList>
               {rootArticles.data?.getRootArticles.map(article => (
                 <ArticleItem
+                  handleDialog={handleDialog}
                   article={article}
                   articleWithParents={articleWithParents}
                   favorites={favoriteArticles.data?.getUserFavorites}
@@ -110,7 +113,7 @@ const ArticlesDrawer = ({ articleWithParents }) => {
           <div>
             <Divider />
             <StyledList>
-              <ListItem button onClick={() => handleDialog("", null)}>
+              <ListItem button onClick={() => handleDialog(null, "", true)}>
                 <ListItemIcon>
                   <AddIcon color="primary" />
                 </ListItemIcon>
@@ -120,7 +123,12 @@ const ArticlesDrawer = ({ articleWithParents }) => {
           </div>
         </ItemsContainer>
       </Drawer>
-      <DialogCreateArticle dialogOpen={dialogOpen} dialogValue={dialogValue} />
+      <DialogCreateArticle
+        parentId={parentId}
+        handleDialog={handleDialog}
+        dialogOpen={dialogOpen}
+        dialogValue={dialogValue}
+      />
     </>
   );
 };

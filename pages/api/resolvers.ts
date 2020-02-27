@@ -85,8 +85,6 @@ const resolvers = {
     getUserFavorites: (_, __, { dataBase, userId }) => {
       return dataBase.Favorites.findAll({ where: { userId: userId } }).then(
         favorites => {
-          console.log(favorites);
-          console.log(favorites.map(favorite => favorite.articleId));
           return dataBase.Articles.findAll({
             where: {
               id: { [Op.in]: favorites.map(favorite => favorite.articleId) }
@@ -172,7 +170,7 @@ const resolvers = {
           return dataBase.Articles.create({
             title: title,
             icon: icon || "📒",
-            content: content || "Here is some content for your Article",
+            content: content || "",
             parentId: parentId || null,
             authorId: userId
           })

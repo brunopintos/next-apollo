@@ -18,15 +18,10 @@ import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import TextField from "@material-ui/core/TextField";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { useDrag, useDrop } from "react-dnd";
 import { useSnackbar } from "notistack";
+import DialogCreateArticle from "./DialogCreateArticle";
 
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
@@ -38,17 +33,6 @@ const GET_SUB_ARTICLES = gql`
       parent {
         id
       }
-    }
-  }
-`;
-
-const CREATE_SUB_ARTICLE = gql`
-  mutation createArticle($title: String!, $parentId: ID!) {
-    createArticle(input: { title: $title, parentId: $parentId }) {
-      id
-      title
-      icon
-      content
     }
   }
 `;
@@ -75,25 +59,6 @@ const MOVE_ARTICLE = gql`
       icon
       content
     }
-  }
-`;
-
-const validationSchema = Yup.object().shape({
-  title: Yup.string()
-    .min(1, "Your title must be at least 1 characters.")
-    .max(100, "Your title is too long.")
-    .required("Must enter a title.")
-});
-
-const StyledButton = styled(Button)`
-  && {
-    text-transform: none;
-  }
-`;
-
-const CustomDialog = styled(Dialog)`
-  && {
-    min-width: 50%;
   }
 `;
 
@@ -152,11 +117,17 @@ const ItemTypes = {
   ARTICLE: "article"
 };
 
-const ArticleItem = ({ article, articleWithParents, favorites }) => {
+const ArticleItem = ({
+  handleDialog,
+  article,
+  articleWithParents,
+  favorites
+}) => {
   const router = useRouter();
   const classes = useStyles();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
+  const [dialogValue, setDialogValue] = useState("");
   const [favorite, setFavorite] = useState(
     favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
       .length !== 0
@@ -187,7 +158,6 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
     }
   });
 
-  const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
   const [favoriteArticle] = useMutation(FAVORITE_ARTICLE);
   const [unfavoriteArticle] = useMutation(UNFAVORITE_ARTICLE);
   const [moveArticle] = useMutation(MOVE_ARTICLE);
@@ -227,10 +197,6 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
-  };
-
-  const handleDialog = () => {
-    setDialogOpen(!dialogOpen);
   };
 
   const handleFavorite = () => {
@@ -303,7 +269,7 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
             <StyledIconButtonWithHover
               color="primary"
               aria-label="delete"
-              onClick={handleDialog}
+              onClick={() => handleDialog(article?.id, "", true)}
             >
               <AddIcon />
             </StyledIconButtonWithHover>
@@ -320,6 +286,7 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
         >
           <List component="div" disablePadding>
             <ArticleItem
+              handleDialog={handleDialog}
               article={article}
               articleWithParents={articleWithParents}
               favorites={favorites}
@@ -327,94 +294,6 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
           </List>
         </Collapse>
       ))}
-      <CustomDialog
-        fullWidth={true}
-        maxWidth={"sm"}
-        onClose={handleDialog}
-        aria-labelledby="dialog-title"
-        open={dialogOpen}
-      >
-        <DialogTitle id="dialog-title">New Article</DialogTitle>
-        <DialogContent dividers>
-          <Formik
-            initialValues={{
-              title: ""
-            }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting, setErrors }) => {
-              createSubArticle({
-                variables: {
-                  title: values.title,
-                  parentId: article?.id
-                }
-              })
-                .then(() => {
-                  enqueueSnackbar(`Article ${title} in!!`, {
-                    variant: "success"
-                  });
-                  setDialogOpen(!dialogOpen);
-                })
-                .catch(err => {
-                  setErrors({
-                    title: err?.graphQLErrors?.map(x => x.message)
-                  });
-                  setSubmitting(false);
-                  setDialogOpen(!dialogOpen);
-                });
-            }}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting
-            }) => (
-              <Form onSubmit={handleSubmit} noValidate>
-                <DialogContent>
-                  <TextField
-                    color="secondary"
-                    name="title"
-                    label="Title"
-                    variant="outlined"
-                    value={values.title}
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.title && errors.title}
-                    helperText={
-                      touched.title && errors.title ? errors.title : ""
-                    }
-                    required
-                    autoFocus
-                    fullWidth
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <StyledButton
-                    variant="contained"
-                    color="primary"
-                    onClick={handleDialog}
-                  >
-                    Cancel
-                  </StyledButton>
-                  <StyledButton
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    aria-label="Continue"
-                    disabled={isSubmitting}
-                  >
-                    Create
-                  </StyledButton>
-                </DialogActions>
-              </Form>
-            )}
-          </Formik>
-        </DialogContent>
-      </CustomDialog>
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useRouter } from "next/router";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
@@ -10,10 +11,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Button from "@material-ui/core/Button";
+import { useSnackbar } from "notistack";
 
 const CREATE_ARTICLE = gql`
-  mutation createArticle($title: String!) {
-    createArticle(input: { title: $title }) {
+  mutation createArticle($title: String!, $parentId: ID) {
+    createArticle(input: { title: $title, parentId: $parentId }) {
       id
       title
       icon
@@ -41,20 +43,21 @@ const CustomDialog = styled(Dialog)`
   }
 `;
 
-const DialogCreateArticle = ({ dialogOpen, dialogValue }) => {
+const DialogCreateArticle = ({
+  parentId,
+  handleDialog,
+  dialogOpen,
+  dialogValue
+}) => {
+  const router = useRouter();
   const [createArticle] = useMutation(CREATE_ARTICLE);
-
-  const handleDialog = () => {
-    setDialogValue("");
-    setValue("");
-    setDialogOpen(!dialogOpen);
-  };
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <CustomDialog
       fullWidth={true}
       maxWidth={"sm"}
-      onClose={handleDialog}
+      onClose={() => handleDialog(null, "", false)}
       aria-labelledby="dialog-title"
       open={dialogOpen}
     >
@@ -62,27 +65,35 @@ const DialogCreateArticle = ({ dialogOpen, dialogValue }) => {
       <DialogContent dividers>
         <Formik
           initialValues={{
-            title: dialogValue
+            title: dialogValue,
+            parentId: parentId
           }}
           validationSchema={validationSchema}
           onSubmit={(values, { setSubmitting, setErrors }) => {
             createArticle({
               variables: {
-                title: values.title
+                title: values.title,
+                parentId: values.parentId
               }
             })
-              .then(() => {
-                enqueueSnackbar(`Article ${title} created!!`, {
-                  variant: "success"
-                });
-                handleDialog();
+              .then(article => {
+                enqueueSnackbar(
+                  `Article ${article?.data?.createArticle?.title} created!!`,
+                  {
+                    variant: "success"
+                  }
+                );
+                handleDialog(null, "", false);
+                router.push(
+                  `/article/${article?.data?.createArticle?.title}-${article?.data?.createArticle?.id}`
+                );
               })
               .catch(err => {
+                console.log(err);
                 setErrors({
                   title: err?.graphQLErrors?.map(x => x.message)
                 });
                 setSubmitting(false);
-                handleDialog();
               });
           }}
         >
@@ -117,7 +128,7 @@ const DialogCreateArticle = ({ dialogOpen, dialogValue }) => {
                 <StyledButton
                   variant="contained"
                   color="primary"
-                  onClick={handleDialog}
+                  onClick={() => handleDialog(null, "", false)}
                 >
                   Cancel
                 </StyledButton>

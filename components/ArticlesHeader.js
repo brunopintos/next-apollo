@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { logout } from "../lib/auth";
 import styled from "styled-components";
@@ -88,12 +88,12 @@ const ArticlesHeader = ({ handleDialog }) => {
             onChange={(event, newValue) => {
               if (typeof newValue === "string") {
                 setTimeout(() => {
-                  handleDialog(newValue, true);
+                  handleDialog(null, newValue, true);
                 });
                 return;
               }
               if (newValue && newValue.inputValue) {
-                handleDialog(newValue.inputValue, true);
+                handleDialog(null, newValue.inputValue, true);
                 return;
               }
               setValue(newValue);
