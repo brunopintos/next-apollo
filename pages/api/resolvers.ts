@@ -241,8 +241,27 @@ const resolvers = {
       }
       return articleToReturn;
     },
-    moveArticle: (_, { input: { subArticleId, parentId } }, { dataBase }) => {
-      if (subArticleId !== parentId) {
+    moveArticle: async (
+      _,
+      { input: { subArticleId, parentId } },
+      { dataBase }
+    ) => {
+      const article = await dataBase.Articles.findByPk(parentId);
+      const articleWithParents = [article];
+      let parent = await dataBase.Articles.findByPk(article.parentId);
+      while (parent) {
+        articleWithParents.push(parent);
+        const newParentId = parent.parentId;
+        parent = newParentId
+          ? await dataBase.Articles.findByPk(newParentId)
+          : null;
+      }
+      if (subArticleId === parentId) {
+        throw new UserInputError("Article can not be moved to itself.");
+      } else if (
+        articleWithParents.filter(parent => parent.id == subArticleId)
+          .length === 0
+      ) {
         return dataBase.Articles.update(
           { parentId: parentId },
           {
@@ -259,7 +278,7 @@ const resolvers = {
             throw new UserInputError("Update could not be done.");
           });
       } else {
-        throw new UserInputError("An article can not be his parent.");
+        throw new UserInputError("Article can not be moved to its child.");
       }
     },
     favoriteArticle: (_, { id }, { dataBase, userId }) => {

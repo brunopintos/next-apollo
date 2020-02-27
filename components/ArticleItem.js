@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import Link from "next/link";
@@ -25,6 +26,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { useDrag, useDrop } from "react-dnd";
+import { useSnackbar } from "notistack";
 
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
@@ -151,7 +153,10 @@ const ItemTypes = {
 };
 
 const ArticleItem = ({ article, articleWithParents, favorites }) => {
+  const router = useRouter();
   const classes = useStyles();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
   const [favorite, setFavorite] = useState(
     favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
       .length !== 0
@@ -161,13 +166,7 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
       0 &&
       articleWithParents?.[articleWithParents.length - 1].id !== article?.id
   );
-
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { data } = useQuery(GET_SUB_ARTICLES, {
-    variables: {
-      id: article.id
-    }
-  });
   useEffect(() => {
     setFavorite(
       favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
@@ -182,13 +181,19 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
     );
   }, [article, articleWithParents]);
 
+  const { data } = useQuery(GET_SUB_ARTICLES, {
+    variables: {
+      id: article.id
+    }
+  });
+
   const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
   const [favoriteArticle] = useMutation(FAVORITE_ARTICLE);
   const [unfavoriteArticle] = useMutation(UNFAVORITE_ARTICLE);
   const [moveArticle] = useMutation(MOVE_ARTICLE);
 
   const [{ isDragging }, drag] = useDrag({
-    item: { id: article?.id, type: ItemTypes.ARTICLE },
+    item: { id: article?.id, title: article?.title, type: ItemTypes.ARTICLE },
     collect: monitor => ({
       isDragging: !!monitor.isDragging()
     })
@@ -202,7 +207,18 @@ const ArticleItem = ({ article, articleWithParents, favorites }) => {
           subArticleId: dragObject.id,
           parentId: article.id
         }
-      });
+      })
+        .then(articleMoved => {
+          enqueueSnackbar(`${dragObject?.title} moved to ${article?.title}!!`, {
+            variant: "success"
+          });
+          router.push(`/article/${dragObject?.title}-${dragObject?.id}`);
+        })
+        .catch(err => {
+          enqueueSnackbar(err?.graphQLErrors?.[0].message, {
+            variant: "error"
+          });
+        });
     },
     collect: monitor => ({
       isOver: !!monitor.isOver()

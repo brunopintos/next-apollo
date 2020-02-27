@@ -92,12 +92,10 @@ const ArticlesHeader = ({ handleDialog }) => {
                 });
                 return;
               }
-
               if (newValue && newValue.inputValue) {
                 handleDialog(newValue.inputValue, true);
                 return;
               }
-
               setValue(newValue);
               router.push(`/article/${newValue.title}-${newValue.id}`);
             }}
