@@ -26,7 +26,6 @@ const typeDefs = gql`
       password: String!
     ): AuthPayLoad!
     login(usernameOrEmail: String!, password: String!): AuthPayLoad!
-    logout: Boolean!
     createArticle(input: InputCreateArticle!): Article!
     updateArticle(input: InputUpdateArticle!): Article!
     moveArticle(input: InputMoveArticle!): Article!

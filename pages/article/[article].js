@@ -1,45 +1,11 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import gql from "graphql-tag";
-import styled from "styled-components";
 import withAuth from "../../lib/jwt";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import HomeIcon from "@material-ui/icons/Home";
-import Drawer from "@material-ui/core/Drawer";
-import AppBar from "@material-ui/core/AppBar";
-import IconButton from "@material-ui/core/IconButton";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import ArticleItem from "../../components/ArticleItem";
 import ArticleContent from "../../components/ArticleContent";
-import AddIcon from "@material-ui/icons/Add";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import TextField from "@material-ui/core/TextField";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import Link from "next/link";
-import Button from "@material-ui/core/Button";
-import Autocomplete, {
-  createFilterOptions
-} from "@material-ui/lab/Autocomplete";
-
-const GET_ARTICLES = gql`
-  query getArticles {
-    getArticles {
-      id
-      title
-      content
-    }
-  }
-`;
+import ArticleListDrawer from "../../components/ArticlesDrawer";
 
 const GET_ARTICLE_WITH_PARENTS = gql`
   query getArticleWithParents($id: ID!) {
@@ -53,88 +19,6 @@ const GET_ARTICLE_WITH_PARENTS = gql`
   }
 `;
 
-const GET_USER_FAVORITES = gql`
-  query getUserFavorites {
-    getUserFavorites {
-      id
-    }
-  }
-`;
-
-const GET_ROOT_ARTICLES = gql`
-  query getRootArticles {
-    getRootArticles {
-      id
-      title
-      icon
-      content
-      parent {
-        id
-      }
-    }
-  }
-`;
-
-const LOG_OUT = gql`
-  mutation logout {
-    logout
-  }
-`;
-
-const CREATE_ARTICLE = gql`
-  mutation createArticle($title: String!) {
-    createArticle(input: { title: $title }) {
-      id
-      title
-      icon
-      content
-    }
-  }
-`;
-
-const validationSchema = Yup.object().shape({
-  title: Yup.string()
-    .min(1, "Your title must be at least 1 characters.")
-    .max(100, "Your title is too long.")
-    .required("Must enter a title.")
-});
-
-const StyledButton = styled(Button)`
-  && {
-    text-transform: none;
-  }
-`;
-
-const ItemsContainer = styled.div`
-  && {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-`;
-
-const CustomDialog = styled(Dialog)`
-  && {
-    min-width: 50%;
-  }
-`;
-
-const StyledAppBar = styled(AppBar)`
-  && {
-    background-color: Gold;
-  }
-`;
-
-const StyledToolBar = styled(Toolbar)`
-  && {
-    display: flex;
-    justify-content: space-between;
-  }
-`;
-
-const filter = createFilterOptions();
-
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -143,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
   listRoot: {
     width: "100%",
-    maxWidth: 360,
+    maxWidth: 240,
     backgroundColor: theme.palette.background.paper
   },
   appBar: {
@@ -217,240 +101,26 @@ const Article = props => {
   const classes = useStyles();
   const router = useRouter();
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [value, setValue] = React.useState(null);
-  const [dialogValue, setDialogValue] = React.useState("");
-
-  const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const articleWithParents = useQuery(GET_ARTICLE_WITH_PARENTS, {
     fetchPolicy: "cache-and-network",
     variables: {
       id: /(.*)\-(\d+)$/.exec(router.query.article)[2]
     }
   });
-  const favoriteArticles = useQuery(GET_USER_FAVORITES);
-  const articles = useQuery(GET_ARTICLES);
-
-  const [createArticle] = useMutation(CREATE_ARTICLE);
-  const [logout] = useMutation(LOG_OUT);
 
   const articleTitle = /(.*)\-(\d+)$/.exec(router.query.article)[1];
-
-  const handleDialog = () => {
-    setDialogValue("");
-    setValue("");
-    setDialogOpen(!dialogOpen);
-  };
 
   return (
     <div className={classes.root}>
       {props.changeTitle(`LKB - ${articleTitle}`)}
-      <StyledAppBar position="fixed" className={classes.appBar}>
-        <StyledToolBar>
-          <Link href="/">
-            <IconButton color="secondary" edge="start" aria-label="home page">
-              <HomeIcon />
-            </IconButton>
-          </Link>
-          <Autocomplete
-            value={value}
-            onChange={(event, newValue) => {
-              if (typeof newValue === "string") {
-                // timeout to avoid instant validation of the dialog's form.
-                setTimeout(() => {
-                  setDialogOpen(true);
-                  setDialogValue(newValue);
-                });
-                return;
-              }
-
-              if (newValue && newValue.inputValue) {
-                setDialogOpen(true);
-                setDialogValue(newValue.inputValue);
-                return;
-              }
-
-              setValue(newValue);
-              router.push(`/article/${newValue.title}-${newValue.id}`);
-            }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              if (params.inputValue !== "") {
-                filtered.push({
-                  inputValue: params.inputValue,
-                  title: `Add article: "${params.inputValue}"`
-                });
-              }
-
-              return filtered;
-            }}
-            options={articles.data?.getArticles}
-            getOptionLabel={option => {
-              // e.g value selected with enter, right from the input
-              if (typeof option === "string") {
-                return option;
-              }
-              if (option.inputValue) {
-                return option.inputValue;
-              }
-              return option.title;
-            }}
-            renderOption={option => option.title}
-            style={{ width: 400 }}
-            autoComplete
-            autoHighlight
-            renderInput={params => (
-              <div className={classes.search}>
-                {/* <div className={classes.searchIcon}>
-                  <SearchIcon color="secondary" />
-                </div> */}
-                <TextField
-                  {...params}
-                  color="secondary"
-                  label="Search article..."
-                  classes={{
-                    root: classes.inputRoot
-                  }}
-                  fullWidth
-                />
-              </div>
-            )}
-          />
-          <Link href="/">
-            <StyledButton color="secondary" onClick={logout}>
-              Log out
-            </StyledButton>
-          </Link>
-        </StyledToolBar>
-      </StyledAppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper
-        }}
-      >
-        <ItemsContainer>
-          <div>
-            <div className={classes.toolbar} />
-            <List className={classes.listRoot}>
-              {rootArticles.data?.getRootArticles.map(article => (
-                <ArticleItem
-                  article={article}
-                  selectedArticleWithParents={
-                    articleWithParents.data?.getArticleWithParents
-                  }
-                  favorites={favoriteArticles.data?.getUserFavorites}
-                />
-              ))}
-            </List>
-          </div>
-          <div>
-            <Divider />
-            <List className={classes.listRoot}>
-              <ListItem button onClick={handleDialog}>
-                <ListItemIcon>
-                  <AddIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="New article" />
-              </ListItem>
-            </List>
-          </div>
-        </ItemsContainer>
-      </Drawer>
+      <ArticleListDrawer
+        articleWithParents={articleWithParents.data?.getArticleWithParents}
+      />
       <main className={classes.content}>
         <ArticleContent
           articleWithParents={articleWithParents.data?.getArticleWithParents}
         />
       </main>
-      <CustomDialog
-        fullWidth={true}
-        maxWidth={"sm"}
-        onClose={handleDialog}
-        aria-labelledby="dialog-title"
-        open={dialogOpen}
-      >
-        <DialogTitle id="dialog-title">New Article</DialogTitle>
-        <DialogContent dividers>
-          <Formik
-            initialValues={{
-              title: dialogValue
-            }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting, setErrors }) => {
-              createArticle({
-                variables: {
-                  title: values.title
-                }
-              })
-                .then(() => {
-                  enqueueSnackbar(`Article ${title} created!!`, {
-                    variant: "success"
-                  });
-                  handleDialog();
-                })
-                .catch(err => {
-                  setErrors({
-                    title: err?.graphQLErrors?.map(x => x.message)
-                  });
-                  setSubmitting(false);
-                  handleDialog();
-                });
-            }}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting
-            }) => (
-              <Form onSubmit={handleSubmit} noValidate>
-                <DialogContent>
-                  <TextField
-                    color="secondary"
-                    name="title"
-                    label="Title"
-                    variant="outlined"
-                    value={values.title}
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.title && errors.title}
-                    helperText={
-                      touched.title && errors.title ? errors.title : ""
-                    }
-                    required
-                    autoFocus
-                    fullWidth
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <StyledButton
-                    variant="contained"
-                    color="primary"
-                    onClick={handleDialog}
-                  >
-                    Cancel
-                  </StyledButton>
-                  <StyledButton
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    aria-label="Continue"
-                    disabled={isSubmitting}
-                  >
-                    Create
-                  </StyledButton>
-                </DialogActions>
-              </Form>
-            )}
-          </Formik>
-        </DialogContent>
-      </CustomDialog>
     </div>
   );
 };

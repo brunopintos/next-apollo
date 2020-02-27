@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import Link from "next/link";
@@ -150,23 +150,38 @@ const ItemTypes = {
   ARTICLE: "article"
 };
 
-const ArticleItem = ({ article, selectedArticleWithParents, favorites }) => {
+const ArticleItem = ({ article, articleWithParents, favorites }) => {
   const classes = useStyles();
   const [favorite, setFavorite] = useState(
-    !!favorites?.filter(favoriteArticle => favoriteArticle.id === article?.id)
+    favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
+      .length !== 0
   );
   const [expanded, setExpanded] = useState(
-    !!selectedArticleWithParents?.filter(parent => parent.id === article?.id) &&
-      selectedArticleWithParents?.[selectedArticleWithParents.length - 1].id !==
-        article?.id
+    articleWithParents?.filter(parent => parent.id === article?.id).length !==
+      0 &&
+      articleWithParents?.[articleWithParents.length - 1].id !== article?.id
   );
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  //useLazyQuery?
-  const { loading, error, data } = useQuery(GET_SUB_ARTICLES, {
+  const { data } = useQuery(GET_SUB_ARTICLES, {
     variables: {
       id: article.id
     }
   });
+  useEffect(() => {
+    setFavorite(
+      favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
+        .length !== 0
+    );
+  }, [article, favorites]);
+  useEffect(() => {
+    setExpanded(
+      articleWithParents?.filter(parent => parent.id === article?.id).length !==
+        0 &&
+        articleWithParents?.[articleWithParents.length - 1].id !== article?.id
+    );
+  }, [article, articleWithParents]);
+
   const [createSubArticle] = useMutation(CREATE_SUB_ARTICLE);
   const [favoriteArticle] = useMutation(FAVORITE_ARTICLE);
   const [unfavoriteArticle] = useMutation(UNFAVORITE_ARTICLE);
@@ -219,29 +234,18 @@ const ArticleItem = ({ article, selectedArticleWithParents, favorites }) => {
     setFavorite(!favorite);
   };
 
+  const isArticleSelected = article =>
+    articleWithParents?.[articleWithParents.length - 1] === article?.id;
+
   return (
     <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-      {/* pasar a router push en vez de link
-      
-          -poner en el listItem un onClicked y adentro el router push
-          
-          -para que el expandLess y el expandMore tengan comportamiento aparte los pongo dentro de un ListItemSecondaryAction
-
-          -lo mismo hago para el boton de agregar un subarticle
-
-          https://material-ui.com/es/components/lists/#checkbox
-      */}
       <StyledListItem
         ref={drop}
         style={{
           backgroundColor: isOver ? "#ffd600" : "transparent"
         }}
         key={article?.id}
-        selected={
-          selectedArticleWithParents?.[
-            selectedArticleWithParents.length - 1
-          ] === article?.id
-        }
+        selected={isArticleSelected(article)}
       >
         <ItemContent>
           <ItemExpandAndTextContent>
@@ -301,7 +305,7 @@ const ArticleItem = ({ article, selectedArticleWithParents, favorites }) => {
           <List component="div" disablePadding>
             <ArticleItem
               article={article}
-              selectedArticleWithParents={selectedArticleWithParents}
+              articleWithParents={articleWithParents}
               favorites={favorites}
             />
           </List>
