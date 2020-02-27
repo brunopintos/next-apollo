@@ -57,7 +57,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
   listRoot: {
     width: "100%",
-    maxWidth: 240,
+    maxWidth: drawerWidth,
     backgroundColor: theme.palette.background.paper
   },
   drawer: {

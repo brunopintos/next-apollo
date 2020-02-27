@@ -170,7 +170,7 @@ const resolvers = {
           return dataBase.Articles.create({
             title: title,
             icon: icon || "📒",
-            content: content || "",
+            content: content || "<p>Here is some content for your Article</p>",
             parentId: parentId || null,
             authorId: userId
           })
@@ -203,7 +203,7 @@ const resolvers = {
         throw new UserInputError("Article not found Error.");
       }
       const updateReturn = await dataBase.Articles.update(
-        { content: newContent || "" },
+        { content: newContent || "<p></p>" },
         {
           returning: true,
           where: {
