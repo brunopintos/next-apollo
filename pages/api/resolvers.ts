@@ -119,7 +119,7 @@ const resolvers = {
           throw new UserInputError("Incorrect password.");
         }
         const token = jwt.sign(user.toJSON(), "supersecret", {
-          expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
+          expiresIn: "7d"
         });
         res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
@@ -134,10 +134,22 @@ const resolvers = {
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
+            expiresIn: "7d"
           });
           res.setHeader("Set-Cookie", [`token=${token}`]);
-          return { token: token };
+          if (user?.dataValues?.id === 1) {
+            return dataBase.Articles.create({
+              title: "Get Started",
+              icon: "📒",
+              content: `<p><span style="background-color: unset; text-align: inherit; font-family: Roboto, &quot;Segoe UI&quot;, GeezaPro, &quot;DejaVu Serif&quot;, sans-serif, -apple-system, BlinkMacSystemFont;">👋 Welcome to Lithium KB! This is an introduction page for all new members of the platform.</span><br></p><p><br></p><p><strong>Give these things a try:</strong></p><ol><li>﻿﻿<span style="text-decoration: line-through;">Create an account<br></span></li><li>Create a new article:</li><ol><li>With the "New article" button on the bottom left corner of the screen.</li><li>With the "+" button in each article on the left, to create an article inside another.</li><li>With the search bar typing the name of your article and selecting the "Add article" option.</li></ol><li>Search for an article with the search bar.</li><li>Navigate through articles with breadcrumbs.</li><li>Favorite a specific article.</li><li>Modify the content of an article and watch the modifications list.</li><li>Move an article inside another by drag n drop.</li></ol>`,
+              parentId: null,
+              authorId: 1
+            }).then(() => {
+              return { token: token };
+            });
+          } else {
+            return { token: token };
+          }
         })
         .catch(err => {
           if (err.errors[0].message.includes("username")) {
@@ -178,11 +190,7 @@ const resolvers = {
               return article;
             })
             .catch(err => {
-              if (err.errors[0].message.includes("title")) {
-                throw new UserInputError("Article title is already in use.");
-              } else {
-                throw new UserInputError("Icon too long");
-              }
+              throw new UserInputError("Icon too long");
             });
         })
         .catch(() => {
