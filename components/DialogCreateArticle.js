@@ -90,7 +90,6 @@ const DialogCreateArticle = ({
                 );
               })
               .catch(err => {
-                console.log(err);
                 setErrors({
                   title: err?.graphQLErrors?.map(x => x.message)
                 });

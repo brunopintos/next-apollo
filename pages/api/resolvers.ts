@@ -210,6 +210,7 @@ const resolvers = {
       if (!article || !article.dataValues) {
         throw new UserInputError("Article not found Error.");
       }
+      const previousArticleContent = article.dataValues.content;
       const updateReturn = await dataBase.Articles.update(
         { content: newContent || "<p></p>" },
         {
@@ -239,8 +240,9 @@ const resolvers = {
           }
         );
       } else {
-        const nuevaModification = await dataBase.Modifications.create({
+        await dataBase.Modifications.create({
           newContent: newContent,
+          previousContent: previousArticleContent,
           articleId: articleId,
           authorId: userId
         });
