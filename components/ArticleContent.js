@@ -1,6 +1,3 @@
-/**
- * Initilaize RichTextEditor from React element
- */
 import {
   RichTextEditorComponent,
   Inject,
@@ -13,14 +10,13 @@ import {
 } from "@syncfusion/ej2-react-richtexteditor";
 import * as React from "react";
 import { useMutation } from "@apollo/react-hooks";
-import { useState } from "react";
-import { useEffect } from "react";
-import Button from "@material-ui/core/Button";
+import { useState, useEffect } from "react";
 import NextLink from "next/link";
-import MaterialLink from "@material-ui/core/Link";
-import styled from "styled-components";
 import gql from "graphql-tag";
 import moment from "moment";
+
+import styled from "styled-components";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 

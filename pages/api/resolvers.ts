@@ -85,8 +85,6 @@ const resolvers = {
     getUserFavorites: (_, __, { dataBase, userId }) => {
       return dataBase.Favorites.findAll({ where: { userId: userId } }).then(
         favorites => {
-          console.log(favorites);
-          console.log(favorites.map(favorite => favorite.articleId));
           return dataBase.Articles.findAll({
             where: {
               id: { [Op.in]: favorites.map(favorite => favorite.articleId) }
@@ -121,19 +119,11 @@ const resolvers = {
           throw new UserInputError("Incorrect password.");
         }
         const token = jwt.sign(user.toJSON(), "supersecret", {
-          expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
+          expiresIn: "7d"
         });
         res.setHeader("Set-Cookie", [`token=${token}`]);
         return { token: token };
       });
-    },
-    logout: async (_, __, { res }) => {
-      try {
-        res.deleteHeader("Set-Cookie");
-      } catch {
-        return false;
-      }
-      return true;
     },
     signupUser: (_, { username, email, password }, { dataBase, res }) => {
       return dataBase.Users.create({
@@ -144,10 +134,22 @@ const resolvers = {
       })
         .then(user => {
           const token = jwt.sign(user.toJSON(), "supersecret", {
-            expiresIn: "7d" //TODO: enviar una request de un token nuevo el 6to dia
+            expiresIn: "7d"
           });
           res.setHeader("Set-Cookie", [`token=${token}`]);
-          return { token: token };
+          if (user?.dataValues?.id === 1) {
+            return dataBase.Articles.create({
+              title: "Get Started",
+              icon: "📒",
+              content: `<p><span style="background-color: unset; text-align: inherit; font-family: Roboto, &quot;Segoe UI&quot;, GeezaPro, &quot;DejaVu Serif&quot;, sans-serif, -apple-system, BlinkMacSystemFont;">👋 Welcome to Lithium KB! This is an introduction page for all new members of the platform.</span><br></p><p><br></p><p><strong>Give these things a try:</strong></p><ol><li>﻿﻿<span style="text-decoration: line-through;">Create an account<br></span></li><li>Create a new article:</li><ol><li>With the "New article" button on the bottom left corner of the screen.</li><li>With the "+" button in each article on the left, to create an article inside another.</li><li>With the search bar typing the name of your article and selecting the "Add article" option.</li></ol><li>Search for an article with the search bar.</li><li>Navigate through articles with breadcrumbs.</li><li>Favorite a specific article.</li><li>Modify the content of an article and watch the modifications list.</li><li>Move an article inside another by drag n drop.</li></ol>`,
+              parentId: null,
+              authorId: 1
+            }).then(() => {
+              return { token: token };
+            });
+          } else {
+            return { token: token };
+          }
         })
         .catch(err => {
           if (err.errors[0].message.includes("username")) {
@@ -180,7 +182,7 @@ const resolvers = {
           return dataBase.Articles.create({
             title: title,
             icon: icon || "📒",
-            content: content || "Here is some content for your Article",
+            content: content || "<p>Here is some content for your Article</p>",
             parentId: parentId || null,
             authorId: userId
           })
@@ -188,11 +190,7 @@ const resolvers = {
               return article;
             })
             .catch(err => {
-              if (err.errors[0].message.includes("title")) {
-                throw new UserInputError("Article title is already in use.");
-              } else {
-                throw new UserInputError("Icon too long");
-              }
+              throw new UserInputError("Icon too long");
             });
         })
         .catch(() => {
@@ -212,8 +210,9 @@ const resolvers = {
       if (!article || !article.dataValues) {
         throw new UserInputError("Article not found Error.");
       }
+      const previousArticleContent = article.dataValues.content;
       const updateReturn = await dataBase.Articles.update(
-        { content: newContent || "" },
+        { content: newContent || "<p></p>" },
         {
           returning: true,
           where: {
@@ -241,16 +240,36 @@ const resolvers = {
           }
         );
       } else {
-        const nuevaModification = await dataBase.Modifications.create({
+        await dataBase.Modifications.create({
           newContent: newContent,
+          previousContent: previousArticleContent,
           articleId: articleId,
           authorId: userId
         });
       }
       return articleToReturn;
     },
-    moveArticle: (_, { input: { subArticleId, parentId } }, { dataBase }) => {
-      if (subArticleId !== parentId) {
+    moveArticle: async (
+      _,
+      { input: { subArticleId, parentId } },
+      { dataBase }
+    ) => {
+      const article = await dataBase.Articles.findByPk(parentId);
+      const articleWithParents = [article];
+      let parent = await dataBase.Articles.findByPk(article.parentId);
+      while (parent) {
+        articleWithParents.push(parent);
+        const newParentId = parent.parentId;
+        parent = newParentId
+          ? await dataBase.Articles.findByPk(newParentId)
+          : null;
+      }
+      if (subArticleId === parentId) {
+        throw new UserInputError("Article can not be moved to itself.");
+      } else if (
+        articleWithParents.filter(parent => parent.id == subArticleId)
+          .length === 0
+      ) {
         return dataBase.Articles.update(
           { parentId: parentId },
           {
@@ -267,7 +286,7 @@ const resolvers = {
             throw new UserInputError("Update could not be done.");
           });
       } else {
-        throw new UserInputError("An article can not be his parent.");
+        throw new UserInputError("Article can not be moved to its child.");
       }
     },
     favoriteArticle: (_, { id }, { dataBase, userId }) => {

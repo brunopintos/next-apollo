@@ -1,22 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
-import gql from "graphql-tag";
-import withAuth from "../../../lib/jwt";
 import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+import moment from "moment";
+
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
-import PersonIcon from "@material-ui/icons/Person";
 import Divider from "@material-ui/core/Divider";
+import PersonIcon from "@material-ui/icons/Person";
+
+import withAuth from "../../../lib/jwt";
 
 const GET_ARTICLE_MODIFICATIONS = gql`
   query getArticleModifications($id: ID!) {
     getArticleModifications(id: $id) {
       id
       newContent
+      previousContent
       author {
         username
       }
@@ -39,9 +43,22 @@ const ArticleModification = props => {
   return (
     <div>
       {props.changeTitle(`LKB - ${articleTitle} modifications`)}
-      <Typography>
-        Lista de Modificaciones del articulo: {articleTitle}
-      </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <Typography
+          style={{
+            fontWeight: "bold"
+          }}
+          variant="h4"
+          color="secondary"
+        >
+          Article Modifications: {articleTitle}
+        </Typography>
+      </div>
       <List>
         {data?.getArticleModifications.map(modification => (
           <>
@@ -53,21 +70,36 @@ const ArticleModification = props => {
               </ListItemAvatar>
               <ListItemText
                 primary={
-                  <div style={{ maxHeight: 200, overflow: "hidden" }}>
-                    New Content:
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      maxHeight: 300,
+                      overflow: "hidden",
+                      paddingBottom: 20
+                    }}
+                  >
                     <div
                       dangerouslySetInnerHTML={{
                         __html: modification.newContent
                       }}
+                      style={{ backgroundColor: "lightgreen", minWidth: "49%" }}
+                    ></div>
+                    <Divider orientation="vertical" flexItem />
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: modification.previousContent
+                      }}
+                      style={{ backgroundColor: "lightcoral", minWidth: "49%" }}
                     ></div>
                   </div>
                 }
                 secondary={
                   <>
                     <Typography color="secondary">
-                      {`Modification author: ${modification.author.username}`}
+                      {`Author: ${modification.author.username}`}
                     </Typography>
-                    {new Date(modification.updatedAt).toString()}
+                    {moment(modification.updatedAt).calendar()}
                   </>
                 }
               />

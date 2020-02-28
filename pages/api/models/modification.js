@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false
       },
+      previousContent: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
       articleId: {
         type: DataTypes.INTEGER,
         references: {

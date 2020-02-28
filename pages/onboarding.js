@@ -1,17 +1,17 @@
 import React from "react";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import styled from "styled-components";
 import Link from "next/link";
 import withAuth from "../lib/jwt";
+
+import styled from "styled-components";
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
+import Button from "@material-ui/core/Button";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 import Layout from "../components/Layout";
-
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
-import Button from "@material-ui/core/Button";
 
 const GET_FIRST_ARTICLE = gql`
   query getFirstArticle {

@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      previousContent: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
       articleId: {
         type: Sequelize.INTEGER,
         references: {
