@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
-import gql from "graphql-tag";
-import withAuth from "../../../lib/jwt";
 import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
-import PersonIcon from "@material-ui/icons/Person";
 import Divider from "@material-ui/core/Divider";
+import PersonIcon from "@material-ui/icons/Person";
+
+import withAuth from "../../../lib/jwt";
 
 const GET_ARTICLE_MODIFICATIONS = gql`
   query getArticleModifications($id: ID!) {

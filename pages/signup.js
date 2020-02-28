@@ -1,6 +1,5 @@
 import React from "react";
 import gql from "graphql-tag";
-import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
@@ -8,10 +7,11 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
 
-import { TextField } from "formik-material-ui";
+import styled from "styled-components";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
+import { TextField } from "formik-material-ui";
 
 import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";

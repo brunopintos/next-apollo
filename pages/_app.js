@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { withApollo } from "../lib/apollo";
 import { SnackbarProvider } from "notistack";
-import React, { useState } from "react";
 import Head from "next/head";
 import { yellow, grey } from "@material-ui/core/colors";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";

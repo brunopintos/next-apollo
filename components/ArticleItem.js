@@ -1,27 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import gql from "graphql-tag";
-import styled from "styled-components";
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useDrag, useDrop } from "react-dnd";
+import { useSnackbar } from "notistack";
 import Link from "next/link";
-import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import styled from "styled-components";
+import { makeStyles } from "@material-ui/core/styles";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
-import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import Dialog from "@material-ui/core/Dialog";
-import { useMutation } from "@apollo/react-hooks";
-import { useDrag, useDrop } from "react-dnd";
-import { useSnackbar } from "notistack";
-import DialogCreateArticle from "./DialogCreateArticle";
 
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
@@ -125,9 +122,8 @@ const ArticleItem = ({
 }) => {
   const router = useRouter();
   const classes = useStyles();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [dialogValue, setDialogValue] = useState("");
   const [favorite, setFavorite] = useState(
     favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
       .length !== 0
@@ -137,7 +133,6 @@ const ArticleItem = ({
       0 &&
       articleWithParents?.[articleWithParents.length - 1].id !== article?.id
   );
-  const [dialogOpen, setDialogOpen] = useState(false);
   useEffect(() => {
     setFavorite(
       favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
@@ -178,7 +173,7 @@ const ArticleItem = ({
           parentId: article.id
         }
       })
-        .then(articleMoved => {
+        .then(() => {
           enqueueSnackbar(`${dragObject?.title} moved to ${article?.title}!!`, {
             variant: "success"
           });

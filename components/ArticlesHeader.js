@@ -1,19 +1,19 @@
-import { useRouter } from "next/router";
 import React from "react";
+import { useRouter } from "next/router";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { logout } from "../lib/auth";
+
 import styled from "styled-components";
+import { fade, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
-import { fade, makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import Link from "next/link";
 import Autocomplete, {
   createFilterOptions
 } from "@material-ui/lab/Autocomplete";
+import { logout } from "../lib/auth";
 
 const GET_ARTICLES = gql`
   query getArticles {

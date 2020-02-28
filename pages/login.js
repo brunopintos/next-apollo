@@ -1,6 +1,5 @@
 import React from "react";
 import gql from "graphql-tag";
-import styled from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
@@ -9,15 +8,16 @@ import * as Yup from "yup";
 import Link from "next/link";
 import Cookies from "js-cookie";
 
-import MainHeader from "../components/MainHeader";
-import Title from "../components/Title";
-import Layout from "../components/Layout";
-
+import styled from "styled-components";
 import { TextField } from "formik-material-ui";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
+import Layout from "../components/Layout";
 
 const LOGIN = gql`
   mutation login($usernameOrEmail: String!, $password: String!) {
