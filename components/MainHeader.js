@@ -10,6 +10,7 @@ import HomeIcon from "@material-ui/icons/Home";
 
 import Link from "next/link";
 import styled from "styled-components";
+import Cookies from "js-cookie";
 
 const StyledButton = styled(Button)`
   && {
@@ -48,12 +49,16 @@ const MainHeader = () => (
         <Title color="secondary" variant="h6">
           Lithium Knowledge Base
         </Title>
-        <Link href="/login">
-          <StyledButton color="secondary">Log in</StyledButton>
-        </Link>
-        <Link href="/signup">
-          <StyledButton color="secondary">Sign up</StyledButton>
-        </Link>
+        {!Cookies.get("token") && (
+          <>
+            <Link href="/login">
+              <StyledButton color="secondary">Log in</StyledButton>
+            </Link>
+            <Link href="/signup">
+              <StyledButton color="secondary">Sign up</StyledButton>
+            </Link>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   </StyledDiv>

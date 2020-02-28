@@ -4,13 +4,12 @@ import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { logout } from "../lib/auth";
 import styled from "styled-components";
-import IconButton from "@material-ui/core/IconButton";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import TextField from "@material-ui/core/TextField";
-import HomeIcon from "@material-ui/icons/Home";
+import Typography from "@material-ui/core/Typography";
 import Link from "next/link";
 import Autocomplete, {
   createFilterOptions
@@ -78,11 +77,9 @@ const ArticlesHeader = ({ handleDialog }) => {
     <>
       <StyledAppBar position="fixed" className={classes.appBar}>
         <StyledToolBar>
-          <Link href="/">
-            <IconButton color="secondary" edge="start" aria-label="home page">
-              <HomeIcon />
-            </IconButton>
-          </Link>
+          <Typography variant="h6" color="secondary">
+            Lithium KB
+          </Typography>
           <Autocomplete
             value={value}
             onChange={(event, newValue) => {
@@ -130,17 +127,15 @@ const ArticlesHeader = ({ handleDialog }) => {
                 <TextField
                   {...params}
                   color="secondary"
-                  label="Search article..."
+                  label="🔍 Search article..."
                   fullWidth
                 />
               </div>
             )}
           />
-          <Link href="/">
-            <StyledButton color="secondary" onClick={logout}>
-              Log out
-            </StyledButton>
-          </Link>
+          <StyledButton color="secondary" onClick={logout}>
+            Log out
+          </StyledButton>
         </StyledToolBar>
       </StyledAppBar>
     </>
