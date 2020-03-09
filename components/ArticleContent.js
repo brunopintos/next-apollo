@@ -27,6 +27,8 @@ const GET_ARTICLE_WITH_PARENTS = gql`
       title
       icon
       content
+      createdAt
+      updatedAt
     }
   }
 `;
