@@ -16,6 +16,18 @@ import DialogCreateArticle from "./DialogCreateArticle";
 import ArticleItem from "./ArticleItem";
 import ArticlesHeader from "./ArticlesHeader";
 
+const GET_ARTICLE_WITH_PARENTS = gql`
+  query getArticleWithParents($id: ID!) {
+    getArticleWithParents(id: $id) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 const GET_ROOT_ARTICLES = gql`
   query getRootArticles {
     getRootArticles {
@@ -73,19 +85,39 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar
 }));
 
-const ArticlesDrawer = ({ articleWithParents }) => {
+const ArticlesDrawer = ({ articleId }) => {
   const classes = useStyles();
   const rootArticles = useQuery(GET_ROOT_ARTICLES);
   const favoriteArticles = useQuery(GET_USER_FAVORITES);
+  const articleWithParents = useQuery(GET_ARTICLE_WITH_PARENTS, {
+    fetchPolicy: "cache-and-network",
+    variables: {
+      id: articleId
+    }
+  });
 
+  const [expandedByArticleOpen, setExapandedByArticleOpen] = useState(
+    articleWithParents.data?.getArticleWithParents.filter(
+      parent => parent.id === articleId
+    ).length !== 0 &&
+      articleWithParents.data?.getArticleWithParents[
+        articleWithParents.data?.getArticleWithParents.length - 1
+      ].id !== articleId
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogValue, setDialogValue] = useState("");
   const [parentId, setParentId] = useState(null);
+  const [toggleRefetch, setToggleRefetch] = useState(false);
 
   const handleDialog = (newParentId, newDialogValue, newDialogOpen) => {
     setParentId(newParentId);
     setDialogValue(newDialogValue);
     setDialogOpen(newDialogOpen != null ? newDialogOpen : !dialogOpen);
+  };
+
+  const handleParentChange = () => {
+    rootArticles.refetch();
+    setToggleRefetch(!toggleRefetch);
   };
 
   return (
@@ -105,8 +137,15 @@ const ArticlesDrawer = ({ articleWithParents }) => {
               {rootArticles.data?.getRootArticles.map(article => (
                 <ArticleItem
                   handleDialog={handleDialog}
+                  handleParentChange={handleParentChange}
+                  toggleRefetch={toggleRefetch}
                   article={article}
-                  articleWithParents={articleWithParents}
+                  expandedByArticleOpen={expandedByArticleOpen}
+                  articleWithParents={
+                    expandedByArticleOpen
+                      ? articleWithParents.data?.getArticleWithParents
+                      : null
+                  }
                   favorites={favoriteArticles.data?.getUserFavorites}
                 />
               ))}
