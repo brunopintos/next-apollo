@@ -18,6 +18,7 @@ import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const GET_SUB_ARTICLES = gql`
   query getSubArticles($id: ID!) {
@@ -67,15 +68,6 @@ const ItemContent = styled.div`
   }
 `;
 
-const ItemExpandAndTextContent = styled.div`
-  && {
-    display: flex;
-    justify-content: flex-start;
-    width: 100%;
-    align-items: center;
-  }
-`;
-
 const ItemButtonsContent = styled.div`
   && {
     display: flex;
@@ -86,6 +78,18 @@ const ItemButtonsContent = styled.div`
 `;
 
 const StyledListItem = styled(ListItem)``;
+
+const ItemExpandAndTextContent = styled.div`
+  && {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    ${StyledListItem}:hover & {
+      max-width: 60%;
+    }
+    align-items: center;
+  }
+`;
 
 const StyledIconButtonWithHover = styled(IconButton)`
   && {
@@ -116,6 +120,7 @@ const ItemTypes = {
 const ArticleItem = ({
   handleDialog,
   handleParentChange,
+  dragNDroppable,
   article,
   toggleRefetch,
   expandedByArticleOpen,
@@ -213,9 +218,9 @@ const ArticleItem = ({
     articleWithParents?.[articleWithParents.length - 1] === article?.id;
 
   return (
-    <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+    <div ref={dragNDroppable && drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
       <StyledListItem
-        ref={drop}
+        ref={dragNDroppable && drop}
         style={{
           backgroundColor: isOver ? "#ffd600" : "transparent"
         }}
@@ -223,7 +228,7 @@ const ArticleItem = ({
         selected={isArticleSelected(article)}
       >
         <ItemContent>
-          <ItemExpandAndTextContent>
+          <ItemExpandAndTextContent style={{ maxWidth: favorite && "60%" }}>
             {subArticles.data?.getSubArticles.length > 0 &&
               (expanded ? (
                 <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -234,11 +239,13 @@ const ArticleItem = ({
               href="/article/[article]"
               as={`/article/${article?.title}-${article?.id}`}
             >
-              <ListItemText
-                color="secondary"
-                disableTypography
-                primary={<Typography noWrap>{article?.title}</Typography>}
-              />
+              <Tooltip title={article?.title}>
+                <ListItemText
+                  color="secondary"
+                  disableTypography
+                  primary={<Typography noWrap>{article?.title}</Typography>}
+                />
+              </Tooltip>
             </Link>
           </ItemExpandAndTextContent>
           <ItemButtonsContent>
@@ -281,6 +288,7 @@ const ArticleItem = ({
             <ArticleItem
               handleDialog={handleDialog}
               handleParentChange={handleParentChange}
+              dragNDroppable={dragNDroppable}
               article={article}
               toggleRefetch={toggleRefetch}
               expandedByArticleOpen={expandedByArticleOpen}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
 
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
@@ -10,7 +11,12 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 import AddIcon from "@material-ui/icons/Add";
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 import DialogCreateArticle from "./DialogCreateArticle";
 import ArticleItem from "./ArticleItem";
@@ -50,10 +56,12 @@ const GET_USER_FAVORITES = gql`
   }
 `;
 
+const drawerWidth = 240;
+
 const StyledList = styled(List)`
   && {
     width: 100%,
-    maxWidth: 240px,
+    maxWidth: ${drawerWidth}
   }
 `;
 
@@ -66,24 +74,59 @@ const ItemsContainer = styled.div`
   }
 `;
 
-const drawerWidth = 240;
+const StyledAppBar = styled(AppBar)`
+  && {
+    width: ${drawerWidth};
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
-  listRoot: {
-    width: "100%",
-    maxWidth: drawerWidth,
+  root: {
+    flexGrow: 1,
     backgroundColor: theme.palette.background.paper
   },
   drawer: {
     width: drawerWidth,
+    maxWidth: drawerWidth,
     flexShrink: 0,
     zIndex: 1150
   },
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
+    maxWidth: drawerWidth
   },
   toolbar: theme.mixins.toolbar
 }));
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <div p={3}>{children}</div>}
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`
+  };
+}
 
 const ArticlesDrawer = ({ articleId }) => {
   const classes = useStyles();
@@ -108,6 +151,7 @@ const ArticlesDrawer = ({ articleId }) => {
   const [dialogValue, setDialogValue] = useState("");
   const [parentId, setParentId] = useState(null);
   const [toggleRefetch, setToggleRefetch] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
 
   const handleDialog = (newParentId, newDialogValue, newDialogOpen) => {
     setParentId(newParentId);
@@ -118,6 +162,10 @@ const ArticlesDrawer = ({ articleId }) => {
   const handleParentChange = () => {
     rootArticles.refetch();
     setToggleRefetch(!toggleRefetch);
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
   return (
@@ -131,25 +179,62 @@ const ArticlesDrawer = ({ articleId }) => {
         }}
       >
         <ItemsContainer>
-          <div>
-            <div className={classes.toolbar} />
-            <StyledList>
-              {rootArticles.data?.getRootArticles.map(article => (
-                <ArticleItem
-                  handleDialog={handleDialog}
-                  handleParentChange={handleParentChange}
-                  toggleRefetch={toggleRefetch}
-                  article={article}
-                  expandedByArticleOpen={expandedByArticleOpen}
-                  articleWithParents={
-                    expandedByArticleOpen
-                      ? articleWithParents.data?.getArticleWithParents
-                      : null
-                  }
-                  favorites={favoriteArticles.data?.getUserFavorites}
-                />
-              ))}
-            </StyledList>
+          <div className={classes.toolbar} />
+          <div className={classes.root}>
+            <StyledAppBar position="static">
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                indicatorColor="secondary"
+                textColor="secondary"
+                variant="standard"
+              >
+                <Tab label="Article" wrapped {...a11yProps(0)} />
+                <Tab label="Favorite" wrapped {...a11yProps(1)} />
+              </Tabs>
+            </StyledAppBar>
+            <TabPanel value={tabValue} index={0}>
+              <StyledList>
+                {rootArticles.data?.getRootArticles.map(article => (
+                  <div className={classes.drawerPaper}>
+                    <ArticleItem
+                      handleDialog={handleDialog}
+                      handleParentChange={handleParentChange}
+                      dragNDroppable={true}
+                      toggleRefetch={toggleRefetch}
+                      article={article}
+                      expandedByArticleOpen={expandedByArticleOpen}
+                      articleWithParents={
+                        expandedByArticleOpen
+                          ? articleWithParents.data?.getArticleWithParents
+                          : null
+                      }
+                      favorites={favoriteArticles.data?.getUserFavorites}
+                    />
+                  </div>
+                ))}
+              </StyledList>
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <StyledList>
+                {favoriteArticles.data?.getUserFavorites.map(article => (
+                  <ArticleItem
+                    handleDialog={handleDialog}
+                    handleParentChange={handleParentChange}
+                    dragNDroppable={false}
+                    toggleRefetch={toggleRefetch}
+                    article={article}
+                    expandedByArticleOpen={expandedByArticleOpen}
+                    articleWithParents={
+                      expandedByArticleOpen
+                        ? articleWithParents.data?.getArticleWithParents
+                        : null
+                    }
+                    favorites={favoriteArticles.data?.getUserFavorites}
+                  />
+                ))}
+              </StyledList>
+            </TabPanel>
           </div>
           <div>
             <Divider />
