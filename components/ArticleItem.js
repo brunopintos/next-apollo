@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { useDrag, useDrop } from "react-dnd";
 import { useSnackbar } from "notistack";
@@ -116,11 +115,13 @@ const ItemTypes = {
 
 const ArticleItem = ({
   handleDialog,
+  handleParentChange,
   article,
+  toggleRefetch,
+  expandedByArticleOpen,
   articleWithParents,
   favorites
 }) => {
-  const router = useRouter();
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -128,11 +129,8 @@ const ArticleItem = ({
     favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
       .length !== 0
   );
-  const [expanded, setExpanded] = useState(
-    articleWithParents?.filter(parent => parent.id === article?.id).length !==
-      0 &&
-      articleWithParents?.[articleWithParents.length - 1].id !== article?.id
-  );
+  const [expanded, setExpanded] = useState(expandedByArticleOpen);
+
   useEffect(() => {
     setFavorite(
       favorites?.filter(favoriteArticle => favoriteArticle.id == article?.id)
@@ -140,14 +138,13 @@ const ArticleItem = ({
     );
   }, [article, favorites]);
   useEffect(() => {
-    setExpanded(
-      articleWithParents?.filter(parent => parent.id === article?.id).length !==
-        0 &&
-        articleWithParents?.[articleWithParents.length - 1].id !== article?.id
-    );
-  }, [article, articleWithParents]);
+    expandedByArticleOpen && setExpanded(expandedByArticleOpen);
+  }, [article, expandedByArticleOpen]);
+  useEffect(() => {
+    subArticles.refetch();
+  }, [article, toggleRefetch]);
 
-  const { data } = useQuery(GET_SUB_ARTICLES, {
+  const subArticles = useQuery(GET_SUB_ARTICLES, {
     variables: {
       id: article.id
     }
@@ -177,7 +174,8 @@ const ArticleItem = ({
           enqueueSnackbar(`${dragObject?.title} moved to ${article?.title}!!`, {
             variant: "success"
           });
-          router.push(`/article/${dragObject?.title}-${dragObject?.id}`);
+          handleParentChange();
+          subArticles.refetch();
         })
         .catch(err => {
           enqueueSnackbar(err?.graphQLErrors?.[0].message, {
@@ -226,7 +224,7 @@ const ArticleItem = ({
       >
         <ItemContent>
           <ItemExpandAndTextContent>
-            {data?.getSubArticles.length > 0 &&
+            {subArticles.data?.getSubArticles.length > 0 &&
               (expanded ? (
                 <ExpandLess color="primary" onClick={handleExpandClick} />
               ) : (
@@ -271,7 +269,7 @@ const ArticleItem = ({
           </ItemButtonsContent>
         </ItemContent>
       </StyledListItem>
-      {data?.getSubArticles.map(article => (
+      {subArticles.data?.getSubArticles.map(article => (
         <Collapse
           className={classes.nested}
           key={article.id}
@@ -282,8 +280,13 @@ const ArticleItem = ({
           <List component="div" disablePadding>
             <ArticleItem
               handleDialog={handleDialog}
+              handleParentChange={handleParentChange}
               article={article}
-              articleWithParents={articleWithParents}
+              toggleRefetch={toggleRefetch}
+              expandedByArticleOpen={expandedByArticleOpen}
+              articleWithParents={
+                expandedByArticleOpen ? articleWithParents : null
+              }
               favorites={favorites}
             />
           </List>

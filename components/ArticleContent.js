@@ -9,7 +9,7 @@ import {
   Count
 } from "@syncfusion/ej2-react-richtexteditor";
 import * as React from "react";
-import { useMutation } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import { useState, useEffect } from "react";
 import NextLink from "next/link";
 import gql from "graphql-tag";
@@ -19,6 +19,28 @@ import styled from "styled-components";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+
+const GET_ARTICLE_WITH_PARENTS = gql`
+  query getArticleWithParents($id: Id!) {
+    getArticleWithParents(id: $id) {
+      id
+      title
+      icon
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const UPDATE_ARTICLE = gql`
+  mutation updateArticle($newContent: String!, $articleId: ID!) {
+    updateArticle(input: { newContent: $newContent, articleId: $articleId }) {
+      id
+      updatedAt
+    }
+  }
+`;
 
 const StyledButton = styled(Button)`
   && {
@@ -60,15 +82,6 @@ const TopBar = styled.div`
 `;
 const StyledContainer = styled.div``;
 
-const UPDATE_ARTICLE = gql`
-  mutation updateArticle($newContent: String!, $articleId: ID!) {
-    updateArticle(input: { newContent: $newContent, articleId: $articleId }) {
-      id
-      updatedAt
-    }
-  }
-`;
-
 const inlineMode = {
   enable: true,
   onSelection: true
@@ -108,12 +121,21 @@ const toolbarSettings = {
   ]
 };
 
-const ArticleContent = ({ articleWithParents }) => {
+const ArticleContent = ({ articleId }) => {
+  const articleWithParents = useQuery(GET_ARTICLE_WITH_PARENTS, {
+    variables: { id: articleId }
+  });
   const [updateArticle] = useMutation(UPDATE_ARTICLE);
   const [updatedTime, setUpdatedTime] = useState(
-    articleWithParents?.[articleWithParents.length - 1]?.updatedAt !==
-      articleWithParents?.[articleWithParents.length - 1]?.createdAt
-      ? articleWithParents?.[articleWithParents.length - 1]?.updatedAt
+    articleWithParents.data?.getArticleWithParents[
+      articleWithParents.data?.getArticleWithParents.length - 1
+    ]?.updatedAt !==
+      articleWithParents.data?.getArticleWithParents[
+        articleWithParents.data?.getArticleWithParents.length - 1
+      ]?.createdAt
+      ? articleWithParents.data?.getArticleWithParents[
+          articleWithParents.data?.getArticleWithParents.length - 1
+        ]?.updatedAt
       : null
   );
   const [lastModificationTime, setLastModificationTime] = useState(
@@ -122,9 +144,15 @@ const ArticleContent = ({ articleWithParents }) => {
   useEffect(() => {
     setLastModificationTime(moment(updatedTime).fromNow());
     setUpdatedTime(
-      articleWithParents?.[articleWithParents.length - 1]?.updatedAt !==
-        articleWithParents?.[articleWithParents.length - 1]?.createdAt
-        ? articleWithParents?.[articleWithParents.length - 1]?.updatedAt
+      articleWithParents.data?.getArticleWithParents[
+        articleWithParents.data?.getArticleWithParents.length - 1
+      ]?.updatedAt !==
+        articleWithParents.data?.getArticleWithParents[
+          articleWithParents.data?.getArticleWithParents.length - 1
+        ]?.createdAt
+        ? articleWithParents.data?.getArticleWithParents[
+            articleWithParents.data?.getArticleWithParents.length - 1
+          ]?.updatedAt
         : null
     );
     const timeOut = setInterval(() => {
@@ -135,14 +163,19 @@ const ArticleContent = ({ articleWithParents }) => {
     };
   }, [
     updatedTime,
-    articleWithParents?.[articleWithParents.length - 1]?.updatedAt
+    articleWithParents.data?.getArticleWithParents[
+      articleWithParents.data?.getArticleWithParents.length - 1
+    ]?.updatedAt
   ]);
 
   const onSave = newContent => {
     updateArticle({
       variables: {
         newContent: newContent,
-        articleId: articleWithParents?.[articleWithParents.length - 1]?.id
+        articleId:
+          articleWithParents.data?.getArticleWithParents[
+            articleWithParents.data?.getArticleWithParents.length - 1
+          ]?.id
       }
     }).then(data => {
       setUpdatedTime(data.data.updateArticle.updatedAt);
@@ -153,7 +186,7 @@ const ArticleContent = ({ articleWithParents }) => {
     <StyledContainer>
       <TopBar>
         <Breadcrumbs maxItems={4} aria-label="breadcrumb">
-          {articleWithParents?.map(article => (
+          {articleWithParents.data?.getArticleWithParents?.map(article => (
             <NextLink
               href="/article/[article]"
               as={`/article/${article.title}-${article.id}`}
@@ -165,10 +198,16 @@ const ArticleContent = ({ articleWithParents }) => {
         </Breadcrumbs>
         {!lastModificationTime.includes("Invalid") && (
           <NextLink
-            href="/modifications/article/[article]"
-            as={`/modifications/article/${
-              articleWithParents?.[articleWithParents.length - 1]?.title
-            }-${articleWithParents?.[articleWithParents.length - 1]?.id}`}
+            href="/modification/article/[article]"
+            as={`/modification/article/${
+              articleWithParents.data?.getArticleWithParents[
+                articleWithParents.data?.getArticleWithParents.length - 1
+              ]?.title
+            }-${
+              articleWithParents.data?.getArticleWithParents[
+                articleWithParents.data?.getArticleWithParents.length - 1
+              ]?.id
+            }`}
           >
             <StyledButton color="secondary">
               Last modified {lastModificationTime}
@@ -177,7 +216,11 @@ const ArticleContent = ({ articleWithParents }) => {
         )}
       </TopBar>
       <TitleTypography variant="h3">
-        {articleWithParents?.[articleWithParents.length - 1]?.title}
+        {
+          articleWithParents.data?.getArticleWithParents[
+            articleWithParents.data?.getArticleWithParents.length - 1
+          ]?.title
+        }
       </TitleTypography>
       <RichTextEditorComponent
         id="inlineRTE"
@@ -192,7 +235,9 @@ const ArticleContent = ({ articleWithParents }) => {
         change={valueTemplate => onSave(valueTemplate.value)}
         saveInterval={300}
         valueTemplate={
-          articleWithParents?.[articleWithParents.length - 1]?.content
+          articleWithParents.data?.getArticleWithParents[
+            articleWithParents.data?.getArticleWithParents.length - 1
+          ]?.content
         }
       >
         <Inject
