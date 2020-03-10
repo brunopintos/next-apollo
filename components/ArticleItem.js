@@ -77,7 +77,11 @@ const ItemButtonsContent = styled.div`
   }
 `;
 
-const StyledListItem = styled(ListItem)``;
+const StyledListItem = styled(ListItem)`
+  && {
+    padding: 8px;
+  }
+`;
 
 const ItemExpandAndTextContent = styled.div`
   && {
@@ -85,7 +89,7 @@ const ItemExpandAndTextContent = styled.div`
     justify-content: flex-start;
     width: 100%;
     ${StyledListItem}:hover & {
-      max-width: 60%;
+      max-width: 67%;
     }
     align-items: center;
   }
@@ -94,7 +98,7 @@ const ItemExpandAndTextContent = styled.div`
 const StyledIconButtonWithHover = styled(IconButton)`
   && {
     opacity: 0;
-    padding: 2px;
+    padding: 1px;
     ${StyledListItem}:hover & {
       opacity: 1;
     }
@@ -103,7 +107,7 @@ const StyledIconButtonWithHover = styled(IconButton)`
 
 const StyledIconButton = styled(IconButton)`
   && {
-    padding: 2px;
+    padding: 1px;
   }
 `;
 
@@ -218,7 +222,10 @@ const ArticleItem = ({
     articleWithParents?.[articleWithParents.length - 1] === article?.id;
 
   return (
-    <div ref={dragNDroppable && drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+    <div
+      ref={dragNDroppable && drag}
+      style={{ opacity: isDragging ? 0.5 : 1, overflowX: "hidden" }}
+    >
       <StyledListItem
         ref={dragNDroppable && drop}
         style={{
@@ -228,7 +235,7 @@ const ArticleItem = ({
         selected={isArticleSelected(article)}
       >
         <ItemContent>
-          <ItemExpandAndTextContent style={{ maxWidth: favorite && "60%" }}>
+          <ItemExpandAndTextContent style={{ maxWidth: favorite && "67%" }}>
             {subArticles.data?.getSubArticles.length > 0 &&
               (expanded ? (
                 <ExpandLess color="primary" onClick={handleExpandClick} />
@@ -249,6 +256,13 @@ const ArticleItem = ({
             </Link>
           </ItemExpandAndTextContent>
           <ItemButtonsContent>
+            <StyledIconButtonWithHover
+              color="primary"
+              aria-label="delete"
+              onClick={() => handleDialog(article?.id, "", true)}
+            >
+              <AddIcon />
+            </StyledIconButtonWithHover>
             {favorite ? (
               <StyledIconButton
                 color="primary"
@@ -266,13 +280,6 @@ const ArticleItem = ({
                 <FavoriteBorderIcon />
               </StyledIconButtonWithHover>
             )}
-            <StyledIconButtonWithHover
-              color="primary"
-              aria-label="delete"
-              onClick={() => handleDialog(article?.id, "", true)}
-            >
-              <AddIcon />
-            </StyledIconButtonWithHover>
           </ItemButtonsContent>
         </ItemContent>
       </StyledListItem>
