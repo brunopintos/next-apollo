@@ -80,6 +80,9 @@ const ItemButtonsContent = styled.div`
 const StyledListItem = styled(ListItem)`
   && {
     padding: 8px;
+    &:hover {
+      background-color: #fff6cc;
+    }
   }
 `;
 
@@ -229,7 +232,7 @@ const ArticleItem = ({
       <StyledListItem
         ref={dragNDroppable && drop}
         style={{
-          backgroundColor: isOver ? "#ffd600" : "transparent"
+          backgroundColor: isOver ? "#fff6cc" : "transparent"
         }}
         key={article?.id}
         selected={isArticleSelected(article)}

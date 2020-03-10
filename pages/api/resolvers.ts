@@ -88,7 +88,8 @@ const resolvers = {
           return dataBase.Articles.findAll({
             where: {
               id: { [Op.in]: favorites.map(favorite => favorite.articleId) }
-            }
+            },
+            order: [["title"]]
           });
         }
       );

@@ -51,6 +51,12 @@ const GET_USER_FAVORITES = gql`
   query getUserFavorites {
     getUserFavorites {
       id
+      title
+      icon
+      content
+      parent {
+        id
+      }
     }
   }
 `;
@@ -76,6 +82,13 @@ const ItemsContainer = styled.div`
 const StyledAppBar = styled(AppBar)`
   && {
     width: ${drawerWidth};
+  }
+`;
+
+const StyledTab = styled(Tab)`
+  && {
+    max-width: 50%;
+    min-width: 50%;
   }
 `;
 
@@ -163,8 +176,10 @@ const ArticlesDrawer = ({ articleId }) => {
     setToggleRefetch(!toggleRefetch);
   };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  const handleTabChange = (event, newTabValue) => {
+    rootArticles.refetch();
+    favoriteArticles.refetch();
+    setTabValue(newTabValue);
   };
 
   return (
@@ -188,8 +203,8 @@ const ArticlesDrawer = ({ articleId }) => {
                 textColor="secondary"
                 variant="standard"
               >
-                <Tab label="Article" wrapped {...a11yProps(0)} />
-                <Tab label="Favorite" wrapped {...a11yProps(1)} />
+                <StyledTab label="All Articles" wrapping {...a11yProps(0)} />
+                <StyledTab label="Favorites" wrapping {...a11yProps(1)} />
               </Tabs>
             </StyledAppBar>
             <TabPanel value={tabValue} index={0}>
@@ -217,20 +232,22 @@ const ArticlesDrawer = ({ articleId }) => {
             <TabPanel value={tabValue} index={1}>
               <StyledList>
                 {favoriteArticles.data?.getUserFavorites.map(article => (
-                  <ArticleItem
-                    handleDialog={handleDialog}
-                    handleParentChange={handleParentChange}
-                    dragNDroppable={false}
-                    toggleRefetch={toggleRefetch}
-                    article={article}
-                    expandedByArticleOpen={expandedByArticleOpen}
-                    articleWithParents={
-                      expandedByArticleOpen
-                        ? articleWithParents.data?.getArticleWithParents
-                        : null
-                    }
-                    favorites={favoriteArticles.data?.getUserFavorites}
-                  />
+                  <div className={classes.drawerPaper}>
+                    <ArticleItem
+                      handleDialog={handleDialog}
+                      handleParentChange={handleParentChange}
+                      dragNDroppable={true}
+                      toggleRefetch={toggleRefetch}
+                      article={article}
+                      expandedByArticleOpen={expandedByArticleOpen}
+                      articleWithParents={
+                        expandedByArticleOpen
+                          ? articleWithParents.data?.getArticleWithParents
+                          : null
+                      }
+                      favorites={favoriteArticles.data?.getUserFavorites}
+                    />
+                  </div>
                 ))}
               </StyledList>
             </TabPanel>
