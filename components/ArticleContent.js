@@ -20,6 +20,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Tooltip from "@material-ui/core/Tooltip";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const GET_ARTICLE_WITH_PARENTS = gql`
   query getArticleWithParents($id: Id!) {
@@ -183,7 +184,19 @@ const ArticleContent = ({ articleId }) => {
     });
   };
 
-  return (
+  return articleWithParents.loading ? (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
+      <CircularProgress color="primary" />
+    </div>
+  ) : (
     <StyledContainer>
       <TopBar>
         <Breadcrumbs maxItems={4} aria-label="breadcrumb">
