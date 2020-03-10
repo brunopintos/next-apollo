@@ -19,6 +19,7 @@ import styled from "styled-components";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const GET_ARTICLE_WITH_PARENTS = gql`
   query getArticleWithParents($id: Id!) {
@@ -209,9 +210,11 @@ const ArticleContent = ({ articleId }) => {
               ]?.id
             }`}
           >
-            <StyledButton color="secondary">
-              Last modified {lastModificationTime}
-            </StyledButton>
+            <Tooltip title={"Watch modifications"}>
+              <StyledButton color="secondary">
+                Last modified {lastModificationTime}
+              </StyledButton>
+            </Tooltip>
           </NextLink>
         )}
       </TopBar>
