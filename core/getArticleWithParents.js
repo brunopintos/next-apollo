@@ -5,6 +5,7 @@ const GET_ARTICLE_WITH_PARENTS = gql`
     getArticleWithParents(id: $id) {
       id
       title
+      icon
       content
       createdAt
       updatedAt
