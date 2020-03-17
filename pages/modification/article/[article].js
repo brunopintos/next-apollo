@@ -15,19 +15,7 @@ import PersonIcon from "@material-ui/icons/Person";
 
 import withAuth from "../../../lib/jwt";
 
-const GET_ARTICLE_MODIFICATIONS = gql`
-  query getArticleModifications($id: ID!) {
-    getArticleModifications(id: $id) {
-      id
-      newContent
-      previousContent
-      author {
-        username
-      }
-      updatedAt
-    }
-  }
-`;
+import GET_ARTICLE_MODIFICATIONS from "../core/getArticleModifications";
 
 const ArticleModification = props => {
   const router = useRouter();
