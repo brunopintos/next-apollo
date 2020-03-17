@@ -20,19 +20,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 
-const GET_SUB_ARTICLES = gql`
-  query getSubArticles($id: ID!) {
-    getSubArticles(id: $id) {
-      id
-      title
-      icon
-      content
-      parent {
-        id
-      }
-    }
-  }
-`;
+import GET_SUB_ARTICLES from "../core/getSubArticles";
 
 const FAVORITE_ARTICLE = gql`
   mutation favoriteArticle($id: ID!) {
