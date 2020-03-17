@@ -14,16 +14,7 @@ import TextField from "@material-ui/core/TextField";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Button from "@material-ui/core/Button";
 
-const CREATE_ARTICLE = gql`
-  mutation createArticle($title: String!, $parentId: ID) {
-    createArticle(input: { title: $title, parentId: $parentId }) {
-      id
-      title
-      icon
-      content
-    }
-  }
-`;
+import CREATE_ARTICLE from "../core/createArticle";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
