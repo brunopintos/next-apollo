@@ -13,14 +13,7 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 import Layout from "../components/Layout";
 
-const GET_FIRST_ARTICLE = gql`
-  query getFirstArticle {
-    getFirstArticle {
-      id
-      title
-    }
-  }
-`;
+import GET_FIRST_ARTICLE from "../core/getFirstArticle";
 
 const Subtitle = styled(Typography)`
   && {

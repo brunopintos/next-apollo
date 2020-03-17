@@ -15,15 +15,7 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import { logout } from "../lib/auth";
 
-const GET_ARTICLES = gql`
-  query getArticles {
-    getArticles {
-      id
-      title
-      content
-    }
-  }
-`;
+import GET_ARTICLES from "../core/getArticles";
 
 const StyledAppBar = styled(AppBar)`
   && {

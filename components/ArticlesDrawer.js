@@ -21,45 +21,9 @@ import DialogCreateArticle from "./DialogCreateArticle";
 import ArticleItem from "./ArticleItem";
 import ArticlesHeader from "./ArticlesHeader";
 
-const GET_ARTICLE_WITH_PARENTS = gql`
-  query getArticleWithParents($id: ID!) {
-    getArticleWithParents(id: $id) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_ROOT_ARTICLES = gql`
-  query getRootArticles {
-    getRootArticles {
-      id
-      title
-      icon
-      content
-      parent {
-        id
-      }
-    }
-  }
-`;
-
-const GET_USER_FAVORITES = gql`
-  query getUserFavorites {
-    getUserFavorites {
-      id
-      title
-      icon
-      content
-      parent {
-        id
-      }
-    }
-  }
-`;
+import GET_ARTICLE_WITH_PARENTS from "../core/getArticleWithParents";
+import GET_ROOT_ARTICLES from "../core/getRootArticles";
+import GET_USER_FAVORITES from "../core/getUserFavorites";
 
 const drawerWidth = 240;
 

@@ -17,13 +17,7 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 import Layout from "../components/Layout";
 
-const SIGNUP_USER = gql`
-  mutation SignupUser($username: String!, $email: String!, $password: String!) {
-    signupUser(username: $username, email: $email, password: $password) {
-      token
-    }
-  }
-`;
+import SIGNUP_USER from "../core/signup";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()

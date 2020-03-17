@@ -22,27 +22,8 @@ import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Tooltip from "@material-ui/core/Tooltip";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-const GET_ARTICLE_WITH_PARENTS = gql`
-  query getArticleWithParents($id: Id!) {
-    getArticleWithParents(id: $id) {
-      id
-      title
-      icon
-      content
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_ARTICLE = gql`
-  mutation updateArticle($newContent: String!, $articleId: ID!) {
-    updateArticle(input: { newContent: $newContent, articleId: $articleId }) {
-      id
-      updatedAt
-    }
-  }
-`;
+import GET_ARTICLE_WITH_PARENTS from "../core/getArticleWithParents";
+import UPDATE_ARTICLE from "../core/updateArticle";
 
 const StyledButton = styled(Button)`
   && {
