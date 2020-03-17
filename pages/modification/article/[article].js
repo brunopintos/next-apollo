@@ -15,7 +15,7 @@ import PersonIcon from "@material-ui/icons/Person";
 
 import withAuth from "../../../lib/jwt";
 
-import GET_ARTICLE_MODIFICATIONS from "../core/getArticleModifications";
+import GET_ARTICLE_MODIFICATIONS from "../../../core/getArticleModifications";
 
 const ArticleModification = props => {
   const router = useRouter();
