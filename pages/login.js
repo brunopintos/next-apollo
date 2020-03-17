@@ -19,13 +19,7 @@ import MainHeader from "../components/MainHeader";
 import Title from "../components/Title";
 import Layout from "../components/Layout";
 
-const LOGIN = gql`
-  mutation login($usernameOrEmail: String!, $password: String!) {
-    login(usernameOrEmail: $usernameOrEmail, password: $password) {
-      token
-    }
-  }
-`;
+import LOGIN from "../core/login";
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
