@@ -21,31 +21,9 @@ import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import GET_SUB_ARTICLES from "../core/getSubArticles";
-
-const FAVORITE_ARTICLE = gql`
-  mutation favoriteArticle($id: ID!) {
-    favoriteArticle(id: $id) {
-      id
-    }
-  }
-`;
-
-const UNFAVORITE_ARTICLE = gql`
-  mutation unfavoriteArticle($id: ID!) {
-    unfavoriteArticle(id: $id)
-  }
-`;
-
-const MOVE_ARTICLE = gql`
-  mutation moveArticle($subArticleId: ID!, $parentId: ID!) {
-    moveArticle(input: { subArticleId: $subArticleId, parentId: $parentId }) {
-      id
-      title
-      icon
-      content
-    }
-  }
-`;
+import FAVORITE_ARTICLE from "../core/favoriteArticle";
+import UNFAVORITE_ARTICLE from "../core/unfavoriteArticle";
+import MOVE_ARTICLE from "../core/moveArticle";
 
 const ItemContent = styled.div`
   && {
