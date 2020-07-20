@@ -1,88 +1,194 @@
-import React from 'react'
-import Head from 'next/head'
-import Nav from '../components/nav'
+import React from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Cookies from "js-cookie";
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>Home</title>
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
+import styled from "styled-components";
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Button from "@material-ui/core/Button";
 
-    <Nav />
+import MainHeader from "../components/MainHeader";
+import Title from "../components/Title";
+import Layout from "../components/Layout";
 
-    <div className="hero">
-      <h1 className="title">Welcome to Next.js!</h1>
-      <p className="description">
-        To get started, edit <code>pages/index.js</code> and save to reload.
-      </p>
+const StyledTitle = styled(Title)`
+  && {
+    padding-top: 20%;
+  }
+`;
 
-      <div className="row">
-        <a href="https://nextjs.org/docs" className="card">
-          <h3>Documentation &rarr;</h3>
-          <p>Learn more about Next.js in the documentation.</p>
-        </a>
-        <a href="https://nextjs.org/learn" className="card">
-          <h3>Next.js Learn &rarr;</h3>
-          <p>Learn about Next.js by following an interactive tutorial!</p>
-        </a>
-        <a
-          href="https://github.com/zeit/next.js/tree/master/examples"
-          className="card"
-        >
-          <h3>Examples &rarr;</h3>
-          <p>Find other example boilerplates on the Next.js GitHub.</p>
-        </a>
-      </div>
-    </div>
+const WelcomeToLKB = styled(Container)`
+  position: relative;
+  min-height: 100%;
+  display: block;
+  z-index: 1;
+  &::before {
+    content: "";
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url("/welcomeToLKB.jpeg");
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-position: center;
+    position: absolute;
+    background-size: cover;
+  }
+`;
 
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
-)
+const OnboardingDescription = styled(Container)`
+  position: relative;
+  min-height: 500px;
+  display: block;
+  z-index: 1;
+  margin: auto;
+  text-align: center;
+`;
 
-export default Home
+const Description = styled(Typography)`
+  && {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    position: relative;
+  }
+`;
+
+const Arrow = styled.img`
+  padding-top: 20%;
+  position: relative;
+  display: block;
+  width: 10%;
+  bottom: 0;
+  right: 45%;
+  left: 45%;
+`;
+
+const StyledCard = styled(Card)`
+  margin: 1.5%;
+  margin-top: 10%;
+  max-width: 30%;
+  display: inline-block; /* si estoy en celular esto se tiene que borrar asi pasan a estar en fila hacia abajo*/
+`;
+
+const Welcome = props => {
+  const router = useRouter();
+  if (!!Cookies.get("token")) {
+    router.push("/article/Get%20Started-1");
+  } else {
+    return (
+      <Layout>
+        {props.changeTitle("LKB - Lithium Knowledge Base")}
+        <MainHeader />
+        <WelcomeToLKB>
+          <StyledTitle variant="h3">Welcome to Lithium KB!</StyledTitle>
+          <Description variant="h6">
+            Turn your tribal knowledge into easy-to-find answers.
+          </Description>
+          <Description variant="h6">
+            With Lithium KB, knowledge and collaboration meet to achieve great
+            things.
+          </Description>
+          <Arrow src="/doubleArrowBottom.png" alt=""></Arrow>
+        </WelcomeToLKB>
+        <OnboardingDescription>
+          <StyledCard>
+            <CardActionArea>
+              <CardMedia
+                component="img"
+                alt="Books"
+                height="140"
+                image="/sourceOfTruth.jpeg"
+                title="Source of Truth"
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="h2">
+                  Create a source of truth
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Save time by harnessing your teams' collective knowledge into
+                  easy-to-find answers for everyone!
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+            <CardActions>
+              <Button size="small" color="primary">
+                Share
+              </Button>
+              <Button size="small" color="primary">
+                Learn More
+              </Button>
+            </CardActions>
+          </StyledCard>
+          <StyledCard>
+            <CardActionArea>
+              <CardMedia
+                component="img"
+                alt="Team sharing information and having fun"
+                height="140"
+                image="/informationSharing.jpeg"
+                title="Information Sharing"
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="h2">
+                  Inspire information sharing
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Encourage all your teams to share knowledge and strengthen
+                  company culture!
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+            <CardActions>
+              <Button size="small" color="primary">
+                Share
+              </Button>
+              <Button size="small" color="primary">
+                Learn More
+              </Button>
+            </CardActions>
+          </StyledCard>
+          <StyledCard>
+            <CardActionArea>
+              <CardMedia
+                component="img"
+                alt="Lithium Knowledge Base get started screenshot"
+                height="140"
+                image="/lkbScreenshot.png"
+                title="Lithium KB get started screenshot"
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="h2">
+                  Use templates
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Accelerate your learning curve and start working smoothly by
+                  using our templates!
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+            <CardActions>
+              <Button size="small" color="primary">
+                Share
+              </Button>
+              <Link href="/login">
+                <Button size="small" color="primary">
+                  Let's Go
+                </Button>
+              </Link>
+            </CardActions>
+          </StyledCard>
+        </OnboardingDescription>
+      </Layout>
+    );
+  }
+};
+
+export default Welcome;
